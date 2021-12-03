@@ -1,17 +1,9 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
-    }
+  fun part1(input: List<Int>) = input.zipWithNext().count { (a, b) -> b > a }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
+  fun part2(input: List<Int>) = input.windowed(3).map(List<Int>::sum).let(::part1)
 
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    val input = readInput("Day01")
-    println(part1(input))
-    println(part2(input))
+  val input = readInts("Day01")
+  println(part1(input))
+  println(part2(input))
 }
