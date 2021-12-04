@@ -11,3 +11,5 @@ fun readInts(name: String) = readWords(name).map(String::toInt)
 fun String.words() = split(SPACE_REGEX)
 
 fun <K> Map<K, Int>.getOrZero(key: K) = getOrDefault(key, 0)
+
+fun <T> Iterable<T>.freq() = groupingBy { it }.eachCount()
