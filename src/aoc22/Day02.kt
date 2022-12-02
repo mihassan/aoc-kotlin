@@ -6,11 +6,11 @@ import aoc22.GameResult.WIN
 import aoc22.Hand.PAPER
 import aoc22.Hand.ROCK
 import aoc22.Hand.SCISSOR
-import aoc22.Part.PART1
-import aoc22.Part.PART2
 import lib.Solution
+import lib.Solution.Part
+import lib.Solution.Part.PART1
+import lib.Solution.Part.PART2
 
-enum class Part { PART1, PART2 }
 
 enum class Hand {
   ROCK, PAPER, SCISSOR;
@@ -112,14 +112,9 @@ private val solution = object : Solution<List<Game>, Int>(2022, "Day02") {
 
   override fun format(output: Int): String = output.toString()
 
-  override fun part1(input: List<Game>): Int = input.sumOf { game: Game ->
-    val myHand = game.strategy.handToPlay(PART1, game.opponent)
-    myHand.score() + game.result(PART1).score()
-  }
-
-  override fun part2(input: List<Game>): Int = input.sumOf { game: Game ->
-    val myHand = game.strategy.handToPlay(PART2, game.opponent)
-    myHand.score() + game.result(PART2).score()
+  override fun solve(part: Part, input: List<Game>): Int = input.sumOf { game: Game ->
+    val myHand = game.strategy.handToPlay(part, game.opponent)
+    myHand.score() + game.result(part).score()
   }
 }
 
