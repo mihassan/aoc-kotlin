@@ -1,9 +1,19 @@
-fun main() {
-  fun part1(input: List<Int>) = input.zipWithNext().count { (a, b) -> b > a }
+import lib.Solution
+import lib.Strings.ints
 
-  fun part2(input: List<Int>) = input.windowed(3).map(List<Int>::sum).let(::part1)
+private val solution = object : Solution<List<Int>, Int>("Day01") {
+  override fun parse(input: String): List<Int> = input.ints()
 
-  val input = readInts("Day01")
-  println(part1(input))
-  println(part2(input))
+  override fun format(output: Int): String = output.toString()
+
+  override fun part1(input: List<Int>): Int = input
+    .zipWithNext()
+    .count { (a, b) -> b > a }
+
+  override fun part2(input: List<Int>): Int = input
+    .windowed(3)
+    .map(List<Int>::sum)
+    .let(::part1)
 }
+
+fun main() = solution.run()
