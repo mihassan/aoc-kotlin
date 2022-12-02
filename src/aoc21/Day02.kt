@@ -1,7 +1,9 @@
+package aoc21
+
 import lib.Solution
 import lib.Strings.words
 
-private val solution = object : Solution<List<Pair<String, Int>>, Int>("Day02") {
+private val solution = object : Solution<List<Pair<String, Int>>, Int>(2021, "Day02") {
   override fun parse(input: String): List<Pair<String, Int>> =
     input.lines().map { it.words() }.map { (d, s) -> d to s.toInt() }
 

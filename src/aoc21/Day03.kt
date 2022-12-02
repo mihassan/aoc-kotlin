@@ -1,3 +1,5 @@
+package aoc21
+
 import lib.Solution
 import lib.Collections.histogram
 
@@ -6,7 +8,7 @@ enum class Day03Rating {
   CO2
 }
 
-private val solution = object : Solution<List<String>, Int>("Day03") {
+private val solution = object : Solution<List<String>, Int>(2021, "Day03") {
   override fun parse(input: String): List<String> = input.lines()
 
   override fun format(output: Int): String = output.toString()

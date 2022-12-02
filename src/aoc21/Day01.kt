@@ -1,7 +1,9 @@
+package aoc21
+
 import lib.Solution
 import lib.Strings.ints
 
-private val solution = object : Solution<List<Int>, Int>("Day01") {
+private val solution = object : Solution<List<Int>, Int>(2021, "Day01") {
   override fun parse(input: String): List<Int> = input.ints()
 
   override fun format(output: Int): String = output.toString()
