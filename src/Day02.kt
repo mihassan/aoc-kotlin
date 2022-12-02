@@ -1,10 +1,18 @@
-fun main() {
-  fun part1(input: List<Pair<String, Int>>): Int {
+import lib.Solution
+import lib.Strings.words
+
+private val solution = object : Solution<List<Pair<String, Int>>, Int>("Day02") {
+  override fun parse(input: String): List<Pair<String, Int>> =
+    input.lines().map { it.words() }.map { (d, s) -> d to s.toInt() }
+
+  override fun format(output: Int): String = output.toString()
+
+  override fun part1(input: List<Pair<String, Int>>): Int {
     val m = input.groupBy({ it.first }, { it.second }).mapValues { it.value.sum() }
-    return m.getOrZero("forward") * (m.getOrZero("down") - m.getOrZero("up"))
+    return (m["forward"] ?: 0) * ((m["down"] ?: 0) - (m["up"] ?: 0))
   }
 
-  fun part2(input: List<Pair<String, Int>>): Int {
+  override fun part2(input: List<Pair<String, Int>>): Int {
     var (aim, x, y) = arrayOf(0, 0, 0)
     input.forEach { (cmd, X) ->
       when (cmd) {
@@ -18,11 +26,6 @@ fun main() {
     }
     return x * y
   }
-
-  val input = readInput("Day02")
-    .map { it.words() }
-    .map { it[0] to it[1].toInt() }
-
-  println(part1(input))
-  println(part2(input))
 }
+
+fun main() = solution.run()

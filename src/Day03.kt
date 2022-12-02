@@ -1,13 +1,20 @@
+import lib.Solution
+import lib.Collections.histogram
+
 enum class Day03Rating {
   O2,
   CO2
 }
 
-fun main() {
-  fun countBits(input: List<String>) =
+private val solution = object : Solution<List<String>, Int>("Day03") {
+  override fun parse(input: String): List<String> = input.lines()
+
+  override fun format(output: Int): String = output.toString()
+
+  fun countBits(input: List<String>): Map<Int, Map<Char, Int>> =
     input.flatMap { it.mapIndexed(::Pair) }
       .groupBy({ it.first }, { it.second })
-      .mapValues { it.value.freq() }
+      .mapValues { it.value.histogram() }
 
   fun gamma(input: Map<Int, Map<Char, Int>>) = input.mapValues {
     it.value.maxByOrNull { it.value }?.key ?: '0'
@@ -19,7 +26,7 @@ fun main() {
 
   fun Map<Int, Char>.readBits() = values.toCharArray().concatToString().toInt(2)
 
-  fun part1(input: List<String>) = countBits(input).let {
+  override fun part1(input: List<String>) = countBits(input).let {
     gamma(it).readBits() * epsilon(it).readBits()
   }
 
@@ -38,16 +45,14 @@ fun main() {
     if (values.size == 1) {
       return values[0]
     }
-    val bitCount = values.map { it[bit] }.freq()
+    val bitCount = values.map { it[bit] }.histogram()
     val selectedBit = bitCriteria(bitCount, rating)
     return filterValues(values.filter { it[bit] == selectedBit }, rating, bit + 1)
   }
 
-  fun part2(input: List<String>) =
+  override fun part2(input: List<String>) =
     filterValues(input, Day03Rating.O2).toInt(2) *
       filterValues(input, Day03Rating.CO2).toInt(2)
-
-  val input = readInput("Day03")
-  println(part1(input))
-  println(part2(input))
 }
+
+fun main() = solution.run()
