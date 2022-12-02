@@ -3,7 +3,7 @@ package lib
 import java.io.File
 import lib.IO
 
-abstract class Solution<P, R>(private val fileName: String? = null) {
+abstract class Solution<P, R>(private val year: Int, private val fileName: String? = null) {
   abstract fun parse(input: String): P
   abstract fun format(output: R): String
 
@@ -12,7 +12,7 @@ abstract class Solution<P, R>(private val fileName: String? = null) {
 
   fun run() {
     val reader = fileName?.let {
-      File("src/data/${it}.txt").reader()
+      File("src/data/aoc${year % 100}/${it}.txt").reader()
     } ?: IO.reader
 
     val input = parse(reader.readText())
