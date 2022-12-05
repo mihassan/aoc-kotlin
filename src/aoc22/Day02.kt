@@ -1,4 +1,6 @@
-package aoc22
+@file:Suppress("PackageDirectoryMismatch")
+
+package aoc22.day02
 
 import aoc22.GameResult.DRAW
 import aoc22.GameResult.LOSS
