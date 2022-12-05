@@ -1,4 +1,6 @@
-package aoc22
+@file:Suppress("PackageDirectoryMismatch")
+
+package aoc22.day03
 
 import lib.Solution
 

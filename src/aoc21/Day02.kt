@@ -1,4 +1,6 @@
-package aoc21
+@file:Suppress("PackageDirectoryMismatch")
+
+package aoc21.day02
 
 import lib.Solution
 import lib.Strings.words

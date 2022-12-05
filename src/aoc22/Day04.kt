@@ -1,4 +1,6 @@
-package aoc22
+@file:Suppress("PackageDirectoryMismatch")
+
+package aoc22.day04
 
 import lib.Solution
 
@@ -26,11 +28,11 @@ private val solution = object : Solution<List<InputLine>, Int>(2022, "Day04") {
 
   override fun format(output: Int): String = output.toString()
 
-  override fun part1(input: List<InputLine>): Int = input.count { (p1, p2) ->
+  override fun part1(input: List<Pair<IntRange, IntRange>>): Int = input.count { (p1, p2) ->
     (p1 in p2) || (p2 in p1)
   }
 
-  override fun part2(input: List<InputLine>): Int = input.count { (p1, p2) ->
+  override fun part2(input: List<Pair<IntRange, IntRange>>): Int = input.count { (p1, p2) ->
     p1 overlaps p2
   }
 }
