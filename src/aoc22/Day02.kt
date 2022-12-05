@@ -2,12 +2,12 @@
 
 package aoc22.day02
 
-import aoc22.GameResult.DRAW
-import aoc22.GameResult.LOSS
-import aoc22.GameResult.WIN
-import aoc22.Hand.PAPER
-import aoc22.Hand.ROCK
-import aoc22.Hand.SCISSOR
+import aoc22.day02.GameResult.DRAW
+import aoc22.day02.GameResult.LOSS
+import aoc22.day02.GameResult.WIN
+import aoc22.day02.Hand.PAPER
+import aoc22.day02.Hand.ROCK
+import aoc22.day02.Hand.SCISSOR
 import lib.Solution
 import lib.Solution.Part
 import lib.Solution.Part.PART1
