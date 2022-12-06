@@ -2,6 +2,7 @@
 
 package aoc22.day05
 
+import java.util.Stack
 import lib.Solution
 import lib.Strings.ints
 import lib.Strings.words
@@ -9,78 +10,77 @@ import lib.Strings.words
 typealias Crate = Char
 typealias StackIndex = Int
 
-data class CrateStack(private val stack: ArrayDeque<Crate> = ArrayDeque()) {
-  fun copy(): CrateStack {
-    val newStack = ArrayDeque<Crate>()
-    newStack.addAll(stack)
-    return CrateStack(newStack)
-  }
+typealias CrateStack = Stack<Crate>
 
-  fun push(crate: Crate) = stack.addFirst(crate)
-  fun pop(): Crate = stack.removeFirst()
-  fun add(crate: Crate) = stack.addLast(crate)
-  fun remove(): Crate = stack.removeFirst()
-  fun top(): Crate = stack.first()
-}
+@Suppress("UNCHECKED_CAST")
+fun CrateStack.copy() = this.clone() as CrateStack
 
 data class Cargo(
   private val stackCount: Int,
   private val stacks: List<CrateStack> = List(stackCount) { CrateStack() },
 ) {
-  fun copy(): Cargo {
-    val newStacks = stacks.map { it.copy() }
-    return Cargo(stackCount, newStacks)
-  }
+  fun copy() = Cargo(stackCount, stacks.map { it.copy() })
 
   fun push(stackIndex: StackIndex, crate: Crate) {
     stacks[stackIndex].push(crate)
+  }
+
+  fun pushN(stackIndex: StackIndex, crates: List<Crate>) {
+    crates.forEach { crate ->
+      stacks[stackIndex].push(crate)
+    }
   }
 
   fun pop(stackIndex: StackIndex): Crate {
     return stacks[stackIndex].pop()
   }
 
-  fun add(stackIndex: StackIndex, crate: Crate) {
-    stacks[stackIndex].add(crate)
+  fun popN(stackIndex: StackIndex, n: Int): List<Crate> {
+    val stack = stacks[stackIndex]
+    val crates = stack.takeLast(n)
+    stack.setSize(stack.size - n)
+    return crates
   }
 
-  fun remove(stackIndex: StackIndex): Crate {
-    return stacks[stackIndex].remove()
-  }
-
-  fun topCrates(): List<Crate> = stacks.map { it.top() }
+  fun topCrates(): List<Crate> = stacks.map { it.peek() }
 
   companion object {
-    fun parseCargo(stackCount: Int, cargoLines: List<String>): Cargo {
-      val cargo = Cargo(stackCount)
-
+    fun parse(stackCount: Int, cargoLines: List<String>): Cargo {
       fun getCrate(line: String, stackIndex: StackIndex): Crate? =
         line.getOrNull(4 * stackIndex + 1)?.takeIf { it.isUpperCase() }
 
-      cargoLines.reversed().forEach { line ->
-        repeat(stackCount) { stackIndex ->
-          getCrate(line, stackIndex)?.let { crate ->
-            cargo.push(stackIndex, crate)
-          }
+      fun getStack(stackIndex: StackIndex): List<Crate> =
+        cargoLines.mapNotNull { line ->
+          getCrate(line, stackIndex)
         }
+
+      val stacks = List(stackCount) { stackIndex ->
+        CrateStack().apply { addAll(getStack(stackIndex).reversed()) }
       }
 
-      return cargo
+      return Cargo(stackCount, stacks)
     }
   }
 }
 
-typealias Procedure = List<Step>
-
 data class Step(val quantity: Int, val from: StackIndex, val to: StackIndex) {
   companion object {
-    fun of(str: String): Step {
-      val parts = str.words()
+    fun parse(line: String): Step {
+      val parts = line.words()
       val quantity = parts[1].toInt()
       val from = parts[3].toInt() - 1
       val to = parts[5].toInt() - 1
       return Step(quantity, from, to)
     }
+  }
+}
+
+data class Procedure(val steps: List<Step>) {
+  fun run(block: (step: Step) -> Unit) = steps.forEach(block)
+
+  companion object {
+    fun parse(procedureLines: List<String>): Procedure =
+      Procedure(procedureLines.map { line -> Step.parse(line) })
   }
 }
 
@@ -98,7 +98,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day05") {
 
     val stackCount = lines[inputSplitPoint - 1].ints().count()
 
-    return Input(Cargo.parseCargo(stackCount, cargoLines), procedureLines.map { Step.of(it) })
+    return Input(Cargo.parse(stackCount, cargoLines), Procedure.parse(procedureLines))
   }
 
   override fun format(output: Output): String = output.topCrates().joinToString("")
@@ -106,7 +106,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun part1(input: Input): Output {
     val cargo: Cargo = input.cargo.copy()
 
-    input.procedure.forEach { (quantity, from, to) ->
+    input.procedure.run { (quantity, from, to) ->
       repeat(quantity) {
         val crate = cargo.pop(from)
         cargo.push(to, crate)
@@ -118,9 +118,9 @@ private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun part2(input: Input): Output {
     val cargo: Cargo = input.cargo.copy()
 
-    input.procedure.forEach { (quantity, from, to) ->
-      val crates = List(quantity) { cargo.pop(from) }
-      crates.reversed().forEach { crate -> cargo.push(to, crate) }
+    input.procedure.run { (quantity, from, to) ->
+      val crates = cargo.popN(from, quantity)
+      cargo.pushN(to, crates)
     }
     return cargo
   }
