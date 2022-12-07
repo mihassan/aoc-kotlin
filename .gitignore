@@ -1,5 +1,9 @@
+# From https://github.com/github/gitignore/blob/master/Gradle.gitignore
 .gradle
-.github
+/build/
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# JetBrains IDE files.
 .idea
-build
-src/**/*.txt
