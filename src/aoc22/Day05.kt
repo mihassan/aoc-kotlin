@@ -4,8 +4,6 @@ package aoc22.day05
 
 import java.util.Stack
 import lib.Solution
-import lib.Strings.ints
-import lib.Strings.words
 
 typealias Crate = Char
 typealias StackIndex = Int
@@ -45,12 +43,12 @@ data class Cargo(
   fun topCrates(): List<Crate> = stacks.map { it.peek() }
 
   companion object {
-    fun parse(stackCount: Int, cargoLines: List<String>): Cargo {
+    fun parse(stackCount: Int, stackLines: List<String>): Cargo {
       fun getCrate(line: String, stackIndex: StackIndex): Crate? =
         line.getOrNull(4 * stackIndex + 1)?.takeIf { it.isUpperCase() }
 
       fun getStack(stackIndex: StackIndex): List<Crate> =
-        cargoLines.mapNotNull { line ->
+        stackLines.mapNotNull { line ->
           getCrate(line, stackIndex)
         }
 
@@ -66,7 +64,7 @@ data class Cargo(
 data class Step(val quantity: Int, val from: StackIndex, val to: StackIndex) {
   companion object {
     fun parse(line: String): Step {
-      val parts = line.words()
+      val parts = line.split(" ")
       val quantity = parts[1].toInt()
       val from = parts[3].toInt() - 1
       val to = parts[5].toInt() - 1
@@ -90,15 +88,12 @@ typealias Output = Cargo
 
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: String): Input {
-    val lines = input.lines()
-    val inputSplitPoint = lines.indexOf("")
+    val (cargoLines, procedureLines) = input.split("\n\n").map { it.lines() }
 
-    val cargoLines = lines.take(inputSplitPoint - 1)
-    val procedureLines = lines.drop(inputSplitPoint + 1)
+    val stackLines = cargoLines.dropLast(1)
+    val stackCount = (stackLines.last().length + 1) / 4
 
-    val stackCount = lines[inputSplitPoint - 1].ints().count()
-
-    return Input(Cargo.parse(stackCount, cargoLines), Procedure.parse(procedureLines))
+    return Input(Cargo.parse(stackCount, stackLines), Procedure.parse(procedureLines))
   }
 
   override fun format(output: Output): String = output.topCrates().joinToString("")
