@@ -1,5 +1,7 @@
 package lib
 
+import java.util.function.Predicate
+
 object Collections {
   fun List<Int>.cumulativeSum1() = runningFold(0) { x, y -> x + y }
   fun List<Int>.cumulativeSum() = cumulativeSum1().drop(1)
@@ -22,6 +24,18 @@ object Collections {
         groups.last().add(e)
       } else {
         groups.add(mutableListOf(e))
+      }
+    }
+    return groups
+  }
+
+  fun <T> List<T>.partitions(predicate: Predicate<T>): List<List<T>> {
+    val groups = mutableListOf<MutableList<T>>()
+    forEach { e ->
+      if (predicate.test(e)) {
+        groups.add(mutableListOf(e))
+      } else {
+        groups.last().add(e)
       }
     }
     return groups
