@@ -14,13 +14,19 @@ import lib.Solution.Part.PART1
 import lib.Solution.Part.PART2
 
 
-enum class Hand {
-  ROCK, PAPER, SCISSOR;
+enum class Hand(val score: Int) {
+  ROCK(1), PAPER(2), SCISSOR(3);
 
-  fun score(): Int = when (this) {
-    ROCK -> 1
-    PAPER -> 2
-    SCISSOR -> 3
+  fun beats(): Hand = when (this) {
+    ROCK -> SCISSOR
+    PAPER -> ROCK
+    SCISSOR -> PAPER
+  }
+
+  fun beatenBy(): Hand = when (this) {
+    ROCK -> PAPER
+    PAPER -> SCISSOR
+    SCISSOR -> ROCK
   }
 
   companion object {
@@ -28,7 +34,7 @@ enum class Hand {
       "A" -> ROCK
       "B" -> PAPER
       "C" -> SCISSOR
-      else -> throw IllegalArgumentException("Bad input for a hand: $hand")
+      else -> error("Bad input for a hand: $hand")
     }
   }
 }
@@ -48,17 +54,9 @@ enum class Strategy {
   }
 
   private fun handToPlayForPart2(opponent: Hand): Hand = when (this) {
-    X -> when (opponent) {
-      ROCK -> SCISSOR
-      PAPER -> ROCK
-      SCISSOR -> PAPER
-    }
-    Y -> opponent
-    Z -> when (opponent) {
-      ROCK -> PAPER
-      PAPER -> SCISSOR
-      SCISSOR -> ROCK
-    }
+    X -> opponent.beats() // Loss
+    Y -> opponent // Draw
+    Z -> opponent.beatenBy() // Win
   }
 
   companion object {
@@ -66,37 +64,25 @@ enum class Strategy {
       "X" -> X
       "Y" -> Y
       "Z" -> Z
-      else -> throw IllegalArgumentException("Bad input for a strategy: $strategy")
+      else -> error("Bad input for a strategy: $strategy")
     }
   }
 }
 
-enum class GameResult {
-  WIN, LOSS, DRAW;
+enum class GameResult(val score: Int) {
+  WIN(6), LOSS(0), DRAW(3)
+}
 
-  fun score(): Int = when (this) {
-    WIN -> 6
-    LOSS -> 0
-    DRAW -> 3
-  }
+fun Hand.play(other: Hand): GameResult = when (other) {
+  beats() -> WIN
+  beatenBy() -> LOSS
+  else -> DRAW
 }
 
 data class Game(val opponent: Hand, val strategy: Strategy) {
-
-  fun result(part: Part): GameResult {
+  fun totalScore(part: Part): Int {
     val myHand = strategy.handToPlay(part, opponent)
-    return when (myHand to opponent) {
-      ROCK to ROCK -> DRAW
-      ROCK to PAPER -> LOSS
-      ROCK to SCISSOR -> WIN
-      PAPER to ROCK -> WIN
-      PAPER to PAPER -> DRAW
-      PAPER to SCISSOR -> LOSS
-      SCISSOR to ROCK -> LOSS
-      SCISSOR to PAPER -> WIN
-      SCISSOR to SCISSOR -> DRAW
-      else -> throw java.lang.AssertionError()
-    }
+    return myHand.score + myHand.play(opponent).score
   }
 
   companion object {
@@ -110,13 +96,12 @@ data class Game(val opponent: Hand, val strategy: Strategy) {
 
 private val solution = object : Solution<List<Game>, Int>(2022, "Day02") {
   override fun parse(input: String): List<Game> =
-    input.split("\n").filter { it.isNotBlank() }.map { Game.of(it) }
+    input.lines().filter { it.isNotBlank() }.map { Game.of(it) }
 
   override fun format(output: Int): String = output.toString()
 
-  override fun solve(part: Part, input: List<Game>): Int = input.sumOf { game: Game ->
-    val myHand = game.strategy.handToPlay(part, game.opponent)
-    myHand.score() + game.result(part).score()
+  override fun solve(part: Part, input: List<Game>): Int = input.sumOf { game ->
+    game.totalScore(part)
   }
 }
 
