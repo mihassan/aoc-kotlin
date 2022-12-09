@@ -4,7 +4,9 @@ import java.util.function.Predicate
 
 object Collections {
   fun <T> List<T>.prefixes() = (1..size).map { take(it) }
-  fun <T> List<T>.suffixes() = (0 until size).map { drop(it) }
+  fun <T> List<T>.suffixes() = indices.map { drop(it) }
+
+  fun <T> List<T>.splitIn(parts: Int): List<List<T>> = chunked(size / parts)
 
   fun List<Int>.cumulativeSum1() = runningFold(0) { x, y -> x + y }
   fun List<Int>.cumulativeSum() = cumulativeSum1().drop(1)

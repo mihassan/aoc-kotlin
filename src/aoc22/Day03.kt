@@ -3,6 +3,8 @@
 package aoc22.day03
 
 import lib.Solution
+import lib.Strings.intersect
+import lib.Strings.splitIn
 
 
 private val solution = object : Solution<List<String>, Int>(2022, "Day03") {
@@ -12,23 +14,21 @@ private val solution = object : Solution<List<String>, Int>(2022, "Day03") {
 
   override fun part1(input: List<String>): Int =
     input.sumOf {
-      val l = it.length / 2
-      val x = it.take(l).toSet()
-      val y = it.drop(l).toSet()
-
-      priority((x intersect y).single())
+      val (x, y) = it.splitIn(2)
+      (x intersect y).single().priority
     }
 
   override fun part2(input: List<String>): Int =
     input.chunked(3).sumOf { (x, y, z) ->
-      priority((x.toSet() intersect y.toSet() intersect z.toSet()).single())
+      (x intersect y intersect z).single().priority
     }
 
-  private fun priority(item: Char) =
-    if (item.isLowerCase())
-      item.code - 'a'.code + 1
-    else
-      item.code - 'A'.code + 27
+  private val Char.priority
+    get() = when (this) {
+      in 'a'..'z' -> this - 'a' + 1
+      in 'A'..'Z' -> this - 'A' + 27
+      else -> error("Check input")
+    }
 }
 
 fun main() = solution.run()

@@ -11,4 +11,10 @@ object Strings {
   fun String.isInt() = toIntOrNull() != null
   fun String.isLong() = toLongOrNull() != null
   fun String.isDouble() = toDoubleOrNull() != null
+
+  fun String.splitIn(parts: Int): List<String> = chunked(length / parts)
+
+  infix fun String.intersect(other: String): Set<Char> = toSet() intersect other.toSet()
+  infix fun String.intersect(other: Set<Char>): Set<Char> = toSet() intersect other
+  infix fun Set<Char>.intersect(other: String): Set<Char> = this intersect other.toSet()
 }
