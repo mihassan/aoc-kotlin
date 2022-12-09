@@ -17,19 +17,10 @@ sealed interface Command {
     fun parse(line: String): Command {
       val parts = line.words()
 
-      assert(parts.size in 2..3)
-      assert(parts[0] == PREFIX)
-
       return when (parts[1]) {
-        "ls" -> {
-          assert(parts.size == 2)
-          LsCommand
-        }
-        "cd" -> {
-          assert(parts.size == 3)
-          CdCommand(parts[2])
-        }
-        else -> throw java.lang.AssertionError()
+        "ls" -> LsCommand
+        "cd" -> CdCommand(parts[2])
+        else -> error("Bad command ${parts[1]}")
       }
     }
   }
@@ -45,13 +36,10 @@ sealed class Entry {
     fun parse(line: String): Entry {
       val parts = line.words()
 
-      assert(parts.size == 2)
-
-      return if (parts[0] == "dir") {
+      return if (parts[0] == "dir")
         DirEntry(parts[1])
-      } else {
+      else
         FileEntry(parts[1], parts[0].toInt())
-      }
     }
   }
 }
@@ -68,11 +56,8 @@ data class CommandResult(val entries: List<Entry>) {
 data class ExecutedCommand(val command: Command, val result: CommandResult) {
   companion object {
     fun parse(lines: List<String>): ExecutedCommand {
-      assert(lines.isNotEmpty())
-
       val command = Command.parse(lines.first())
       val result = CommandResult.parse(lines.drop(1))
-
       return ExecutedCommand(command, result)
     }
   }
@@ -90,10 +75,8 @@ sealed class FileTree : Iterable<FileTree> {
   data class FileNode(
     override val fullPath: String,
     override val parent: FileTree,
-    val size: Int,
+    override val totalSize: Int,
   ) : FileTree() {
-    override val totalSize: Int = size
-
     override fun iterator() = iterator<FileTree> {
       yield(this@FileNode)
     }
@@ -127,13 +110,26 @@ sealed class FileTree : Iterable<FileTree> {
   }
 }
 
-fun walkFileTree(
-  executedCommands: List<ExecutedCommand>,
-  block: (parentPath: String, fullPath: String, entry: Entry) -> Unit,
-) {
-  val cwd = mutableListOf<String>()
+class FileTreeWalker constructor(private val executedCommands: List<ExecutedCommand>) {
+  private val cwd = mutableListOf<String>()
 
-  fun handleCdCommand(cdPath: String) {
+  fun onVisit(block: (parentPath: String, fullPath: String, entry: Entry) -> Unit) {
+    executedCommands.forEach { (command, result) ->
+      when (command) {
+        is Command.CdCommand -> processCdCommand(command.path)
+        Command.LsCommand -> processLsCommand(result, block)
+      }
+    }
+  }
+
+  private fun getParentPath() =
+    cwd.joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
+
+  private fun getFullPath(relativePath: String) =
+    (cwd + relativePath).joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
+
+
+  private fun processCdCommand(cdPath: String) {
     when (cdPath) {
       FileTree.ROOT_PATH -> cwd.clear()
       FileTree.PARENT_PATH -> cwd.removeLast()
@@ -141,28 +137,21 @@ fun walkFileTree(
     }
   }
 
-  fun handleLsCommand(result: CommandResult): Unit {
+  private fun processLsCommand(
+    result: CommandResult,
+    block: (parentPath: String, fullPath: String, entry: Entry) -> Unit,
+  ) {
     result.entries.forEach { entry ->
-      val parentPath = cwd.joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
-      val fullPath =
-        (cwd + entry.path).joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
-      block(parentPath, fullPath, entry)
-    }
-  }
-
-  executedCommands.forEach { (command, result) ->
-    when (command) {
-      is Command.CdCommand -> handleCdCommand(command.path)
-      Command.LsCommand -> handleLsCommand(result)
+      block(getParentPath(), getFullPath(entry.path), entry)
     }
   }
 }
 
 
-private fun constructEdgelessFileTree(executedCommands: List<ExecutedCommand>): Map<String, FileTree> =
+private fun constructFileTreeNodes(walker: FileTreeWalker): Map<String, FileTree> =
   buildMap {
     set(FileTree.ROOT_PATH, FileTree.RootNode)
-    walkFileTree(executedCommands) { parentPath, fullPath, entry ->
+    walker.onVisit { parentPath, fullPath, entry ->
       val parent = checkNotNull(get(parentPath))
       when (entry) {
         is Entry.DirEntry -> set(fullPath, FileTree.DirNode(fullPath, parent))
@@ -173,9 +162,10 @@ private fun constructEdgelessFileTree(executedCommands: List<ExecutedCommand>): 
 
 
 fun constructFileTree(executedCommands: List<ExecutedCommand>): FileTree {
-  val graph = constructEdgelessFileTree(executedCommands)
+  val walker = FileTreeWalker(executedCommands)
+  val graph = constructFileTreeNodes(walker)
 
-  walkFileTree(executedCommands) { parentPath, fullPath, _ ->
+  walker.onVisit { parentPath, fullPath, _ ->
     val parent = checkNotNull(graph[parentPath] as? FileTree.DirNode)
     val child = checkNotNull(graph[fullPath])
     parent.addChild(child)
@@ -203,11 +193,11 @@ private val solution = object : Solution<Input, Output>(2022, "Day07") {
 
   override fun part2(input: Input): Output {
     val fileTree = constructFileTree(input)
-    val required = fileTree.totalSize - 40000000
+    val minThreshold = fileTree.totalSize - 40000000
     return fileTree
       .filterIsInstance<FileTree.DirNode>()
       .map { it.totalSize }
-      .filter { it >= required }
+      .filter { it >= minThreshold }
       .min()
   }
 }
