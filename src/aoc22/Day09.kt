@@ -4,6 +4,7 @@ package aoc22.day09
 
 import kotlin.math.abs
 import kotlin.math.sign
+import lib.Collections.headTail
 import lib.Solution
 
 data class Point(val x: Int, val y: Int) {
@@ -54,25 +55,24 @@ private val solution = object : Solution<Input, Output>(2022, "Day09") {
 
   override fun solve(part: Part, input: Input): Output {
     val knotCount = checkNotNull(KNOT_COUNT[part])
-    var knots = List(knotCount) { Point(0, 0) }
-    return input
-      .map { direction ->
-        knots = moveRope(knots, direction)
-        knots.last()
-      }.toSet().size
+    val initialKnots = List(knotCount) { Point(0, 0) }
+    val ropeSequence = input.runningFold(initialKnots, ::moveRope)
+    return ropeSequence.map { it.last() }.toSet().size
   }
 
   private fun moveRope(knots: List<Point>, direction: Direction): List<Point> {
-    return buildList {
-      add(knots.first() + direction.delta)
-      repeat(knots.size - 1) {
-        add(followHead(knots[it + 1], this[it]))
-      }
+    val (head, tail) = knots.headTail()
+    val newHead = checkNotNull(head) + direction.delta
+    return tail.runningFold(newHead) { acc, knot ->
+      followNextKnot(knot, acc)
     }
   }
 
-  private fun followHead(tail: Point, head: Point): Point =
-    if (tail touches head) tail else tail + (head - tail).signValue
+  private fun followNextKnot(followedKnot: Point, followingKnot: Point): Point =
+    if (followingKnot touches followedKnot)
+      followedKnot
+    else
+      followedKnot + (followingKnot - followedKnot).signValue
 }
 
 fun main() = solution.run()
