@@ -9,6 +9,7 @@ object Collections {
   fun <T> List<T>.suffixes() = indices.map { drop(it) }
 
   fun <T> List<T>.splitIn(parts: Int): List<List<T>> = chunked(size / parts)
+  fun <T> List<T>.headTail() = firstOrNull() to drop(1)
 
   fun List<Int>.cumulativeSum1() = runningFold(0) { x, y -> x + y }
   fun List<Int>.cumulativeSum() = cumulativeSum1().drop(1)
