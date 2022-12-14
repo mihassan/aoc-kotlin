@@ -2,62 +2,57 @@
 
 package aoc22.day05
 
-import java.util.Stack
+import lib.Collections.headTail
 import lib.Solution
+import lib.Strings.ints
 
-typealias Crate = Char
 typealias StackIndex = Int
 
-typealias CrateStack = Stack<Crate>
+data class Crate(private val char: Char) {
+  override fun toString(): String = "$char"
 
-@Suppress("UNCHECKED_CAST")
-fun CrateStack.copy() = this.clone() as CrateStack
+  companion object {
+    fun parse(char: Char): Crate? = Crate(char).takeIf { char.isUpperCase() }
+  }
+}
+
+data class CrateStack(private val arrayDeque: ArrayDeque<Crate> = ArrayDeque()) {
+  fun copy() = CrateStack(ArrayDeque(this.arrayDeque))
+
+  fun push(crate: Crate) = arrayDeque.addLast(crate)
+  fun pushN(crates: List<Crate>) = arrayDeque.addAll(crates)
+  fun pop(): Crate = arrayDeque.removeLast()
+  fun popN(n: Int): List<Crate> = arrayDeque.takeLast(n).also {
+    repeat(it.size) { arrayDeque.removeLast() }
+  }
+
+  fun top(): Crate = arrayDeque.last()
+}
 
 data class Cargo(
   private val stackCount: Int,
   private val stacks: List<CrateStack> = List(stackCount) { CrateStack() },
 ) {
-  fun copy() = Cargo(stackCount, stacks.map { it.copy() })
+  fun copy() = Cargo(stackCount, stacks.map(CrateStack::copy))
 
-  fun push(stackIndex: StackIndex, crate: Crate) {
-    stacks[stackIndex].push(crate)
-  }
+  fun push(stackIndex: StackIndex, crate: Crate) = stacks[stackIndex].push(crate)
+  fun pushN(stackIndex: StackIndex, crates: List<Crate>) = stacks[stackIndex].pushN(crates)
+  fun pop(stackIndex: StackIndex): Crate = stacks[stackIndex].pop()
+  fun popN(stackIndex: StackIndex, n: Int) = stacks[stackIndex].popN(n)
 
-  fun pushN(stackIndex: StackIndex, crates: List<Crate>) {
-    crates.forEach { crate ->
-      stacks[stackIndex].push(crate)
-    }
-  }
-
-  fun pop(stackIndex: StackIndex): Crate {
-    return stacks[stackIndex].pop()
-  }
-
-  fun popN(stackIndex: StackIndex, n: Int): List<Crate> {
-    val stack = stacks[stackIndex]
-    val crates = stack.takeLast(n)
-    stack.setSize(stack.size - n)
-    return crates
-  }
-
-  fun topCrates(): List<Crate> = stacks.map { it.peek() }
+  fun topCrates(): List<Crate> = stacks.map(CrateStack::top)
 
   companion object {
-    fun parse(stackCount: Int, stackLines: List<String>): Cargo {
-      fun getCrate(line: String, stackIndex: StackIndex): Crate? =
-        line.getOrNull(4 * stackIndex + 1)?.takeIf { it.isUpperCase() }
-
-      fun getStack(stackIndex: StackIndex): List<Crate> =
-        stackLines.mapNotNull { line ->
-          getCrate(line, stackIndex)
+    fun parse(stackCount: Int, stackLines: List<String>) =
+      Cargo(stackCount).apply {
+        stackLines.forEach { line ->
+          line.forEachIndexed { idx, char ->
+            Crate.parse(char)?.let { crate ->
+              push(idx / 4, crate)
+            }
+          }
         }
-
-      val stacks = List(stackCount) { stackIndex ->
-        CrateStack().apply { addAll(getStack(stackIndex).reversed()) }
       }
-
-      return Cargo(stackCount, stacks)
-    }
   }
 }
 
@@ -77,7 +72,7 @@ data class Procedure(val steps: List<Step>) {
   fun run(block: (step: Step) -> Unit) = steps.forEach(block)
 
   companion object {
-    fun parse(procedureLines: List<String>): Procedure =
+    fun parse(procedureLines: List<String>) =
       Procedure(procedureLines.map { line -> Step.parse(line) })
   }
 }
@@ -89,9 +84,8 @@ typealias Output = Cargo
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: String): Input {
     val (cargoLines, procedureLines) = input.split("\n\n").map { it.lines() }
-
-    val stackLines = cargoLines.dropLast(1)
-    val stackCount = (stackLines.last().length + 1) / 4
+    val (stackIndexLine, stackLines) = cargoLines.reversed().headTail()
+    val stackCount = checkNotNull(stackIndexLine).ints().max()
 
     return Input(Cargo.parse(stackCount, stackLines), Procedure.parse(procedureLines))
   }
@@ -107,6 +101,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day05") {
         cargo.push(to, crate)
       }
     }
+
     return cargo
   }
 
@@ -117,6 +112,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day05") {
       val crates = cargo.popN(from, quantity)
       cargo.pushN(to, crates)
     }
+
     return cargo
   }
 }
