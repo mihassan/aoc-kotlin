@@ -10,7 +10,15 @@ typealias Input = List<String>
 typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day07") {
-  override fun parse(input: String): Input = input.lines()
+  // Only match cd command and file listings with size. Ignore ls command and dir listings.
+  val REGEX = """[$] cd (.+)|(\d+) .*""".toRegex()
+
+  override fun parse(input: String): Input =
+    input.lines().mapNotNull { line ->
+      REGEX.matchEntire(line)?.destructured?.let { (cdPath, fileSize) ->
+        cdPath + fileSize
+      }
+    }
 
   override fun format(output: Output): String = "$output"
 
@@ -27,28 +35,18 @@ private val solution = object : Solution<Input, Output>(2022, "Day07") {
 
   private fun getDirSizes(input: Input): List<Int> {
     val currentPath = mutableListOf<String>()
-    val dirSizes = mutableMapOf<List<String>, Int>().withDefault { 0 }
+    val dirSizes = mutableMapOf<List<String>, Int>()
 
-    fun processCdCommand(path: String) {
-      if (path == "..")
-        currentPath.removeLast()
-      else
-        currentPath.add(path)
-    }
-
-    fun processFileSize(fileSize: Int) {
-      currentPath.prefixes().forEach { fullPath ->
-        dirSizes[fullPath] = dirSizes.getValue(fullPath) + fileSize
+    input.forEach {
+      when {
+        it.isInt() -> currentPath.prefixes().forEach { path ->
+          dirSizes.compute(path) { _, prevSize ->
+            (prevSize ?: 0) + it.toInt()
+          }
+        }
+        it == ".." -> currentPath.removeLast()
+        else -> currentPath.add(it)
       }
-    }
-
-    input.forEach { line ->
-      val parts = line.split(" ")
-
-      if (line.startsWith("$ cd"))
-        processCdCommand(parts[2])
-      else if (parts[0].isInt())
-        processFileSize(parts[0].toInt())
     }
 
     return dirSizes.values.toList()
