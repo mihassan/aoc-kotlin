@@ -86,4 +86,3 @@ private val solution = object : Solution<Input, Output>(2022, "Day10") {
 }
 
 fun main() = solution.run()
-
