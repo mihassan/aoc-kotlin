@@ -136,30 +136,27 @@ private typealias Input = Game
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
+  val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)
+
   override fun parse(input: String): Input = Game.parse(input)
 
   override fun format(output: Output): String {
     return "$output"
   }
 
-  override fun part1(input: Input): Output {
+  override fun solve(part: Part, input: Input): Output {
     val game = input.clone()
-    val inspectionCount = mutableMapOf<MonkeyId, Long>()
-    game.runMultipleRounds(20) { monkeyId, item ->
-      inspectionCount[monkeyId] = inspectionCount[monkeyId]?.let { it + 1 } ?: 1
-      Item(item.worryLevel / 3L)
-    }
-    val activeMonkeys = inspectionCount.values.sortedDescending().take(2)
-    return activeMonkeys.reduce(Long::times)
-  }
+    val inspectionCount = game.monkeys.map { it.id }.associateWith { 0L }.toMutableMap()
 
-  override fun part2(input: Input): Output {
-    val game = input.clone()
-    val inspectionCount = mutableMapOf<MonkeyId, Long>()
-    game.runMultipleRounds(10000) { monkeyId, item ->
-      inspectionCount[monkeyId] = inspectionCount[monkeyId]?.let { it + 1 } ?: 1
-      Item(item.worryLevel % game.modulus)
+    game.runMultipleRounds(ROUNDS[part]!!) { monkeyId, item ->
+      inspectionCount[monkeyId] = inspectionCount[monkeyId]!! + 1
+
+      when (part) {
+        Part.PART1 -> Item(item.worryLevel / 3L)
+        Part.PART2 -> Item(item.worryLevel % game.modulus)
+      }
     }
+
     val activeMonkeys = inspectionCount.values.sortedDescending().take(2)
     return activeMonkeys.reduce(Long::times)
   }
