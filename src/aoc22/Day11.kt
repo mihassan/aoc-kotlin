@@ -6,7 +6,7 @@ import lib.Solution
 
 private class Game private constructor(
   val modulus: Long,
-  private val monkeys: MutableList<Monkey> = mutableListOf(),
+  val monkeys: MutableList<Monkey> = mutableListOf(),
 ) {
   private lateinit var onInspectionHandler: ((MonkeyId, Item) -> Item)
 
@@ -48,11 +48,11 @@ private class Game private constructor(
 }
 
 private data class Monkey(
-  private val id: MonkeyId,
-  private val items: MutableList<Item>,
-  private val operation: Operation,
-  private val test: Test,
-  private val throwItemToFn: (Item, MonkeyId) -> Unit,
+  val id: MonkeyId,
+  val items: MutableList<Item>,
+  val operation: Operation,
+  val test: Test,
+  val throwItemToFn: (Item, MonkeyId) -> Unit,
 ) {
   fun processItems(onInspectionHandler: (MonkeyId, Item) -> Item) {
     items.forEach { item -> processItem(item, onInspectionHandler) }
@@ -70,8 +70,7 @@ private data class Monkey(
     throwItemToFn(itemToTest, monkeyId)
   }
 
-  private fun inspect(item: Item): Item = operation.operate(item)
-
+  private fun inspect(item: Item) = Item(operation.operate(item.worryLevel))
 
   fun receive(item: Item) {
     items += item
@@ -80,10 +79,11 @@ private data class Monkey(
   companion object {
     fun parse(monkeyConfig: String, throwItemToFn: (Item, MonkeyId) -> Unit): Monkey {
       val lines = monkeyConfig.lines()
-      val id = Regex("\\d+").find(lines[0])?.value?.toIntOrNull() ?: error("Invalid input")
-      val items = Regex("\\d+").findAll(lines[1]).map { Item.parse(it.value) }.toMutableList()
+      val id = Regex("\\d+").find(lines[0])!!.value.toInt()
+      val items = Item.parseMultipleItems(lines[1]).toMutableList()
       val operation = Operation.parse(lines[2])
-      val test = Test.parse(lines.takeLast(3))
+      val test = Test.parse(lines.takeLast(3).joinToString())
+
       return Monkey(id, items, operation, test, throwItemToFn)
     }
   }
@@ -93,41 +93,38 @@ private typealias MonkeyId = Int
 
 private data class Item(val worryLevel: Long) {
   companion object {
-    fun parse(worryLevel: String): Item {
-      return Item(worryLevel.toLongOrNull() ?: error("Invalid input"))
-    }
+    fun parseSingleItem(str: String): Item = Item(str.toLong())
+
+    fun parseMultipleItems(str: String): List<Item> =
+      Regex("\\d+").findAll(str).map { parseSingleItem(it.value) }.toList()
   }
 }
 
 private sealed interface Operation {
-  fun operate(old: Item): Item
+  fun operate(value: Long): Long
 
   private object Square : Operation {
-    override fun operate(old: Item): Item = Item(old.worryLevel * old.worryLevel)
+    override fun operate(value: Long): Long = value * value
   }
 
   private data class Multiply(val multiplier: Long) : Operation {
-    override fun operate(old: Item): Item = Item(old.worryLevel * multiplier)
+    override fun operate(value: Long): Long = value * multiplier
   }
 
   private data class Add(val summand: Long) : Operation {
-    override fun operate(old: Item): Item = Item(old.worryLevel + summand)
+    override fun operate(value: Long): Long = value + summand
   }
 
   companion object {
-    fun parse(operationConfig: String): Operation {
+    const val SQUARE_PREFIX = "old * old"
+    const val MULTIPLY_PREFIX = "old * "
+    const val ADD_PREFIX = "old + "
+
+    fun parse(str: String): Operation {
       return when {
-        "old * old" in operationConfig -> Square
-        "old * " in operationConfig -> {
-          val multiplierPart = operationConfig.substringAfter("old * ")
-          val multiplier = multiplierPart.toLongOrNull() ?: error("Invalid input")
-          Multiply(multiplier)
-        }
-        "old + " in operationConfig -> {
-          val summandPart = operationConfig.substringAfter("old + ")
-          val summand = summandPart.toLongOrNull() ?: error("Invalid input")
-          Add(summand)
-        }
+        SQUARE_PREFIX in str -> Square
+        MULTIPLY_PREFIX in str -> Multiply(str.substringAfter(MULTIPLY_PREFIX).toLong())
+        ADD_PREFIX in str -> Add(str.substringAfter(ADD_PREFIX).toLong())
         else -> error("Invalid input")
       }
     }
@@ -139,10 +136,9 @@ private data class Test(val modulus: Long, val trueCase: MonkeyId, val falseCase
     if (item.worryLevel % modulus == 0L) trueCase else falseCase
 
   companion object {
-    fun parse(testConfig: List<String>): Test {
-      val (modulus, trueCase, falseCase) = testConfig.map {
-        Regex("\\d+").find(it)?.value?.toIntOrNull() ?: error("Invalid input")
-      }
+    fun parse(str: String): Test {
+      val (modulus, trueCase, falseCase) =
+        Regex("\\d+").findAll(str).map { it.value.toInt() }.toList()
       return Test(modulus.toLong(), trueCase, falseCase)
     }
   }
