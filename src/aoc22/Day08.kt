@@ -3,11 +3,9 @@
 package aoc22.day06
 
 import kotlin.math.max
-import lib.Collections.flipHorizontally
 import lib.Collections.suffixes
-import lib.Collections.transposed
-import lib.Collections.zip2
 import lib.Grid
+import lib.Grid.Companion.max
 import lib.Solution
 
 
@@ -15,12 +13,7 @@ typealias Input = Grid<Int>
 typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day08") {
-  override fun parse(input: String): Input =
-    input.lines().map { row ->
-      row.toCharArray().map { col ->
-        col.digitToInt()
-      }
-    }
+  override fun parse(input: String): Input = Grid(input.lines().map { it.map(Char::digitToInt) })
 
   override fun format(output: Output): String = "$output"
 
@@ -33,8 +26,8 @@ private val solution = object : Solution<Input, Output>(2022, "Day08") {
         visibleFromBottom()
       )
     }.reduce { x, y ->
-      x.zip2(y, Boolean::or)
-    }.flatten().count { it }
+      x.zip(y, Boolean::or)
+    }.count { it }
   }
 
   override fun part2(input: Input): Output {
@@ -46,16 +39,18 @@ private val solution = object : Solution<Input, Output>(2022, "Day08") {
         visibleTreesOnBottom()
       )
     }.reduce { x, y ->
-      x.zip2(y, Int::times)
-    }.flatten().max()
+      x.zip(y, Int::times)
+    }.max()
   }
 
   private fun Input.visibleFromLeft(): Grid<Boolean> =
-    map { row ->
-      row
-        .runningFold(Int.MIN_VALUE, ::max)
-        .zip(row) { maxHeight, height -> maxHeight < height }
-    }
+    Grid(
+      grid.map { row ->
+        row
+          .runningFold(Int.MIN_VALUE, ::max)
+          .zip(row) { maxHeight, height -> maxHeight < height }
+      }
+    )
 
   private fun Input.visibleFromRight(): Grid<Boolean> =
     flipHorizontally().visibleFromLeft().flipHorizontally()
@@ -67,14 +62,16 @@ private val solution = object : Solution<Input, Output>(2022, "Day08") {
     transposed().visibleFromRight().transposed()
 
   private fun Input.visibleTreesOnRight(): Grid<Int> =
-    map { row ->
-      row.suffixes().map { suffix ->
-        val targetHeight = suffix.first()
-        val allRightTrees = suffix.withIndex().drop(1)
-        val blockingTree = allRightTrees.find { it.value >= targetHeight }
-        blockingTree?.index ?: (suffix.size - 1)
+    Grid(
+      grid.map { row ->
+        row.suffixes().map { suffix ->
+          val targetHeight = suffix.first()
+          val allRightTrees = suffix.withIndex().drop(1)
+          val blockingTree = allRightTrees.find { it.value >= targetHeight }
+          blockingTree?.index ?: (suffix.size - 1)
+        }
       }
-    }
+    )
 
   private fun Input.visibleTreesOnLeft(): Grid<Int> =
     flipHorizontally().visibleTreesOnRight().flipHorizontally()
