@@ -66,6 +66,32 @@ data class Grid<T>(val grid: List<List<T>>) {
     map(transform)
   }
 
+  fun findAll(predicate: (T) -> Boolean): List<T> =
+    grid.flatMap { row ->
+      row.mapNotNull { col ->
+        if (predicate(col)) col else null
+      }
+    }
+
+  fun findAll(element: T): List<T> = findAll { it == element }
+
+  fun find(predicate: (T) -> Boolean): T = findAll(predicate).first()
+
+  fun find(element: T): T = find { it == element }
+
+  fun indicesOf(predicate: (T) -> Boolean): List<Point> =
+    grid.flatMapIndexed { y, row ->
+      row.mapIndexedNotNull { x, col ->
+        if (predicate(col)) Point(x, y) else null
+      }
+    }
+
+  fun indicesOf(element: T): List<Point> = indicesOf { it == element }
+
+  fun indexOf(predicate: (T) -> Boolean): Point = indicesOf(predicate).first()
+
+  fun indexOf(element: T): Point = indexOf { it == element }
+
   fun zip(other: Grid<T>, transform: (T, T) -> T): Grid<T> = Grid(
     grid.zip(other.grid) { x, y -> x.zip(y, transform) }
   )
@@ -84,5 +110,7 @@ data class Grid<T>(val grid: List<List<T>>) {
     fun <T : Comparable<T>> Grid<T>.max(): T = grid.maxOf { it.max() }
 
     fun <T : Comparable<T>> Grid<T>.min(): T = grid.minOf { it.min() }
+
+    fun parse(gridStr: String): Grid<Char> = Grid(gridStr.lines().map { it.toCharArray().toList() })
   }
 }

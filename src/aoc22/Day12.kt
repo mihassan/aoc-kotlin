@@ -1,68 +1,68 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc2022.day22
+package aoc2022.day12
 
 import lib.Grid
-import lib.Maths.isZero
 import lib.Point
 import lib.Solution
 
-data class Input(val grid: Grid<Int>, val start: Point, val end: Point)
+enum class PlotType {
+  START, END, MIDDLE
+}
+
+data class Plot(val plotType: PlotType, val height: Int) {
+  companion object {
+    fun parse(ch: Char): Plot = when (ch) {
+      'S' -> Plot(PlotType.START, 0)
+      'E' -> Plot(PlotType.END, 25)
+      else -> Plot(PlotType.MIDDLE, ch - 'a')
+    }
+  }
+}
+
+typealias Input = Grid<Plot>
 
 typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day12") {
-  override fun parse(input: String): Input {
-    lateinit var start: Point
-    lateinit var end: Point
-
-    val grid = input.lines().mapIndexed { r, row ->
-      row.mapIndexed { c, ch ->
-        when (ch) {
-          'S' -> 0.also { start = Point(c, r) }
-          'E' -> 25.also { end = Point(c, r) }
-          else -> ch - 'a'
-        }
-      }
-    }
-
-    return Input(Grid(grid), start, end)
-  }
+  override fun parse(input: String): Input = Grid.parse(input).map(Plot.Companion::parse)
 
   override fun format(output: Output): String = "$output"
 
   override fun solve(part: Part, input: Input): Output {
-    val distance = mutableMapOf<Point, Int>().withDefault { Int.MAX_VALUE }
-    val queue = ArrayDeque<Point>()
+    val end = input.indexOf { it.plotType == PlotType.END }
 
-    input.grid.forEachIndexed { point, height ->
-      when (part) {
-        Part.PART1 -> {
-          if (point == input.start) {
-            distance[point] = 0
-            queue.addLast(point)
-          }
-        }
-        Part.PART2 -> {
-          if (height.isZero()) {
-            distance[point] = 0
-            queue.addLast(point)
-          }
-        }
-      }
+    return when (part) {
+      // We are computing the shortest distance backward from END to START.
+      Part.PART1 -> input.shortedDistance(end) { it.plotType == PlotType.START }
+      Part.PART2 -> input.shortedDistance(end) { it.height == 0 }
+    }
+  }
+
+  fun Grid<Plot>.canReachFrom(points: Pair<Point, Point>): Boolean =
+    this[points.second].height <= this[points.first].height + 1
+
+  fun Grid<Plot>.shortedDistance(start: Point, endPredicate: (Plot) -> Boolean): Int {
+    val distance = mutableMapOf(start to 0)
+    val queue = ArrayDeque(listOf(start))
+
+    fun Point.isNotVisited(): Boolean = this !in distance
+
+    fun stepBackwardFrom(points: Pair<Point, Point>) {
+      distance[points.second] = distance[points.first]!! + 1
+      queue.addLast(points.second)
     }
 
     while (queue.isNotEmpty()) {
-      val curr = queue.removeFirst()
-      input.grid.adjacents(curr).forEach {
-        if ((it !in distance) && (input.grid[it] <= input.grid[curr] + 1)) {
-          queue.addLast(it)
-          distance[it] = distance[curr]!! + 1
-        }
-      }
-    }
+      val currPoint = queue.removeFirst()
 
-    return distance[input.end]!!
+      adjacents(currPoint)
+        .filter(Point::isNotVisited)
+        // This is intentionally backward as we start from END.
+        .filter { nextPoint -> canReachFrom(nextPoint to currPoint) }
+        .forEach { nextPoint -> stepBackwardFrom(currPoint to nextPoint) }
+    }
+    return indicesOf(endPredicate).mapNotNull { distance[it] }.min()
   }
 }
 
