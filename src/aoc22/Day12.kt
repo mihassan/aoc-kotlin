@@ -11,6 +11,8 @@ enum class PlotType {
 }
 
 data class Plot(val plotType: PlotType, val height: Int) {
+  infix fun canStepTo(other: Plot): Boolean = other.height <= height + 1
+
   companion object {
     fun parse(ch: Char): Plot = when (ch) {
       'S' -> Plot(PlotType.START, 0)
@@ -29,40 +31,46 @@ private val solution = object : Solution<Input, Output>(2022, "Day12") {
 
   override fun format(output: Output): String = "$output"
 
-  override fun solve(part: Part, input: Input): Output {
-    val end = input.indexOf { it.plotType == PlotType.END }
-
-    return when (part) {
-      // We are computing the shortest distance backward from END to START.
-      Part.PART1 -> input.shortedDistance(end) { it.plotType == PlotType.START }
-      Part.PART2 -> input.shortedDistance(end) { it.height == 0 }
+  override fun solve(part: Part, input: Input): Output =
+    when (part) {
+      Part.PART1 -> input.shortedDistance { it.plotType == PlotType.START }
+      Part.PART2 -> input.shortedDistance { it.height == 0 }
     }
-  }
 
-  fun Grid<Plot>.canReachFrom(points: Pair<Point, Point>): Boolean =
-    this[points.second].height <= this[points.first].height + 1
-
-  fun Grid<Plot>.shortedDistance(start: Point, endPredicate: (Plot) -> Boolean): Int {
-    val distance = mutableMapOf(start to 0)
-    val queue = ArrayDeque(listOf(start))
+  fun Grid<Plot>.shortedDistance(start: (Plot) -> Boolean): Int {
+    val distance = mutableMapOf<Point, Int>()
+    val queue = ArrayDeque<Point>()
 
     fun Point.isNotVisited(): Boolean = this !in distance
 
-    fun stepBackwardFrom(points: Pair<Point, Point>) {
+    fun canStepFrom(points: Pair<Point, Point>): Boolean =
+      this[points.first] canStepTo this[points.second]
+
+    fun stepFrom(points: Pair<Point, Point>) {
       distance[points.second] = distance[points.first]!! + 1
-      queue.addLast(points.second)
+      queue.add(points.second)
+    }
+
+    indicesOf(start).forEach {
+      distance[it] = 0
+      queue.add(it)
     }
 
     while (queue.isNotEmpty()) {
       val currPoint = queue.removeFirst()
 
       adjacents(currPoint)
-        .filter(Point::isNotVisited)
-        // This is intentionally backward as we start from END.
-        .filter { nextPoint -> canReachFrom(nextPoint to currPoint) }
-        .forEach { nextPoint -> stepBackwardFrom(currPoint to nextPoint) }
+        .filter { nextPoint -> nextPoint.isNotVisited() }
+        .filter { nextPoint -> canStepFrom(currPoint to nextPoint) }
+        .forEach { nextPoint ->
+          stepFrom(currPoint to nextPoint)
+          if (this[nextPoint].plotType == PlotType.END) {
+            return distance[nextPoint]!!
+          }
+        }
     }
-    return indicesOf(endPredicate).mapNotNull { distance[it] }.min()
+
+    error("Did not reach END.")
   }
 }
 
