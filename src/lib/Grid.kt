@@ -19,9 +19,14 @@ data class Point(val x: Int, val y: Int) {
 
   private fun down(): Point = this + Y_DIRECTION
 
-  private companion object {
-    val X_DIRECTION = Point(1, 0)
-    val Y_DIRECTION = Point(0, 1)
+  companion object {
+    private val X_DIRECTION = Point(1, 0)
+    private val Y_DIRECTION = Point(0, 1)
+
+    fun parse(pointStr: String): Point {
+      val (x, y) = pointStr.split(",").map { it.toInt() }
+      return Point(x, y)
+    }
   }
 }
 
