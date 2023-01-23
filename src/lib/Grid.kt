@@ -1,6 +1,6 @@
 package lib
 
-data class Point(val x: Int, val y: Int) {
+data class Point(val x: Int, val y: Int) : Comparable<Point> {
   operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
 
   operator fun minus(other: Point): Point = this + (-other)
@@ -26,6 +26,34 @@ data class Point(val x: Int, val y: Int) {
     fun parse(pointStr: String): Point {
       val (x, y) = pointStr.split(",").map { it.toInt() }
       return Point(x, y)
+    }
+  }
+
+  override fun compareTo(other: Point): Int = compareValuesBy(this, other, { it.x }, { it.y })
+}
+
+data class Line(val start: Point, val end: Point) {
+  private val xRange: IntRange = if (start.x < end.x) start.x..end.x else end.x..start.x
+
+  private val yRange: IntRange = if (start.y < end.y) start.y..end.y else end.y..start.y
+
+  fun expand(): List<Point> = xRange.flatMap { x -> yRange.map { y -> Point(x, y) } }
+
+  companion object {
+    fun parse(lineStr: String): Line {
+      val (start, end) = lineStr.split(" -> ").map(Point.Companion::parse)
+      return Line(start, end)
+    }
+  }
+}
+
+data class Path(val points: List<Point>) {
+  fun expand(): List<Point> = points.zipWithNext(::Line).flatMap(Line::expand)
+
+  companion object {
+    fun parse(pathStr: String): Path {
+      val points = pathStr.split(" -> ").map(Point.Companion::parse)
+      return Path(points)
     }
   }
 }
