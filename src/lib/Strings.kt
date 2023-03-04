@@ -12,8 +12,8 @@ object Strings {
   fun String.isLong() = toLongOrNull() != null
   fun String.isDouble() = toDoubleOrNull() != null
 
-  fun String.extractInts() = Regex("\\d+").findAll(this).map { it.value.toInt() }.toList()
-  fun String.extractLongs() = Regex("\\d+").findAll(this).map { it.value.toLong() }.toList()
+  fun String.extractInts() = Regex("[-+]?\\d+").findAll(this).map { it.value.toInt() }.toList()
+  fun String.extractLongs() = Regex("[-+]?\\d+").findAll(this).map { it.value.toLong() }.toList()
 
   fun String.splitIn(parts: Int): List<String> = chunked(length / parts)
 
