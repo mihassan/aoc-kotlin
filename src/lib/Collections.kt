@@ -21,17 +21,21 @@ object Collections {
   fun <T> List<T>.histogram() = groupingBy { it }.eachCount()
   fun String.histogram() = groupingBy { it }.eachCount()
 
-  fun <T> List<T>.groupContiguous(): List<List<T>> {
+  fun <T> List<T>.groupContiguousBy(predicate: (List<T>, T) -> Boolean): List<List<T>> {
     val groups = mutableListOf<MutableList<T>>()
     forEach { e ->
-      if (e == groups.lastOrNull()?.lastOrNull()) {
-        groups.last().add(e)
+      val lastGroup = groups.lastOrNull()
+      if (lastGroup != null && predicate(lastGroup, e)) {
+        lastGroup.add(e)
       } else {
         groups.add(mutableListOf(e))
       }
     }
     return groups
   }
+
+  fun <T> List<T>.groupContiguous(): List<List<T>> =
+    groupContiguousBy { ts, t -> ts.lastOrNull() == t }
 
   fun <T> List<T>.partitions(predicate: (T) -> Boolean): List<List<T>> {
     val groups = mutableListOf<MutableList<T>>()
