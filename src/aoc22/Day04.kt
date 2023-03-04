@@ -2,18 +2,12 @@
 
 package aoc22.day04
 
+import lib.Ranges.overlaps
+import lib.Ranges.contains
 import lib.Solution
 
 
 typealias InputLine = Pair<IntRange, IntRange>
-
-private operator fun IntRange.contains(other: IntRange): Boolean =
-  other.first in this && other.last in this
-
-private infix fun IntRange.overlaps(other: IntRange): Boolean {
-  check(step > 0 && other.step > 0)
-  return first <= other.last && last >= other.first
-}
 
 private val solution = object : Solution<List<InputLine>, Int>(2022, "Day04") {
   override fun parse(input: String): List<InputLine> = input.lines().map { line ->
