@@ -115,7 +115,7 @@ private fun calculateMaxPressureRelease(input: Input): Long {
     pressureReleased: Map<RoomLabel, Long>,
     location: Location,
   ): Map<RoomLabel, Long> {
-    if (location.remainingDistance > 0L || location.roomLabel in pressureReleased)
+    if (location.remainingDistance > 0L)
       return pressureReleased
 
     val nextPressureReleased =
@@ -124,32 +124,19 @@ private fun calculateMaxPressureRelease(input: Input): Long {
     return nextPressureReleased
   }
 
-  fun markRoomAsSeen(
-    seenRooms: Set<RoomLabel>,
-    location: Location,
-  ): Set<RoomLabel> {
-    return seenRooms + location.roomLabel
-  }
-
   fun openLocations(
     seenRooms: Set<RoomLabel>,
     minutesLeft: Long,
     location: Location,
   ): List<Location> {
     return location.room.tunnels
-      .filter { (nextRoomLabel, distance) ->
-        nextRoomLabel !in seenRooms && minutesLeft > distance + 1
+      .mapNotNull { (nextRoomLabel, distance) ->
+        if (nextRoomLabel !in seenRooms && minutesLeft > distance + 1) {
+          Location(nextRoomLabel, distance + 1)
+        } else {
+          null
+        }
       }
-      .map { (nextRoomLabel, distance) ->
-        Location(nextRoomLabel, distance + 1)
-      }
-  }
-
-  fun move(
-    minutesLeft: Long,
-    location: Location,
-  ): Pair<Long, Location> {
-    return (minutesLeft - location.remainingDistance) to location.copy(remainingDistance = 0L)
   }
 
   fun dfs(
@@ -159,10 +146,11 @@ private fun calculateMaxPressureRelease(input: Input): Long {
     location: Location,
   ) {
     val nextPressureReleased = releasePressure(minutesLeft, pressureReleased, location)
-    val nextSeenRooms = markRoomAsSeen(seenRooms, location)
+    val nextSeenRooms = seenRooms + location.roomLabel
 
     if (location.remainingDistance > 0) {
-      val (nextMinutesLeft, nextLocation) = move(minutesLeft, location)
+      val nextMinutesLeft = minutesLeft - location.remainingDistance
+      val nextLocation = location.copy(remainingDistance = 0L)
       dfs(nextSeenRooms, nextMinutesLeft, nextPressureReleased, nextLocation)
     } else {
       val nextLocationChoices = openLocations(nextSeenRooms, minutesLeft, location)
