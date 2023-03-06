@@ -46,11 +46,12 @@ private val solution = object : Solution<Input, Output>(2022, "Day16") {
 
   override fun part1(input: Input): Output {
     val selectiveRooms = getSelectiveRooms(input).associateBy { it.label }
-    return "${calculateMaxPressureRelease(selectiveRooms)}"
+    return "${calculateMaxPressureRelease(selectiveRooms, 30L, false)}"
   }
 
   override fun part2(input: Input): Output {
-    TODO()
+    val selectiveRooms = getSelectiveRooms(input).associateBy { it.label }
+    return "${calculateMaxPressureRelease(selectiveRooms, 26L, true)}"
   }
 }
 
@@ -103,7 +104,11 @@ private fun getSelectiveRooms(input: Input): List<Room> {
   }
 }
 
-private fun calculateMaxPressureRelease(input: Input): Long {
+private fun calculateMaxPressureRelease(
+  input: Input,
+  totalMinutes: Long,
+  extraHelper: Boolean,
+): Long {
   var result = 0L
 
   data class Location(val roomLabel: RoomLabel, val remainingDistance: Distance) {
@@ -143,6 +148,7 @@ private fun calculateMaxPressureRelease(input: Input): Long {
     seenRooms: Set<RoomLabel>,
     minutesLeft: Long,
     pressureReleased: Map<RoomLabel, Long>,
+    extraHelper: Boolean,
     location: Location,
   ) {
     val nextPressureReleased = releasePressure(minutesLeft, pressureReleased, location)
@@ -151,16 +157,22 @@ private fun calculateMaxPressureRelease(input: Input): Long {
     if (location.remainingDistance > 0) {
       val nextMinutesLeft = minutesLeft - location.remainingDistance
       val nextLocation = location.copy(remainingDistance = 0L)
-      dfs(nextSeenRooms, nextMinutesLeft, nextPressureReleased, nextLocation)
+      dfs(nextSeenRooms, nextMinutesLeft, nextPressureReleased, extraHelper, nextLocation)
     } else {
-      val nextLocationChoices = openLocations(nextSeenRooms, minutesLeft, location)
-      nextLocationChoices.forEach { nextLocation ->
-        dfs(nextSeenRooms, minutesLeft, nextPressureReleased, nextLocation)
+      openLocations(nextSeenRooms, minutesLeft, location)
+        .forEach { nextLocation ->
+          dfs(nextSeenRooms, minutesLeft, nextPressureReleased, extraHelper, nextLocation)
+        }
+      if (extraHelper) {
+        openLocations(nextSeenRooms, totalMinutes, Location("AA", 0L))
+          .forEach { nextLocation ->
+            dfs(nextSeenRooms, totalMinutes, nextPressureReleased, false, nextLocation)
+          }
       }
     }
   }
 
-  dfs(emptySet(), 30L, emptyMap(), Location("AA", 0L))
+  dfs(emptySet(), totalMinutes, emptyMap(), extraHelper, Location("AA", 0L))
 
   return result
 }
