@@ -48,4 +48,6 @@ object Collections {
     }
     return groups
   }
+
+  fun <T> Sequence<T>.repeat() = sequence { while (true) yieldAll(this@repeat) }
 }
