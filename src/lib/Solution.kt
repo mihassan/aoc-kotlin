@@ -1,6 +1,8 @@
 package lib
 
 import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 import lib.Solution.Part.PART1
 import lib.Solution.Part.PART2
 
@@ -8,6 +10,7 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
   enum class Part { PART1, PART2 }
 
   abstract fun parse(input: String): P
+
   abstract fun format(output: R): String
 
   open fun part1(input: P): R = solve(PART1, input)
@@ -19,14 +22,20 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
     PART2 -> part2(input)
   }
 
+  @OptIn(ExperimentalTime::class)
   fun run() {
     val reader = fileName?.let {
       File("src/data/aoc${year % 100}/${it}.txt").reader()
     } ?: IO.reader
 
-    val input = parse(reader.readText())
+    val input = reader.readText()
 
-    println("Solution for part 1: ${format(part1(input))}")
-    println("Solution for part 2: ${format(part2(input))}")
+    Part.values().forEach { part ->
+      var result: String
+      val duration = measureTime {
+        result = format(solve(part, parse(input)))
+      }
+      println("Solution for $part: $result ($duration)")
+    }
   }
 }
