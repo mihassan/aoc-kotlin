@@ -8,8 +8,6 @@ private class Game private constructor(
   val modulus: Long,
   val monkeys: List<Monkey>,
 ) {
-  fun clone() = Game(modulus, monkeys.map { monkey -> monkey.clone() })
-
   fun runMultipleRounds(rounds: Int, onInspectionHandler: (MonkeyId, Item) -> Item) =
     repeat(rounds) { runSingleRound(onInspectionHandler) }
 
@@ -34,8 +32,6 @@ private data class Monkey(
   val operation: Operation,
   val test: Test,
 ) {
-  fun clone() = Monkey(id, items.toMutableList(), operation, test)
-
   fun processItems(
     onInspectionHandler: (MonkeyId, Item) -> Item,
     throwItemToFn: (Item, MonkeyId) -> Unit,
@@ -145,15 +141,14 @@ private val solution = object : Solution<Input, Output>(2022, "Day11") {
   }
 
   override fun solve(part: Part, input: Input): Output {
-    val game = input.clone()
-    val inspectionCount = game.monkeys.map { it.id }.associateWith { 0L }.toMutableMap()
+    val inspectionCount = input.monkeys.map { it.id }.associateWith { 0L }.toMutableMap()
 
-    game.runMultipleRounds(ROUNDS[part]!!) { monkeyId, item ->
+    input.runMultipleRounds(ROUNDS[part]!!) { monkeyId, item ->
       inspectionCount[monkeyId] = inspectionCount[monkeyId]!! + 1
 
       when (part) {
         Part.PART1 -> Item(item.worryLevel / 3L)
-        Part.PART2 -> Item(item.worryLevel % game.modulus)
+        Part.PART2 -> Item(item.worryLevel % input.modulus)
       }
     }
 

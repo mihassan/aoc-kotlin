@@ -14,8 +14,6 @@ data class Cave(
 
   private var pitLevel: Int = bricks.maxOf { it.y }
 
-  fun clone(): Cave = Cave(bricks.toMutableSet(), sands.toMutableSet())
-
   fun addBase() {
     pitLevel += 2
     bricks += (-pitLevel..pitLevel).map { Point(DROPPING_POINT.x + it, pitLevel) }
@@ -69,11 +67,10 @@ private val solution = object : Solution<Input, Output>(2022, "Day14") {
   override fun format(output: Output): String = "$output"
 
   override fun solve(part: Part, input: Input): Output {
-    val cave = input.clone()
-    if (part == Part.PART2) cave.addBase()
+    if (part == Part.PART2) input.addBase()
 
     var sand = 0
-    while (cave.dropSand()) sand++
+    while (input.dropSand()) sand++
 
     return sand
   }
