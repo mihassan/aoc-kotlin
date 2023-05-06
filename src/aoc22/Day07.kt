@@ -104,7 +104,7 @@ sealed class FileTree : Iterable<FileTree> {
   companion object {
     const val ROOT_PATH = "/"
     const val PARENT_PATH = ".."
-    const val PATH_SEPERATOR = "/"
+    const val PATH_SEPARATOR = "/"
 
     val RootNode: DirNode = DirNode(ROOT_PATH, null)
   }
@@ -123,10 +123,10 @@ class FileTreeWalker constructor(private val executedCommands: List<ExecutedComm
   }
 
   private fun getParentPath() =
-    cwd.joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
+    cwd.joinToString(FileTree.PATH_SEPARATOR, prefix = FileTree.ROOT_PATH)
 
   private fun getFullPath(relativePath: String) =
-    (cwd + relativePath).joinToString(FileTree.PATH_SEPERATOR, prefix = FileTree.ROOT_PATH)
+    (cwd + relativePath).joinToString(FileTree.PATH_SEPARATOR, prefix = FileTree.ROOT_PATH)
 
 
   private fun processCdCommand(cdPath: String) {

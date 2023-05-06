@@ -41,8 +41,8 @@ private val solution = object : Solution<Input, Output>(2022, "Day15") {
 
   override fun part2(input: Input): Output {
     val queryRange = 0..4000000
-    val targetRow = queryRange.single {
-      calculateNoBeaconColumns(input, it, true)
+    val targetRow = queryRange.single { row ->
+      calculateNoBeaconColumns(input, row, true)
         .map { it intersect queryRange }
         .sumOf { it.size } < queryRange.size
     }
@@ -77,7 +77,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day15") {
     return when {
       slack < 0 -> IntRange.EMPTY
       ignoreDetectedBeacons || sensor.closestBeacon.y != targetRow -> (center.x - slack)..(center.x + slack)
-      sensor.closestBeacon.x > center.x -> (center.x - slack)..(center.x + slack - 1)
+      sensor.closestBeacon.x > center.x -> (center.x - slack) until center.x + slack
       else -> (center.x - slack + 1)..(center.x + slack)
     }
   }
