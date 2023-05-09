@@ -6,7 +6,11 @@ import lib.Collections.histogram
 @Suppress("NOTHING_TO_INLINE")
 value class Bag<T>(val entries: MutableMap<T, Int> = mutableMapOf()) {
   init {
-    require(entries.all { (_, c) -> c > 0 })
+    entries.forEach { (t, c) ->
+      if (c <= 0) {
+        entries.remove(t)
+      }
+    }
   }
 
   inline val size: Int get() = entries.values.sum()
