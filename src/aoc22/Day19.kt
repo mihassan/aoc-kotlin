@@ -10,74 +10,27 @@ enum class Mineral {
   ORE, CLAY, OBSIDIAN, GEODE;
 
   companion object {
-    fun parse(mineral: String): Mineral = when (mineral) {
-      "ore" -> ORE
-      "clay" -> CLAY
-      "obsidian" -> OBSIDIAN
-      "geode" -> GEODE
-      else -> error("Bad input for Mineral: $mineral")
-    }
+    fun parse(mineral: String): Mineral = Mineral.values().find { it.name.lowercase() == mineral }
+      ?: error("Bad input for Mineral: $mineral")
   }
 }
 
-data class MineralCollection(val minerals: Bag<Mineral>) {
-  operator fun plus(mineral: Mineral) = MineralCollection(minerals + mineral)
+typealias Minerals = Bag<Mineral>
 
-  operator fun plus(other: MineralCollection) = MineralCollection(minerals + other.minerals)
-
-  operator fun minus(mineral: Mineral) = MineralCollection(minerals - mineral)
-
-  operator fun minus(other: MineralCollection) = MineralCollection(minerals - other.minerals)
-
-  operator fun times(multiplicand: Int) = MineralCollection(minerals * multiplicand)
-
-  companion object {
-    fun parse(minerals: String): MineralCollection {
-      val mineralsMap = minerals.split(" and ").associate {
-        val (amount, mineral) = it.words()
-        Mineral.parse(mineral) to amount.toInt()
-      }
-      return MineralCollection(Bag.of(mineralsMap))
-    }
-
-    fun of(vararg minerals: Mineral) = MineralCollection(Bag.of(*minerals))
-  }
-}
-
-
-data class Robot(val canCollect: Mineral) {
-  fun produceMinerals() = MineralCollection.of(canCollect)
-
-  companion object {
-    fun parse(robot: String): Robot = Robot(Mineral.parse(robot))
-  }
-}
-
-data class RobotCollection(val robots: Bag<Robot>) {
-  operator fun plus(robot: Robot) = RobotCollection(robots + robot)
-
-  operator fun plus(other: RobotCollection) = RobotCollection(robots + other.robots)
-
-  operator fun minus(robot: Robot) = RobotCollection(robots - robot)
-
-  operator fun minus(other: RobotCollection) = RobotCollection(robots - other.robots)
-
-  fun produceMinerals() =
-    robots.entries.entries.fold(MineralCollection.of()) { acc, (robot, robotCount) ->
-      acc + robot.produceMinerals() * robotCount
-    }
-
-  companion object {
-    fun of(vararg robots: Robot) = RobotCollection(Bag.of(*robots))
-  }
-}
-
-data class Rule(val robot: Robot, val cost: MineralCollection) {
+data class Rule(val robot: Mineral, val cost: Minerals) {
   companion object {
     fun parse(rule: String): Rule {
-      val (robot, mineralAmount) = rule.removePrefix("Each ").removeSuffix(".")
+      val (robotPart, costPart) = rule.removePrefix("Each ").removeSuffix(".")
         .split(" robot costs ")
-      return Rule(Robot.parse(robot), MineralCollection.parse(mineralAmount))
+
+      val robot = Mineral.parse(robotPart)
+
+      val minerals = Bag.of(costPart.split(" and ").associate {
+        val (amount, mineral) = it.words()
+        Mineral.parse(mineral) to amount.toInt()
+      })
+
+      return Rule(robot, minerals)
     }
   }
 }
@@ -105,14 +58,12 @@ private val solution = object : Solution<Input, Output>(2022, "Day19") {
   }
 
   override fun part1(input: Input): Output {
-    return input.mapIndexed { index, blueprint ->
-      findMaxGeodes(
-        blueprint,
-        RobotCollection.of(Robot(Mineral.ORE)),
-        MineralCollection.of(),
-        24
-      ) * (index + 1)
-    }.sum()
+    val totalMinutes = 24
+    return input.withIndex().sumOf { (index, blueprint) ->
+      (index + 1) * findMaxGeodes(
+        blueprint, Bag.of(Mineral.ORE), Bag.of(), totalMinutes
+      )
+    }
   }
 
   override fun part2(input: Input): Output {
@@ -121,20 +72,19 @@ private val solution = object : Solution<Input, Output>(2022, "Day19") {
 
   private fun findMaxGeodes(
     blueprint: Blueprint,
-    robots: RobotCollection,
-    minerals: MineralCollection,
+    robots: Minerals,
+    minerals: Minerals,
     minutesLeft: Int,
-    skippedRobots: Set<Robot> = emptySet(),
+    skippedRobots: Set<Mineral> = emptySet(),
   ): Int {
     if (minutesLeft <= 0) {
-      return minerals.minerals[Mineral.GEODE]
+      return minerals[Mineral.GEODE]
     }
 
-    val mineralsAfterProduction = minerals + robots.produceMinerals()
+    val mineralsAfterProduction = minerals + robots
 
-    val robotCandidates: Map<Robot, MineralCollection> = blueprint.rules
-      .filter { it.cost.minerals.isSubSetOf(minerals.minerals) }
-      .associate { it.robot to it.cost }
+    val robotCandidates: Map<Mineral, Minerals> =
+      blueprint.rules.filter { it.cost.isSubSetOf(minerals) }.associate { it.robot to it.cost }
 
     var maxGeodes = findMaxGeodes(
       blueprint,
@@ -144,18 +94,13 @@ private val solution = object : Solution<Input, Output>(2022, "Day19") {
       skippedRobots + robotCandidates.keys
     )
 
-    fun maybeConstructRobot(robot: Robot) {
-      if (robot in skippedRobots || robot !in robotCandidates)
-        return
+    fun maybeConstructRobot(robot: Mineral) {
+      if (robot in skippedRobots || robot !in robotCandidates) return
       val mineralsAfterConstruction = mineralsAfterProduction - robotCandidates[robot]!!
       val robotsAfterConstruction = robots + robot
-      val maxGeodesAfterConstruction =
-        findMaxGeodes(
-          blueprint,
-          robotsAfterConstruction,
-          mineralsAfterConstruction,
-          minutesLeft - 1
-        )
+      val maxGeodesAfterConstruction = findMaxGeodes(
+        blueprint, robotsAfterConstruction, mineralsAfterConstruction, minutesLeft - 1
+      )
       maxGeodes = maxOf(maxGeodes, maxGeodesAfterConstruction)
     }
 
