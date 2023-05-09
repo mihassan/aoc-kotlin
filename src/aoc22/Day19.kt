@@ -81,30 +81,40 @@ private val solution = object : Solution<Input, Output>(2022, "Day19") {
       return minerals[Mineral.GEODE]
     }
 
-    val mineralsAfterProduction = minerals + robots
-
     val robotCandidates: Map<Mineral, Minerals> =
       blueprint.rules.filter { it.cost.isSubSetOf(minerals) }.associate { it.robot to it.cost }
+
+    minerals += robots
 
     var maxGeodes = findMaxGeodes(
       blueprint,
       robots,
-      mineralsAfterProduction,
+      minerals,
       minutesLeft - 1,
       skippedRobots + robotCandidates.keys
     )
 
     fun maybeConstructRobot(robot: Mineral) {
       if (robot in skippedRobots || robot !in robotCandidates) return
-      val mineralsAfterConstruction = mineralsAfterProduction - robotCandidates[robot]!!
-      val robotsAfterConstruction = robots + robot
-      val maxGeodesAfterConstruction = findMaxGeodes(
-        blueprint, robotsAfterConstruction, mineralsAfterConstruction, minutesLeft - 1
-      )
-      maxGeodes = maxOf(maxGeodes, maxGeodesAfterConstruction)
+
+      minerals -= robotCandidates[robot]!!
+      robots += robot
+
+      findMaxGeodes(blueprint, robots, minerals, minutesLeft - 1)
+        .takeIf { it > maxGeodes }
+        ?.let {
+          maxGeodes = it
+        }
+
+      // Backtrack to before construction
+      minerals += robotCandidates[robot]!!
+      robots -= robot
     }
 
     robotCandidates.forEach { maybeConstructRobot(it.key) }
+
+    // Backtrack to before production
+    minerals -= robots
 
     return maxGeodes
   }
