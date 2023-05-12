@@ -42,33 +42,15 @@ enum class Turn(val symbol: Char) {
 }
 
 data class Board(val tiles: Map<Point, Tile>) {
-  val width: Int = tiles.keys.map(Point::x).toSet().size
-  val height: Int = tiles.keys.map(Point::y).toSet().size
-  val xBoundary: Map<Int, IntRange> =
+  private val xBoundary: Map<Int, IntRange> =
     tiles.keys.groupBy({ it.y }, { it.x }).mapValues { (_, xs) -> xs.min()..xs.max() }
-  val yBoundary: Map<Int, IntRange> =
+
+  private val yBoundary: Map<Int, IntRange> =
     tiles.keys.groupBy({ it.x }, { it.y }).mapValues { (_, ys) -> ys.min()..ys.max() }
 
-  fun move(from: Point, direction: Direction): Point {
-    val (x, y) = from
-    val (l, r) = xBoundary[y]?.let { it.first to it.last } ?: error("Invalid y: $y")
-    val (u, d) = yBoundary[x]?.let { it.first to it.last } ?: error("Invalid x: $x")
-    val dest = when (direction) {
-      Direction.RIGHT -> if (x < r) Point(x + 1, y) else Point(l, y)
-      Direction.LEFT -> if (x > l) Point(x - 1, y) else Point(r, y)
-      Direction.UP -> if (y > u) Point(x, y - 1) else Point(x, d)
-      Direction.DOWN -> if (y < d) Point(x, y + 1) else Point(x, u)
-    }
-    return if (tiles[dest] == Tile.WALL) from else dest
-  }
+  fun getXBoundary(y: Int): IntRange = xBoundary[y] ?: error("Invalid y: $y")
 
-  fun move(from: Point, direction: Direction, steps: Int): Point {
-    var dest = from
-    repeat(steps) {
-      dest = move(dest, direction)
-    }
-    return dest
-  }
+  fun getYBoundary(x: Int): IntRange = yBoundary[x] ?: error("Invalid x: $x")
 
   companion object {
     fun parse(boardStr: String) = Board(boardStr.lines().flatMapIndexed(::parseLine).toMap())
@@ -76,6 +58,41 @@ data class Board(val tiles: Map<Point, Tile>) {
     private fun parseLine(y: Int, s: String) = s.mapIndexedNotNull { x, c -> parseTile(x, y, c) }
 
     private fun parseTile(x: Int, y: Int, c: Char) = Tile.parse(c)?.let { Point(x, y) to it }
+  }
+}
+
+sealed class MoveHandler(val board: Board) {
+  abstract fun moveSingleStep(from: Point, direction: Direction): Pair<Point, Direction>
+
+  fun move(from: Point, direction: Direction, steps: Int): Pair<Point, Direction> {
+    var (currentPoint, currentDirection) = from to direction
+
+    repeat(steps) {
+      val (nextPoint, nextDirection) = moveSingleStep(currentPoint, currentDirection)
+      if (board.tiles[nextPoint] != Tile.WALL) {
+        currentPoint = nextPoint
+        currentDirection = nextDirection
+      }
+    }
+
+    return currentPoint to currentDirection
+  }
+
+  class WrappingMoveHandler(board: Board) : MoveHandler(board) {
+    override fun moveSingleStep(from: Point, direction: Direction): Pair<Point, Direction> {
+      val (x, y) = from
+      val xBoundary = board.getXBoundary(y)
+      val yBoundary = board.getYBoundary(x)
+
+      val dest = when (direction) {
+        Direction.RIGHT -> if (x + 1 in xBoundary) Point(x + 1, y) else Point(xBoundary.first, y)
+        Direction.LEFT -> if (x - 1 in xBoundary) Point(x - 1, y) else Point(xBoundary.last, y)
+        Direction.UP -> if (y - 1 in yBoundary) Point(x, y - 1) else Point(x, yBoundary.last)
+        Direction.DOWN -> if (y + 1 in yBoundary) Point(x, y + 1) else Point(x, yBoundary.first)
+      }
+
+      return dest to direction
+    }
   }
 }
 
@@ -110,6 +127,8 @@ private val solution = object : Solution<Input, Output>(2022, "Day22") {
 
   override fun part1(input: Input): Output {
     val (board, instructions) = input
+    val mover = MoveHandler.WrappingMoveHandler(board)
+
     var point = board.tiles
       .filterKeys { it.y == 0 }
       .filterValues { it == Tile.OPEN }
@@ -120,7 +139,8 @@ private val solution = object : Solution<Input, Output>(2022, "Day22") {
     instructions.forEach { instruction ->
       when (instruction) {
         is Instruction.TurnInstruction -> direction = direction.turn(instruction.turn)
-        is Instruction.MoveInstruction -> point = board.move(point, direction, instruction.step)
+        is Instruction.MoveInstruction -> point =
+          mover.move(point, direction, instruction.step).first
       }
     }
 
