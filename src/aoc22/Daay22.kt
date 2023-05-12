@@ -5,15 +5,11 @@ package aoc22.day22
 import lib.Point
 import lib.Solution
 
-enum class Tile {
-  WALL, OPEN;
+enum class Tile(val symbol: Char) {
+  WALL('#'), OPEN('.');
 
   companion object {
-    fun parse(c: Char): Tile = when (c) {
-      '#' -> WALL
-      '.' -> OPEN
-      else -> error("Invalid tile: $c")
-    }
+    fun parse(c: Char): Tile? = values().find { it.symbol == c }
   }
 }
 
@@ -37,15 +33,11 @@ enum class Direction {
   }
 }
 
-enum class Turn {
-  RIGHT, LEFT;
+enum class Turn(val symbol: Char) {
+  RIGHT('R'), LEFT('L');
 
   companion object {
-    fun parse(c: Char): Turn = when (c) {
-      'R' -> RIGHT
-      'L' -> LEFT
-      else -> error("Invalid turn: $c")
-    }
+    fun parse(c: Char): Turn? = values().find { it.symbol == c }
   }
 }
 
@@ -79,19 +71,11 @@ data class Board(val tiles: Map<Point, Tile>) {
   }
 
   companion object {
-    fun parse(boardStr: String): Board = Board(
-      boardStr.lines().flatMapIndexed { y, line ->
-        line.mapIndexedNotNull { x, c ->
-          when (c) {
-            '#' -> Tile.WALL
-            '.' -> Tile.OPEN
-            else -> null
-          }?.let {
-            Point(x, y) to it
-          }
-        }
-      }.toMap()
-    )
+    fun parse(boardStr: String) = Board(boardStr.lines().flatMapIndexed(::parseLine).toMap())
+
+    private fun parseLine(y: Int, s: String) = s.mapIndexedNotNull { x, c -> parseTile(x, y, c) }
+
+    private fun parseTile(x: Int, y: Int, c: Char) = Tile.parse(c)?.let { Point(x, y) to it }
   }
 }
 
@@ -100,11 +84,10 @@ sealed interface Instruction {
   data class MoveInstruction(val step: Int) : Instruction
 
   companion object {
-    fun parse(instructionStr: String): Instruction = when (instructionStr) {
-      "R" -> TurnInstruction(Turn.RIGHT)
-      "L" -> TurnInstruction(Turn.LEFT)
-      else -> MoveInstruction(instructionStr.toInt())
-    }
+    fun parse(instructionStr: String): Instruction =
+      Turn.parse(instructionStr.first())
+        ?.let(::TurnInstruction)
+        ?: MoveInstruction(instructionStr.toInt())
 
     fun parseMany(instructionsStr: String): List<Instruction> =
       Regex("(\\d+|R|L)").findAll(instructionsStr).map { parse(it.value) }.toList()
