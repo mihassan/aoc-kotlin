@@ -2,6 +2,7 @@
 
 package aoc22.day22
 
+import lib.Direction
 import lib.Point
 import lib.Solution
 
@@ -13,31 +14,27 @@ enum class Tile(val symbol: Char) {
   }
 }
 
-enum class Direction {
-  RIGHT, DOWN, LEFT, UP;
-
-  fun turn(turn: Turn): Direction = when (turn) {
-    Turn.RIGHT -> when (this) {
-      RIGHT -> DOWN
-      DOWN -> LEFT
-      LEFT -> UP
-      UP -> RIGHT
-    }
-
-    Turn.LEFT -> when (this) {
-      RIGHT -> UP
-      DOWN -> RIGHT
-      LEFT -> DOWN
-      UP -> LEFT
-    }
-  }
-}
-
 enum class Turn(val symbol: Char) {
   RIGHT('R'), LEFT('L');
 
   companion object {
     fun parse(c: Char): Turn? = values().find { it.symbol == c }
+  }
+}
+
+fun Direction.turn(turn: Turn): Direction = when (turn) {
+  Turn.RIGHT -> when (this) {
+    Direction.RIGHT -> Direction.DOWN
+    Direction.DOWN -> Direction.LEFT
+    Direction.LEFT -> Direction.UP
+    Direction.UP -> Direction.RIGHT
+  }
+
+  Turn.LEFT -> when (this) {
+    Direction.RIGHT -> Direction.UP
+    Direction.DOWN -> Direction.RIGHT
+    Direction.LEFT -> Direction.DOWN
+    Direction.UP -> Direction.LEFT
   }
 }
 
@@ -84,11 +81,15 @@ sealed class MoveHandler(val board: Board) {
       val xBoundary = board.getXBoundary(y)
       val yBoundary = board.getYBoundary(x)
 
-      val dest = when (direction) {
-        Direction.RIGHT -> if (x + 1 in xBoundary) Point(x + 1, y) else Point(xBoundary.first, y)
-        Direction.LEFT -> if (x - 1 in xBoundary) Point(x - 1, y) else Point(xBoundary.last, y)
-        Direction.UP -> if (y - 1 in yBoundary) Point(x, y - 1) else Point(x, yBoundary.last)
-        Direction.DOWN -> if (y + 1 in yBoundary) Point(x, y + 1) else Point(x, yBoundary.first)
+      var dest = from.move(direction)
+
+      if (dest !in board.tiles) {
+        dest = when (direction) {
+          Direction.RIGHT -> Point(xBoundary.first, y)
+          Direction.LEFT -> Point(xBoundary.last, y)
+          Direction.UP -> Point(x, yBoundary.last)
+          Direction.DOWN -> Point(x, yBoundary.first)
+        }
       }
 
       return dest to direction
