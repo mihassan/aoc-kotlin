@@ -11,10 +11,11 @@ import lib.Point
 import lib.Solution
 import lib.Ranges.contains
 
+// Not using lib.Direction here as the y direction is inverted.
 enum class Direction {
   LEFT, // Decrement x
   RIGHT, // Increment x
-  DOWN; // Decrement x
+  DOWN; // Decrement y
 
   companion object {
     fun Char.toDirection(): Direction = when (this) {
