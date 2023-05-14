@@ -1,5 +1,9 @@
 package lib
 
+enum class Direction {
+  RIGHT, DOWN, LEFT, UP
+}
+
 data class Point(val x: Int, val y: Int) : Comparable<Point> {
   operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
 
@@ -11,13 +15,20 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
 
   fun adjacents(): List<Point> = listOf(left(), right(), up(), down())
 
-  private fun left(): Point = this - X_DIRECTION
+  fun move(direction: Direction): Point = when (direction) {
+    Direction.RIGHT -> right()
+    Direction.DOWN -> down()
+    Direction.LEFT -> left()
+    Direction.UP -> up()
+  }
 
-  private fun right(): Point = this + X_DIRECTION
+  fun left(): Point = this - X_DIRECTION
 
-  private fun up(): Point = this - Y_DIRECTION
+  fun right(): Point = this + X_DIRECTION
 
-  private fun down(): Point = this + Y_DIRECTION
+  fun up(): Point = this - Y_DIRECTION
+
+  fun down(): Point = this + Y_DIRECTION
 
   companion object {
     private val X_DIRECTION = Point(1, 0)
