@@ -2,6 +2,7 @@
 
 package aoc22.day22
 
+import kotlin.math.sqrt
 import lib.Direction
 import lib.Point
 import lib.Solution
@@ -86,13 +87,147 @@ sealed class MoveHandler(val board: Board) {
       if (dest !in board.tiles) {
         dest = when (direction) {
           Direction.RIGHT -> Point(xBoundary.first, y)
+          Direction.DOWN -> Point(x, yBoundary.first)
           Direction.LEFT -> Point(xBoundary.last, y)
           Direction.UP -> Point(x, yBoundary.last)
-          Direction.DOWN -> Point(x, yBoundary.first)
         }
       }
 
       return dest to direction
+    }
+  }
+
+  /**
+   * This move handler assumes that the board is a cube with a fixed layout:
+   *
+   *    | F^ | R^
+   * ---|----|---
+   *    | D^ |
+   * ---|----|---
+   * Lv | Bv |
+   * ---|----|---
+   * U> |    |
+   *
+   * Also see: https://imgur.com/cGEtOzf
+   */
+  class CubeMoveHandler(board: Board) : MoveHandler(board) {
+    private val side = sqrt(board.tiles.size / 6.0).toInt()
+
+    override fun moveSingleStep(from: Point, direction: Direction): Pair<Point, Direction> {
+      val block = from / side
+      val (blockX, blockY) = from - block * side
+
+      return when (direction) {
+        Direction.RIGHT -> handleRight(from, block, blockX, blockY)
+        Direction.DOWN -> handleDown(from, block, blockX, blockY)
+        Direction.LEFT -> handleLeft(from, block, blockX, blockY)
+        Direction.UP -> handleUp(from, block, blockX, blockY)
+      }
+    }
+
+    private fun handleRight(
+      from: Point,
+      block: Point,
+      blockX: Int,
+      blockY: Int,
+    ): Pair<Point, Direction> {
+      if (blockX < side - 1) {
+        return from.right() to Direction.RIGHT
+      }
+      return when (block) {
+        // F -> R
+        Point(1, 0) -> Point(2 * side, blockY) to Direction.RIGHT
+        // R -> B
+        Point(2, 0) -> Point(side + (side - 1), 2 * side + (side - blockY - 1)) to Direction.LEFT
+        // D -> R
+        Point(1, 1) -> Point(2 * side + blockY, (side - 1)) to Direction.UP
+        // L -> B
+        Point(0, 2) -> Point(side, 2 * side + blockY) to Direction.RIGHT
+        // B -> R
+        Point(1, 2) -> Point(2 * side + (side - 1), side - blockY - 1) to Direction.LEFT
+        // U -> B
+        Point(0, 3) -> Point(side + blockY, 2 * side + (side - 1)) to Direction.UP
+        else -> error("Invalid block: $block")
+      }
+    }
+
+
+    private fun handleDown(
+      from: Point,
+      block: Point,
+      blockX: Int,
+      blockY: Int,
+    ): Pair<Point, Direction> {
+      if (blockY < side - 1) {
+        return from.down() to Direction.DOWN
+      }
+      return when (block) {
+        // F -> D
+        Point(1, 0) -> Point(side + blockX, side) to Direction.DOWN
+        // R -> D
+        Point(2, 0) -> Point(side + (side - 1), side + blockX) to Direction.LEFT
+        // D -> B
+        Point(1, 1) -> Point(side + blockX, 2 * side) to Direction.DOWN
+        // L -> U
+        Point(0, 2) -> Point(blockX, 3 * side) to Direction.DOWN
+        // B -> U
+        Point(1, 2) -> Point((side - 1), 3 * side + blockX) to Direction.LEFT
+        // U -> R
+        Point(0, 3) -> Point(2 * side + blockX, 0) to Direction.DOWN
+        else -> error("Invalid block: $block")
+      }
+    }
+
+    private fun handleLeft(
+      from: Point,
+      block: Point,
+      blockX: Int,
+      blockY: Int,
+    ): Pair<Point, Direction> {
+      if (blockX > 0) {
+        return from.left() to Direction.LEFT
+      }
+      return when (block) {
+        // F -> L
+        Point(1, 0) -> Point(0, 2 * side + (side - blockY - 1)) to Direction.RIGHT
+        // R -> F
+        Point(2, 0) -> Point(side + (side - 1), blockY) to Direction.LEFT
+        // D -> L
+        Point(1, 1) -> Point(blockY, 2 * side) to Direction.DOWN
+        // L -> F
+        Point(0, 2) -> Point(side, (side - blockY - 1)) to Direction.RIGHT
+        // B -> L
+        Point(1, 2) -> Point((side - 1), 2 * side + blockY) to Direction.LEFT
+        // U -> F
+        Point(0, 3) -> Point(side + blockY, 0) to Direction.DOWN
+        else -> error("Invalid block: $block")
+      }
+    }
+
+    private fun handleUp(
+      from: Point,
+      block: Point,
+      blockX: Int,
+      blockY: Int,
+    ): Pair<Point, Direction> {
+      if (blockY > 0) {
+        return from.up() to Direction.UP
+      }
+      return when (block) {
+        // F -> U
+        Point(1, 0) -> Point(0, 3 * side + blockX) to Direction.RIGHT
+        // R -> U
+        Point(2, 0) -> Point(blockX, 3 * side + (side - 1)) to Direction.UP
+        // D -> F
+        Point(1, 1) -> Point(side + blockX, (side - 1)) to Direction.UP
+        // L -> D
+        Point(0, 2) -> Point(side, side + blockX) to Direction.RIGHT
+        // B -> D
+        Point(1, 2) -> Point(side + blockX, side + (side - 1)) to Direction.UP
+        // U -> L
+        Point(0, 3) -> Point(blockX, 2 * side + (side - 1)) to Direction.UP
+        else -> error("Invalid block: $block")
+      }
     }
   }
 }
@@ -126,9 +261,12 @@ private val solution = object : Solution<Input, Output>(2022, "Day22") {
     return "$output"
   }
 
-  override fun part1(input: Input): Output {
+  override fun solve(part: Part, input: Input): Output {
     val (board, instructions) = input
-    val mover = MoveHandler.WrappingMoveHandler(board)
+    val mover = when(part) {
+      Part.PART1 -> MoveHandler.WrappingMoveHandler(board)
+      Part.PART2 -> MoveHandler.CubeMoveHandler(board)
+    }
 
     var point = board.tiles
       .filterKeys { it.y == 0 }
@@ -140,16 +278,15 @@ private val solution = object : Solution<Input, Output>(2022, "Day22") {
     instructions.forEach { instruction ->
       when (instruction) {
         is Instruction.TurnInstruction -> direction = direction.turn(instruction.turn)
-        is Instruction.MoveInstruction -> point =
-          mover.move(point, direction, instruction.step).first
+        is Instruction.MoveInstruction -> {
+          val move = mover.move(point, direction, instruction.step)
+          point = move.first
+          direction = move.second
+        }
       }
     }
 
     return 1000 * (point.y + 1) + 4 * (point.x + 1) + direction.ordinal
-  }
-
-  override fun part2(input: Input): Output {
-    TODO("Not yet implemented")
   }
 }
 
