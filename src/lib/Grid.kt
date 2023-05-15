@@ -13,6 +13,8 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
 
   operator fun times(scale: Int): Point = Point(x * scale, y * scale)
 
+  operator fun div(scale: Int): Point = Point(x / scale, y / scale)
+
   fun adjacents(): List<Point> = listOf(left(), right(), up(), down())
 
   fun move(direction: Direction): Point = when (direction) {
