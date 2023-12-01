@@ -25,13 +25,13 @@ private val solution = object : Solution<Input, Output>(2023, "Day01") {
 
   override fun part2(input: Input): Output {
     return input.map {
-      replacepents.fold(it) { acc, (match, replacement) ->
+      replacements.fold(it) { acc, (match, replacement) ->
         match.toRegex().replace(acc, replacement)
       }
     }.run { part1(this) }
   }
 
-  private val replacepents = listOf(
+  private val replacements = listOf(
     "on(e|8)" to "1n$1",
     "tw(o|1)" to "2w$1",
     "thre(e|8)" to "3hre$1",
