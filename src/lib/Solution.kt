@@ -1,7 +1,6 @@
 package lib
 
 import java.io.File
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import lib.Solution.Part.PART1
 import lib.Solution.Part.PART2
@@ -22,7 +21,6 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
     PART2 -> part2(input)
   }
 
-  @OptIn(ExperimentalTime::class)
   fun run() {
     val reader = fileName?.let {
       File("src/data/aoc${year % 100}/${it}.txt").reader()
