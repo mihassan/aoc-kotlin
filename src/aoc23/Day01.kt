@@ -24,23 +24,27 @@ private val solution = object : Solution<Input, Output>(2023, "Day01") {
   }
 
   override fun part2(input: Input): Output {
-    return input.map {
-      replacements.fold(it) { acc, (match, replacement) ->
-        match.toRegex().replace(acc, replacement)
-      }
-    }.run { part1(this) }
+    return input.sumOf { line ->
+      val firstDigit = numbers.find(line)!!.value.let { numberToDigit[it] ?: it.toInt() }
+      val lastDigit = numbers.findLast(line)!!.let { numberToDigit[it] ?: it.toInt() }
+      10 * firstDigit + lastDigit
+    }
   }
 
-  private val replacements = listOf(
-    "on(e|8)" to "1n$1",
-    "tw(o|1)" to "2w$1",
-    "thre(e|8)" to "3hre$1",
-    "four" to "4our",
-    "fiv(e|8)" to "5iv$1",
-    "six" to "6ix",
-    "seve(n|9)" to "7eve$1",
-    "eigh(t|2|3)" to "8igh$1",
-    "nin(e|8)" to "9in$1"
+  private fun Regex.findLast(input: String): String? =
+    this.pattern.reversed().toRegex().find(input.reversed())?.value?.reversed()
+
+  private val numbers = """1|2|3|4|5|6|7|8|9|one|two|three|four|five|six|seven|eight|nine""".toRegex()
+  private val numberToDigit = mapOf(
+    "one" to 1,
+    "two" to 2,
+    "three" to 3,
+    "four" to 4,
+    "five" to 5,
+    "six" to 6,
+    "seven" to 7,
+    "eight" to 8,
+    "nine" to 9
   )
 }
 
