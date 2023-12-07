@@ -2,6 +2,7 @@ package lib
 
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 object Maths {
@@ -29,6 +30,8 @@ object Maths {
   infix fun Long.floorDiv(o: Long) = floor(toDouble() / o).toInt()
   infix fun Int.ceilDiv(o: Int) = ceil(toDouble() / o).toInt()
   infix fun Long.ceilDiv(o: Long) = ceil(toDouble() / o).toInt()
+
+  infix fun Int.pow(p: Int): Int = (1..p).fold(1) { acc, _ -> acc * this }
 
   infix fun Int.mod(m: Int) = ((this % m) + m) % m
   infix fun Long.mod(m: Long) = ((this % m) + m) % m
