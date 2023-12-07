@@ -4,6 +4,10 @@ enum class Direction {
   RIGHT, DOWN, LEFT, UP
 }
 
+enum class Adjacency {
+  HORIZONTAL, VERTICAL, ORTHOGONAL, DIAGONAL, ALL
+}
+
 data class Point(val x: Int, val y: Int) : Comparable<Point> {
   operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
 
@@ -15,7 +19,13 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
 
   operator fun div(scale: Int): Point = Point(x / scale, y / scale)
 
-  fun adjacents(): List<Point> = listOf(left(), right(), up(), down())
+  fun adjacents(adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> = when (adjacency) {
+    Adjacency.HORIZONTAL -> listOf(left(), right())
+    Adjacency.VERTICAL -> listOf(up(), down())
+    Adjacency.ORTHOGONAL -> adjacents(Adjacency.HORIZONTAL) + adjacents(Adjacency.VERTICAL)
+    Adjacency.DIAGONAL -> listOf(upLeft(), upRight(), downLeft(), downRight())
+    Adjacency.ALL -> adjacents(Adjacency.ORTHOGONAL) + adjacents(Adjacency.DIAGONAL)
+  }
 
   fun move(direction: Direction): Point = when (direction) {
     Direction.RIGHT -> right()
@@ -31,6 +41,14 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
   fun up(): Point = this - Y_DIRECTION
 
   fun down(): Point = this + Y_DIRECTION
+
+  fun upLeft(): Point = up().left()
+
+  fun upRight(): Point = up().right()
+
+  fun downLeft(): Point = down().left()
+
+  fun downRight(): Point = down().right()
 
   companion object {
     private val X_DIRECTION = Point(1, 0)
@@ -62,6 +80,9 @@ data class Line(val start: Point, val end: Point) {
 
 data class Path(val points: List<Point>) {
   fun expand(): List<Point> = points.zipWithNext(::Line).flatMap(Line::expand)
+
+  fun adjacents(adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
+    points.flatMap { it.adjacents(adjacency) }.distinct() - points.toSet()
 
   companion object {
     fun parse(pathStr: String): Path {
@@ -149,8 +170,11 @@ data class Grid<T>(val grid: List<List<T>>) {
   operator fun contains(point: Point): Boolean =
     (point.x in (0 until width)) && (point.y in (0 until height))
 
-  fun adjacents(point: Point): List<Point> =
-    point.adjacents().filter { it in this }
+  fun adjacents(point: Point, adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
+    point.adjacents(adjacency).filter { it in this }
+
+  fun adjacents(path: Path, adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
+    path.adjacents(adjacency).filter { it in this }
 
   companion object {
     fun <T : Comparable<T>> Grid<T>.max(): T = grid.maxOf { it.max() }
