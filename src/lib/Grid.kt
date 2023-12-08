@@ -64,6 +64,10 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
 }
 
 data class Line(val start: Point, val end: Point) {
+  init {
+    require(start.x == end.x || start.y == end.y) { "Line must be horizontal or vertical" }
+  }
+
   private val xRange: IntRange = if (start.x < end.x) start.x..end.x else end.x..start.x
 
   private val yRange: IntRange = if (start.y < end.y) start.y..end.y else end.y..start.y
@@ -80,9 +84,6 @@ data class Line(val start: Point, val end: Point) {
 
 data class Path(val points: List<Point>) {
   fun expand(): List<Point> = points.zipWithNext(::Line).flatMap(Line::expand)
-
-  fun adjacents(adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
-    points.flatMap { it.adjacents(adjacency) }.distinct() - points.toSet()
 
   companion object {
     fun parse(pathStr: String): Path {
@@ -172,9 +173,6 @@ data class Grid<T>(val grid: List<List<T>>) {
 
   fun adjacents(point: Point, adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
     point.adjacents(adjacency).filter { it in this }
-
-  fun adjacents(path: Path, adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> =
-    path.adjacents(adjacency).filter { it in this }
 
   companion object {
     fun <T : Comparable<T>> Grid<T>.max(): T = grid.maxOf { it.max() }
