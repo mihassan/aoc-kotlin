@@ -12,8 +12,6 @@ import lib.Solution
 data class PartNumber(val value: Int, val path: Path)
 
 data class Gear(val starLocation: Point, val partNumbers: List<PartNumber>) {
-  fun isValid(): Boolean = partNumbers.size == 2
-
   fun value(): Int = partNumbers.fold(1) { acc, partNumber -> acc * partNumber.value }
 }
 
@@ -26,18 +24,17 @@ data class EngineSchematic(val grid: Grid<Char>) {
   fun extractGears(): List<Gear> =
     extractPartNumbers()
       .flatMap(::findStarPartNumberPairs)
-      .groupBy({ it.first }, {it.second})
+      .groupBy({ it.first }, { it.second })
       .map { Gear(it.key, it.value) }
-      .filter { it.isValid() }
+      .filter(::isValidGear)
 
   private fun findNumberLocations(): List<List<Point>> = grid
     .indicesOf { it.isDigit() }
-    .sortedWith(compareBy(Point::y, Point::x))
     .groupContiguousBy { pts, pt -> pts.last().right() == pt }
 
   private fun toPartNumber(points: List<Point>): PartNumber {
     val path = Path(points)
-    val value = points.sorted().map { grid[it] }.joinToString("").toInt()
+    val value = points.map { grid[it] }.joinToString("").toInt()
     return PartNumber(value, path)
   }
 
@@ -50,6 +47,8 @@ data class EngineSchematic(val grid: Grid<Char>) {
     grid.adjacents(partNumber.path, Adjacency.ALL)
       .filter { grid[it].isStar() }
       .map { it to partNumber }
+
+  private fun isValidGear(gear: Gear): Boolean = gear.partNumbers.size == 2
 
   private fun Char.isSymbol(): Boolean = !this.isDigit() && this != '.'
 
