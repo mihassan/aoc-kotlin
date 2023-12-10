@@ -2,6 +2,8 @@
 
 package aoc23.day05
 
+import kotlin.math.max
+import kotlin.math.min
 import lib.Collections.headTail
 import lib.Solution
 import lib.Strings.extractLongs
@@ -110,13 +112,41 @@ private val solution = object : Solution<Input, Output>(2023, "Day05") {
 
   override fun part2(input: Input): Output {
     var result = Long.MAX_VALUE
-    input.seeds.chunked(2)
-      .forEach { (start, length) ->
-        (start ..< start + length).forEach { seed ->
-          val (_, tmp) = input.convert(Item(Category.SEED, seed), Category.LOCATION)
-          if (tmp < result) result = tmp
+
+    // Check all seeds in the given range which potentially skipping over some seeds.
+    fun check(range: LongProgression): Long? {
+      var minSeed: Long? = null
+      var minLocation = result
+
+      for (seed in range) {
+        val location = input.convert(Item(Category.SEED, seed), Category.LOCATION)
+        if (location.number < minLocation) {
+          minSeed = seed
+          minLocation = location.number
         }
       }
+
+      result = min(result, minLocation)
+
+      return minSeed
+    }
+
+    input.seeds.chunked(2)
+      .forEach { (start, length) ->
+        if (length < 1000000) {
+          // For small ranges, check all seeds.
+          check(start..<start + length)
+        } else {
+          // For large ranges, check in two stages.
+          // Stage 1: Jump by 1,000 to get closer to the minimum seed.
+          check(start..<start + length step 1000)?.let { minSeed ->
+            // Stage 2: Check last 1,000 seeds (inclusive of minSeed) which we skipped earlier.
+            // Care should be taken to not go past start.
+            check(max(minSeed - 999, start)..minSeed)
+          }
+        }
+      }
+
     return result
   }
 }
