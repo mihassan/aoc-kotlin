@@ -31,6 +31,24 @@ object Maths {
   infix fun Int.ceilDiv(o: Int) = ceil(toDouble() / o).toInt()
   infix fun Long.ceilDiv(o: Long) = ceil(toDouble() / o).toInt()
 
+  infix fun Int.gcd(o: Int): Int {
+    if (o == 0) return this
+    return o gcd (this % o)
+  }
+
+  infix fun Long.gcd(o: Long): Long {
+    if (o == 0L) return this
+    return o gcd (this % o)
+  }
+
+  infix fun Int.lcm(o: Int): Int {
+    return this / (this gcd o) * o
+  }
+
+  infix fun Long.lcm(o: Long): Long {
+    return this / (this gcd o) * o
+  }
+
   infix fun Int.pow(p: Int): Int = (1..p).fold(1) { acc, _ -> acc * this }
 
   infix fun Int.mod(m: Int) = ((this % m) + m) % m
