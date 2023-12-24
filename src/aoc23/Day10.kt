@@ -8,7 +8,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Pipe(val symbol: Char, val connections: Set<Direction>) {
+enum class Tile(val symbol: Char, val connections: Set<Direction>) {
   GROUND('.', emptySet()),
   VERTICAL('|', setOf(UP, DOWN)),
   HORIZONTAL('-', setOf(LEFT, RIGHT)),
@@ -19,37 +19,38 @@ enum class Pipe(val symbol: Char, val connections: Set<Direction>) {
   START('S', setOf(UP, DOWN, LEFT, RIGHT));
 
   companion object {
-    fun fromSymbol(symbol: Char): Pipe {
+    fun parse(symbol: Char): Tile {
       return values().find { it.symbol == symbol } ?: error("Unknown symbol: $symbol")
     }
   }
 }
 
-data class Field(val grid: Grid<Pipe>) {
-  private val start: Point by lazy { grid.indexOf(Pipe.START) }
+data class Field(val grid: Grid<Tile>) {
+  private val start: Point by lazy { grid.indexOf(Tile.START) }
 
-  fun findPipe(): List<Point> {
-    var curr = flow(start).first()
+  fun findPipe(): List<Point> = buildList {
+    var curr = connectedPoints(start).first()
     var prev = start
 
-    return buildList {
-      add(prev)
-      while (curr != start) {
-        add(curr)
-        val next = flow(curr).first { it != prev }
-        prev = curr
-        curr = next
-      }
+    add(prev)
+    while (curr != start) {
+      add(curr)
+      val next = connectedPoints(curr).first { it != prev }
+      prev = curr
+      curr = next
     }
   }
 
-  private fun flow(from: Point): List<Point> =
-    mayFlow(from).filter { it in grid && from in mayFlow(it) }
+  private fun connectedPoints(from: Point): List<Point> =
+    possibleConnectedPoints(from).filter { next ->
+      next in grid && from in possibleConnectedPoints(next)
+    }
 
-  private fun mayFlow(from: Point): List<Point> = grid[from].connections.map(from::move)
+  private fun possibleConnectedPoints(from: Point): List<Point> =
+    grid[from].connections.map(from::move)
 
   companion object {
-    fun parse(input: String): Field = Field(Grid.parse(input).map { Pipe.fromSymbol(it) })
+    fun parse(input: String): Field = Field(Grid.parse(input).map { Tile.parse(it) })
   }
 }
 
