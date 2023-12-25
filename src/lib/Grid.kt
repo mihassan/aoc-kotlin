@@ -1,7 +1,15 @@
 package lib
 
 enum class Direction {
-  RIGHT, DOWN, LEFT, UP
+  RIGHT, DOWN, LEFT, UP;
+
+  fun turnRight(): Direction = rotate(1)
+
+  fun turnLeft(): Direction = rotate(3)
+
+  fun turnAround(): Direction = rotate(2)
+
+  private fun rotate(turn: Int): Direction = Direction.values()[(ordinal + turn) % 4]
 }
 
 enum class Adjacency {
