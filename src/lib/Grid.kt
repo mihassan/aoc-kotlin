@@ -1,5 +1,7 @@
 package lib
 
+import kotlin.math.abs
+
 enum class Direction {
   RIGHT, DOWN, LEFT, UP;
 
@@ -26,6 +28,8 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
   operator fun times(scale: Int): Point = Point(x * scale, y * scale)
 
   operator fun div(scale: Int): Point = Point(x / scale, y / scale)
+
+  fun manhattanDistance(other: Point): Int = abs(x - other.x) + abs(y - other.y)
 
   fun adjacents(adjacency: Adjacency = Adjacency.ORTHOGONAL): List<Point> = when (adjacency) {
     Adjacency.HORIZONTAL -> listOf(left(), right())
