@@ -2,104 +2,21 @@
 
 package aoc23.day12
 
-import aoc23.day12.Condition.*
+import lib.Collections.headTail
 import lib.Solution
 import lib.Strings.extractInts
 
-enum class Condition(val symbol: Char) {
-  OPERATIONAL('.'), DAMAGED('#'), UNKNOWN('?');
-
-  override fun toString(): String = "$symbol"
-
-  companion object {
-    fun parse(symbol: Char): Condition = values().find { it.symbol == symbol }!!
-  }
-}
-
-data class Conditions(val conditions: List<Condition>) {
-  override fun toString(): String = conditions.joinToString("")
-
-  fun noDamageAfter(idx: Int): Boolean = DAMAGED !in conditions.subList(idx, conditions.size)
-
-  fun noDamageBetween(range: IntRange): Boolean =
-    DAMAGED !in conditions.subList(range.first, range.last + 1)
-
-  companion object {
-    fun parse(conditionsStr: String): Conditions =
-      Conditions(conditionsStr.map { Condition.parse(it) })
-  }
-}
-
-data class ConditionRecord(val conditions: Conditions, val groups: List<Int>) {
-  private data class DpKey(val conditionsIdx: Int, val groupsIdx: Int)
-
+data class ConditionRecord(val conditions: String, val groups: List<Int>) {
   fun unfold(times: Int): ConditionRecord {
-    val conditionsWithoutPrefix = conditions.conditions.drop(1)
-    val newConditions = Conditions(buildList<Condition> {
-      addAll(conditions.conditions)
-      repeat(times - 1) {
-        add(UNKNOWN)
-        addAll(conditionsWithoutPrefix)
-      }
-    })
-
+    val newConditions = List(times) { conditions }.joinToString("?")
     val newGroups = List(times) { groups }.flatten()
-
     return ConditionRecord(newConditions, newGroups)
   }
 
-  fun arrangements(): Long {
-    // Dynamic programming cache to avoid recomputing the same sub-problems.
-    val dp: MutableMap<DpKey, Long> = mutableMapOf()
-
-    fun solve(dpKey: DpKey): Long {
-      // Return dp value if already computed.
-      if (dpKey in dp) return dp[dpKey]!!
-
-      // Base case: no more groups to match.
-      if (dpKey.groupsIdx >= groups.size) {
-        // If there are still damages in the remaining conditions, this arrangement is invalid.
-        return if (conditions.noDamageAfter(dpKey.conditionsIdx)) 1 else 0
-      }
-
-      return findAllGroups(dpKey)
-        .filter { conditions.noDamageBetween(dpKey.conditionsIdx..it) }
-        .map { match ->
-          DpKey(match + groups[dpKey.groupsIdx] + 1, dpKey.groupsIdx + 1)
-        }
-        .sumOf { solve(it) }.also {
-          // Cache result.
-          dp[dpKey] = it
-        }
-    }
-
-    return solve(DpKey(0, 0))
-  }
-
-  private fun computeGroupRegex(groupsIdx: Int): Regex {
-    val group = groups[groupsIdx]
-    // Each part must start with an operational part.
-    val operationalPart = "[${UNKNOWN.symbol}${OPERATIONAL.symbol}]"
-    // Followed by a damaged part of length group.
-    val damagedPart = "[${UNKNOWN.symbol}${DAMAGED.symbol}]".repeat(group)
-
-    // The group regex is the operational part followed by the damaged part. We use a lookahead
-    // trick to simulate overlapping matches.
-    return Regex("""${operationalPart}(?=${damagedPart})""")
-  }
-
-  private fun findAllGroups(dpKey: DpKey): Sequence<Int> =
-    computeGroupRegex(dpKey.groupsIdx)
-      .findAll("$conditions", dpKey.conditionsIdx)
-      .map { it.range.first }
-
   companion object {
     fun parse(lineStr: String): ConditionRecord {
-      val (conditionsStr, groupsStr) = lineStr.split(" ")
-      val conditions = Conditions.parse(".$conditionsStr")
-      val groups = groupsStr.extractInts()
-
-      return ConditionRecord(conditions, groups)
+      val (conditions, groups) = lineStr.split(" ")
+      return ConditionRecord(conditions, groups.extractInts())
     }
   }
 }
@@ -113,9 +30,49 @@ private val solution = object : Solution<Input, Output>(2023, "Day12") {
 
   override fun format(output: Output): String = "$output"
 
-  override fun part1(input: Input): Output = input.sumOf { it.arrangements() }
+  override fun part1(input: Input): Output = input.sumOf { arrangements(it) }
 
   override fun part2(input: Input): Output = part1(input.map { it.unfold(5) })
+
+  fun arrangements(conditionRecord: ConditionRecord): Long {
+    // Dynamic programming cache to avoid recomputing the same sub-problems.
+    val dp: MutableMap<ConditionRecord, Long> = mutableMapOf()
+
+    fun solve(conditionRecord: ConditionRecord): Long {
+      // Return dp value if already computed.
+      if (conditionRecord in dp) return dp[conditionRecord]!!
+
+      val (group, nextGroups) = conditionRecord.groups.headTail()
+
+      // Base case: no more groups to match.
+      if (group == null) {
+        // If there are still damages in the remaining conditions, this arrangement is invalid.
+        return if (conditionRecord.conditions.any { it == '#' }) 0 else 1
+      }
+
+      // The following regex matches a group of `group` consecutive damaged characters (either `#`
+      // or `?`). We use a lookahead to simulate overlapping matches. The match must not be followed
+      // by a `#` character, which would make the arrangement invalid.
+      return Regex("""[^.](?=[^.]{${group - 1}}([^#]|$))""")
+        .findAll(conditionRecord.conditions)
+        .map { it.range.first }
+        // Filter out matches that are preceded by a `#` character.
+        .filter { '#' !in conditionRecord.conditions.take(it) }
+        .sumOf {
+          // Drop `group` characters from the conditions and one extra character to account for the
+          // fact that two groups cannot be adjacent.
+          val nextConditions = conditionRecord.conditions.drop(it + group + 1)
+          val nextConditionRecord = ConditionRecord(nextConditions, nextGroups)
+          // Recursively solve the sub-problem.
+          solve(nextConditionRecord)
+        }.also {
+          // Cache the result.
+          dp[conditionRecord] = it
+        }
+    }
+
+    return solve(conditionRecord)
+  }
 }
 
 fun main() = solution.run()
