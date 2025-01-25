@@ -64,7 +64,7 @@ data class Input(val steps: List<Step>, val network: Network) {
     return stepIndex
   }
 
-  private fun getStep(stepIndex: Long): Step = steps[(stepIndex % steps.size).toInt()]!!
+  private fun getStep(stepIndex: Long): Step = steps[(stepIndex % steps.size).toInt()]
 
   companion object {
     fun parse(inputStr: String): Input {

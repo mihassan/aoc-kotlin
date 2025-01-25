@@ -5,7 +5,7 @@ package aoc22.day10
 import lib.Solution
 
 sealed interface Instruction {
-  object Noop : Instruction
+  data object Noop : Instruction
   data class AddX(val value: Int) : Instruction
 
   companion object {

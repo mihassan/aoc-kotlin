@@ -83,7 +83,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day21") {
   override fun part2(input: Input): Output {
     val monkeys = input.toMutableList()
 
-    // Update root job to be an equals operation.
+    // Update root job to be an `EQUALS` operation.
     val rootIdx = monkeys.indexOfFirst { it.name == "root" }
     val root = monkeys[rootIdx]
     val rootJob = root.job as? Job.RunOperation ?: error("Root job should not be a fixed number.")

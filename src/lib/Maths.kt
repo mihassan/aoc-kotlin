@@ -2,7 +2,6 @@ package lib
 
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.pow
 import kotlin.math.sqrt
 
 object Maths {

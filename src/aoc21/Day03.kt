@@ -20,12 +20,12 @@ private val solution = object : Solution<List<String>, Int>(2021, "Day03") {
       .groupBy({ it.first }, { it.second })
       .mapValues { it.value.histogram() }
 
-  fun gamma(input: Map<Int, Map<Char, Int>>) = input.mapValues {
-    it.value.maxByOrNull { it.value }?.key ?: '0'
+  fun gamma(input: Map<Int, Map<Char, Int>>) = input.mapValues { entry ->
+    entry.value.maxByOrNull { it.value }?.key ?: '0'
   }
 
-  fun epsilon(input: Map<Int, Map<Char, Int>>) = input.mapValues {
-    it.value.minByOrNull { it.value }?.key ?: '0'
+  fun epsilon(input: Map<Int, Map<Char, Int>>) = input.mapValues { entry ->
+    entry.value.minByOrNull { it.value }?.key ?: '0'
   }
 
   fun Map<Int, Char>.readBits() = values.toCharArray().concatToString().toInt(2)

@@ -7,7 +7,7 @@ import lib.Solution
 import lib.Strings.words
 
 sealed interface Command {
-  object LsCommand : Command
+  data object LsCommand : Command
 
   data class CdCommand(val path: String) : Command
 

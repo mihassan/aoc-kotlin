@@ -86,7 +86,7 @@ private data class Item(val worryLevel: Long) {
 private sealed interface Operation {
   fun operate(value: Long): Long
 
-  private object Square : Operation {
+  private data object Square : Operation {
     override fun operate(value: Long): Long = value * value
   }
 

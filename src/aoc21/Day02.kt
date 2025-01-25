@@ -18,13 +18,13 @@ private val solution = object : Solution<List<Pair<String, Int>>, Int>(2021, "Da
 
   override fun part2(input: List<Pair<String, Int>>): Int {
     var (aim, x, y) = arrayOf(0, 0, 0)
-    input.forEach { (cmd, X) ->
+    input.forEach { (cmd, dx) ->
       when (cmd) {
-        "down" -> aim += X
-        "up" -> aim -= X
+        "down" -> aim += dx
+        "up" -> aim -= dx
         "forward" -> {
-          x += X
-          y += aim * X
+          x += dx
+          y += aim * dx
         }
       }
     }
