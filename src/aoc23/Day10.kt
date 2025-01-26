@@ -88,14 +88,17 @@ data class Field(val grid: Grid<Tile>) {
   })
 
   private fun connections(from: Point): List<Connection> =
-    possibleConnections(from).filter { connection ->
-      connection.to in grid && connection.direction.turnAround() in grid[connection.to].connections
-    }
+    possibleConnections(from).filter { it.isValid() }
+
+  private fun Connection.isValid(): Boolean =
+    from in grid && grid[to]?.let {
+      direction.turnAround() in it.connections
+    } ?: false
 
   private fun possibleConnections(from: Point): List<Connection> =
-    grid[from].connections.map {
+    grid[from]?.connections?.map {
       Connection(from, from.move(it), it)
-    }
+    } ?: emptyList()
 
   companion object {
     fun parse(input: String): Field = Field(Grid.parse(input).map { Tile.parse(it) })

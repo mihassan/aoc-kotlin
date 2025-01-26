@@ -44,7 +44,11 @@ private val solution = object : Solution<Input, Output>(2022, "Day12") {
     fun Point.isNotVisited(): Boolean = this !in distance
 
     fun canStepFrom(points: Pair<Point, Point>): Boolean =
-      this[points.first] canStepTo this[points.second]
+      this[points.first]?.let { p1 ->
+        this[points.second]?.let { p2 ->
+          p1 canStepTo p2
+        }
+      } ?: false
 
     fun stepFrom(points: Pair<Point, Point>) {
       distance[points.second] = distance[points.first]!! + 1
@@ -64,7 +68,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day12") {
         .filter { nextPoint -> canStepFrom(currPoint to nextPoint) }
         .forEach { nextPoint ->
           stepFrom(currPoint to nextPoint)
-          if (this[nextPoint].plotType == PlotType.END) {
+          if (this[nextPoint]?.plotType == PlotType.END) {
             return distance[nextPoint]!!
           }
         }
