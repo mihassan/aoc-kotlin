@@ -4,40 +4,59 @@ package aoc24.day03
 
 import lib.Solution
 
-typealias Input = String
+typealias Input = List<Instruction>
 
 typealias Output = Int
 
-private val solution = object : Solution<Input, Output>(2024, "Day03") {
-  private val  MUL_PATTERN: Regex = """mul\((\d+),(\d+)\)""".toRegex()
-  private val FULL_PATTERN= """mul\((\d+),(\d+)\)|do\(\)|don't\(\)""".toRegex()
+sealed interface Instruction {
+  data object DO : Instruction
+  data object DON_T : Instruction
+  data class MUL(val x: Int, val y: Int) : Instruction {
+    val value: Int
+      get() = x * y
+  }
+}
 
-  override fun parse(input: String): Input = input
+private val solution = object : Solution<Input, Output>(2024, "Day03") {
+  private val INSTRUCTION_PATTERN = """mul\((\d+),(\d+)\)|do\(\)|don't\(\)""".toRegex()
+
+  override fun parse(input: String): Input =
+    INSTRUCTION_PATTERN.findAll(input).map {
+      when (it.value) {
+        "do()" ->
+          Instruction.DO
+
+        "don't()" ->
+          Instruction.DON_T
+
+        else -> {
+          val (x, y) = it.destructured
+          Instruction.MUL(x.toInt(), y.toInt())
+        }
+      }
+    }.toList()
 
   override fun format(output: Output): String = "$output"
 
-  override fun part1(input: Input): Output {
-    return MUL_PATTERN
-      .findAll(input)
-      .map { it.destructured }
-      .sumOf { (x, y) -> x.toInt() * y.toInt() }
-  }
+  override fun part1(input: Input): Output =
+    input
+      .filterIsInstance<Instruction.MUL>()
+      .sumOf { it.value }
 
   override fun part2(input: Input): Output {
     var enabled = true
     var sum = 0
-    FULL_PATTERN.findAll(input).forEach {
-      when(it.value) {
-        "do()" -> enabled = true
-        "don't()" -> enabled = false
-        else -> {
-          if (enabled) {
-            val (x, y) = it.destructured
-            sum += x.toInt() * y.toInt()
-          }
-        }
+
+    input.forEach {
+      when (it) {
+        Instruction.DO -> enabled = true
+
+        Instruction.DON_T -> enabled = false
+
+        is Instruction.MUL -> if (enabled) sum += it.value
       }
     }
+
     return sum
   }
 }
