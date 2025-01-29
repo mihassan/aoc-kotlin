@@ -166,6 +166,10 @@ data class Grid<T>(val grid: List<List<T>>) {
 
   fun find(element: T): T = find { it == element }
 
+  fun findOrNull(predicate: (T) -> Boolean): T? = findAll(predicate).firstOrNull()
+
+  fun findOrNull(element: T): T? = findOrNull { it == element }
+
   fun indicesOf(predicate: (T) -> Boolean): List<Point> =
     grid.flatMapIndexed { y, row ->
       row.mapIndexedNotNull { x, col ->
@@ -179,6 +183,10 @@ data class Grid<T>(val grid: List<List<T>>) {
 
   fun indexOf(element: T): Point = indexOf { it == element }
 
+  fun indexOfOrNull(predicate: (T) -> Boolean): Point? = indicesOf(predicate).firstOrNull()
+
+  fun indexOfOrNull(element: T): Point? = indexOfOrNull { it == element }
+
   fun zip(other: Grid<T>, transform: (T, T) -> T): Grid<T> = Grid(
     grid.zip(other.grid) { x, y -> x.zip(y, transform) }
   )
@@ -186,6 +194,18 @@ data class Grid<T>(val grid: List<List<T>>) {
   fun count(predicate: (T) -> Boolean): Int = grid.sumOf { it.count(predicate) }
 
   operator fun get(point: Point): T? = if (point in this) grid[point.y][point.x] else null
+
+  fun set(point: Point, value: T): Grid<T> =
+    Grid(
+      grid.mapIndexed { rowIdx, row ->
+        if (point.y == rowIdx)
+          row.mapIndexed { colIdx, col ->
+            if (point.x == colIdx) value else col
+          }
+        else
+          row
+      }
+    )
 
   operator fun contains(point: Point): Boolean =
     (point.x in (0 until width)) && (point.y in (0 until height))
