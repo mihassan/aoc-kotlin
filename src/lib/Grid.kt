@@ -106,8 +106,8 @@ data class Path(val points: List<Point>) {
 }
 
 data class Grid<T>(val grid: List<List<T>>) {
-  private val height: Int = grid.size
-  private val width: Int = grid.map(List<T>::size).toSet().single()
+  val height: Int = grid.size
+  val width: Int = grid.map(List<T>::size).toSet().single()
 
   fun transposed(): Grid<T> = Grid(
     List(width) { x ->
