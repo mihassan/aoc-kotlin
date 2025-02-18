@@ -71,12 +71,12 @@ private val solution = object : Solution<Input, Output>(2024, "Day09") {
     val blocks = LinkedList(inputBlocks)
 
     while (!blocks.isEmpty()) {
-      when (blocks.first) {
+      when (blocks.first()) {
         is FileBlock ->
           // Leftmost file blocks is fixed and won't be moved anymore. So, it is safe to yield them.
           add(blocks.removeFirst())
 
-        is FreeBlock -> when (blocks.last) {
+        is FreeBlock -> when (blocks.last()) {
           is FreeBlock ->
             // Rightmost free blocks can be ignored.
             blocks.removeLast()
