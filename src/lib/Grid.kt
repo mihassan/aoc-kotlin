@@ -11,7 +11,9 @@ enum class Direction {
 
   fun turnAround(): Direction = rotate(2)
 
-  private fun rotate(turn: Int): Direction = Direction.values()[(ordinal + turn) % 4]
+  private fun rotate(turn: Int): Direction = Direction.entries[(ordinal + turn) % 4]
+
+  companion object
 }
 
 enum class Adjacency {
