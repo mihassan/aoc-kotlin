@@ -49,6 +49,7 @@ object Maths {
   }
 
   infix fun Int.pow(p: Int): Int = (1..p).fold(1) { acc, _ -> acc * this }
+  infix fun Long.pow(p: Long): Long = (1..p).fold(1) { acc, _ -> acc * this }
 
   infix fun Int.mod(m: Int) = ((this % m) + m) % m
   infix fun Long.mod(m: Long) = ((this % m) + m) % m
