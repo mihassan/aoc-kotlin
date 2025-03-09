@@ -36,19 +36,12 @@ private val solution = object : Solution<Input, Output>(2024, "Day20") {
 
   override fun format(output: Output): String = "$output"
 
-  override fun part1(input: Input): Output {
-    val distances = calculateShortestDistances(input.grid, input.start)
-    val saves = input.grid.indicesOf(Tile.WALL).mapNotNull {
-      val neighbourDistances = it.adjacents().mapNotNull { distances[it] }
-      if (neighbourDistances.size < 2)
-        null
-      else
-        (neighbourDistances.max() - neighbourDistances.min() - 2)
+  override fun solve(part: Part, input: Input): Output {
+    val allowedCheatSize = when (part) {
+      Part.PART1 -> 2
+      Part.PART2 -> 20
     }
-    return saves.count { it >= 100 }
-  }
 
-  override fun part2(input: Input): Output {
     val distances = calculateShortestDistances(input.grid, input.end)
     var totalCheats = 0
 
@@ -56,7 +49,7 @@ private val solution = object : Solution<Input, Output>(2024, "Day20") {
       distances.forEach { (cheatEnd, distanceFromCheatEnd) ->
         val cheatSize = cheatStart.manhattanDistance(cheatEnd)
         val save = (distanceFromCheatStart - distanceFromCheatEnd) - cheatSize
-        if (save >= 100 && cheatSize >= 1 && cheatSize <= 20)
+        if (save >= 100 && cheatSize >= 1 && cheatSize <= allowedCheatSize)
           totalCheats++
       }
     }
