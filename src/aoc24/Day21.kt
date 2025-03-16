@@ -3,10 +3,10 @@
 package aoc24.day21
 
 import aoc24.day21.Keypad.DirectionKeypad
+import aoc24.day21.Keypad.DirectionKeypad.computeMovesToApply
 import aoc24.day21.Keypad.NumericKeypad
 import kotlin.math.absoluteValue
 import lib.Collections.histogram
-import lib.DP.memoize
 import lib.Point
 import lib.Solution
 
@@ -21,6 +21,21 @@ sealed class Keypad() {
   abstract val layout: Map<Move, Point>
   abstract val hole: Point
 
+  /**
+   * Return the sequence of moves to move from the source key to the destination key.
+   * Regardless of the Keypad on which the move is performed,
+   * the output move sequence can be entered into a DIRECTION keypad.
+   *
+   * The algorithm is greedy and tries to avoid the hole as much as possible.
+   * The key observation is that when moving right, prefer to move in y-axis first.
+   * Otherwise, move in x-axis first.
+   * The idea is borrowed from the following Reddit post by u/Prof_McBurney:
+   * https://www.reddit.com/r/adventofcode/comments/1hjgyps/2024_day_21_part_2_i_got_greedyish.
+   *
+   * @param src The source key.
+   * @param dst The destination key.
+   * @return The sequence of direction moves (i.e., '<', '>', '^', 'v') that ends with 'A'.
+   */
   fun move(src: Move, dst: Move): String {
     val srcPoint = layout[src] ?: error("Invalid key: $src")
     val dstPoint = layout[dst] ?: error("Invalid key: $dst")
@@ -31,19 +46,28 @@ sealed class Keypad() {
 
     val moves = when {
       // Avoid the hole when moving from the row of the hole to the column of the hole
-      srcPoint.y == hole.y && dstPoint.x == hole.x -> yMoves + xMoves
+      // by moving column first and then row.
+      Point(dstPoint.x, srcPoint.y) == hole -> yMoves + xMoves
       // Avoid the hole when moving from the column of the hole to the row of the hole
-      srcPoint.x == hole.x && dstPoint.y == hole.y -> xMoves + yMoves
-      // When going right, prefer to move in y-axis first
+      // by moving row first and then column.
+      Point(srcPoint.x, dstPoint.y) == hole -> xMoves + yMoves
+      // When going right, prefer to move in y-axis first.
+      // This is the key observation to keep the algorithm greedy.
+      // The idea is borrowed from the following Reddit post by u/Prof_McBurney:
+      // https://www.reddit.com/r/adventofcode/comments/1hjgyps/2024_day_21_part_2_i_got_greedyish
       dx > 0 -> yMoves + xMoves
-      // Otherwise move in x-axis first
+      // Otherwise move in x-axis first.
       else -> xMoves + yMoves
     }
 
     return moves.joinToString("") + 'A'
   }
 
-  fun applyMoves(moves: Moves): Moves =
+  /**
+   * Compute the moves that needs to be applied to a DIRECTION keypad so that the moves are applied.
+   * It assumes that the robot hand is currently at the 'A' key.
+   */
+  open fun computeMovesToApply(moves: Moves): Moves =
     "A$moves".zipWithNext { a, b -> move(a, b) }.joinToString("")
 
   object NumericKeypad : Keypad() {
@@ -72,30 +96,68 @@ sealed class Keypad() {
       'v' to Point(1, 1),
       '>' to Point(2, 1)
     )
+
+    /**
+     * Override the [computeMovesToApply] method to memoize the result.
+     * This is because the computation is expensive and the result is deterministic,
+     * provided that the robot hand starts at the 'A' key and ends at the 'A' key.
+     */
+    override fun computeMovesToApply(moves: Moves): Moves =
+      cache.getOrPut(moves) { super.computeMovesToApply(moves) }
+
+    private val cache: MutableMap<Moves, Moves> = mutableMapOf()
   }
 }
 
-// A segment is a sequence of moves that ends with 'A'.
-typealias Segment = String
+/** A segment is a sequence of moves that ends with 'A'. */
+@ConsistentCopyVisibility
+data class Segment private constructor(val moves: Moves) {
+  val length: Int get() = moves.length
 
-// A compressed move is a map from a segment to the number of times it is repeated.
-// We can compress like this because the order of segments does not matter.
-typealias CompressedMoves = Map<Segment, Long>
+  companion object {
+    private val SEGMENT_PATTERN = """[^A]*A""".toRegex()
+
+    fun fromMoves(moves: Moves): List<Segment> =
+      SEGMENT_PATTERN.findAll(moves).map { Segment(it.value) }.toList()
+  }
+}
 
 /**
- * Apply the given segment of moves to the keypad and return the compressed moves.
+ * A compressed move is a [Map] from a segment to the number of times it is repeated.
+ * We can compress like this because the order of segments does not matter to the final count.
  */
-private fun applyMoveSegment(keypad: Keypad, segment: Segment): CompressedMoves =
-  keypad.applyMoves(segment).splitIntoSegments().histogram().mapValues { it.value.toLong() }
+@ConsistentCopyVisibility
+data class CompressedMoves private constructor(private val segments: Map<Segment, Long>) {
+  val length: Long get() = segments.entries.sumOf { (segment, count) -> segment.length * count }
 
-/**
- * Memoized version of [applyMoveSegment].
- */
-private val applyMoveSegmentMemo: (Keypad, Segment) -> CompressedMoves =
-  memoize { keypad, segment -> applyMoveSegment(keypad, segment) }
+  /**
+   * Find the moves needed to be applied to the keypad to produce the given compressed moves.
+   * */
+  fun computeMovesToApply(): CompressedMoves =
+    segments.flatMap { (segment, count) ->
+      DirectionKeypad
+        .computeMovesToApply(segment.moves)
+        .let(Segment::fromMoves)
+        .map { it to count }
+    }.let(::fromSegmentCountPairs)
 
-private fun String.splitIntoSegments(): List<Segment> =
-  Regex("""[^A]*A""").findAll(this).map { it.value }.toList()
+  companion object {
+    /** Create a [CompressedMoves] from a list of moves by splitting them into segments first. */
+    fun fromMoves(moves: Moves): CompressedMoves =
+      CompressedMoves(Segment.fromMoves(moves).histogram().mapValues { it.value.toLong() })
+
+    /**
+     * Create a [CompressedMoves] from a list of segment-count pairs.
+     * There can be multiple segments with the same moves.
+     * So, we need to group them by the moves and sum the counts.
+     */
+    fun fromSegmentCountPairs(segments: List<Pair<Segment, Long>>): CompressedMoves =
+      segments
+        .groupingBy { it.first }.fold(0L) { acc, (_, count) -> acc + count }
+        .let(::CompressedMoves)
+  }
+}
+
 
 private val solution = object : Solution<Input, Output>(2024, "Day21") {
   override fun parse(input: String): Input = input.lines()
@@ -104,37 +166,30 @@ private val solution = object : Solution<Input, Output>(2024, "Day21") {
 
   override fun part1(input: Input): Output =
     input.sumOf {
-      applyMovesThroughChain(it, 3)
+      computeComplexityOfTheChain(it, 3)
     }
 
   override fun part2(input: Input): Output =
     input.sumOf {
-      applyMovesThroughChain(it, 26)
+      computeComplexityOfTheChain(it, 26)
     }
 
-  private fun applyMovesThroughChain(initialMoves: Moves, step: Int): Long {
-    var finalMoves: CompressedMoves = applyMoveSegmentMemo(NumericKeypad, initialMoves)
-    repeat(step - 1) {
-      finalMoves = finalMoves.applyMoves()
+  /**
+   * Compute the complexity of the initial moves to be applied to the DIRECTION keypad.
+   * The moves are applied to a sequence of [chainLength] DIRECTION and NUMERIC keypads.
+   * All but the last keypad are DIRECTION keypads, only the last keypad is a NUMERIC keypad.
+   */
+  private fun computeComplexityOfTheChain(numericMoves: Moves, chainLength: Int): Long {
+    var moves: CompressedMoves =
+      CompressedMoves.fromMoves(NumericKeypad.computeMovesToApply(numericMoves))
+    repeat(chainLength - 1) {
+      moves = moves.computeMovesToApply()
     }
-    return finalMoves.length() * initialMoves.numericValue()
+    return moves.length * numericMoves.numericValue()
   }
-
-  private fun CompressedMoves.applyMoves(): CompressedMoves =
-    flatMap { (segment, count) ->
-      applyMoveSegmentMemo(
-        DirectionKeypad,
-        segment
-      ).mapValues { (_, count2) -> count * count2 }.entries
-    }.groupBy({ it.key }, { it.value }).mapValues { (_, counts) -> counts.sum() }
-
-  private fun CompressedMoves.length(): Long =
-    this.map { (segment, count) -> segment.length.toLong() * count }.sum().toLong()
 
   private fun String.numericValue(): Long =
     this.dropWhile { it == '0' }.dropLastWhile { it == 'A' }.toLong()
 }
 
-fun main() {
-  solution.run()
-}
+fun main() =  solution.run()
