@@ -11,6 +11,12 @@ sourceSets.main {
   java.srcDirs("src")
 }
 
+tasks {
+  wrapper {
+    gradleVersion = "8.13"
+  }
+}
+
 application {
   mainClass = "MainKt"
 }
