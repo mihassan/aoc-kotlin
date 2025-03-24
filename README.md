@@ -11,6 +11,15 @@ The input data should be saved in a file named `DayXX.txt`, where `XX` is the da
 It should be saved `src/data/aocXX` folder, where `XX` is the last 2 digits of the year.
 For example, `src/data/aoc24/Day01.txt` contains the input data for day 1 of the year 2024.
 
+Alternatively, you can run the following command to download the input data for a specific day:
+
+```shell
+./gradlew fetchInput --args="YY DD"
+```
+
+Make sure to set the `AOC_SESSION` environment variable to your AoC session cookie.
+You can retrieve the session cookie from your browser and export it as an environment variable.
+
 ## How to run the solutions
 
 Preferred approach is to load the project in IntelliJ IDEA and run the solutions from there.
@@ -20,7 +29,7 @@ You can run the `main` function from inside the IDE and see the output in the co
 Alternatively, you can run the solutions from the command line using the following command:
 
 ```shell
-./gradlew run --args="YY DD"
+./gradlew solve --args="YY DD"
 ```
 
 ## Philosophy
