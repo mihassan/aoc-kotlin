@@ -10,3 +10,6 @@
 
 # Do not track input data
 /src/data/
+
+# Ignore kotlin error reports
+.kotlin
