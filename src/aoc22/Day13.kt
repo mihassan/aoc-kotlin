@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc2022.day13
+package aoc22.day13
 
 import lib.Collections.headTail
 import lib.Solution

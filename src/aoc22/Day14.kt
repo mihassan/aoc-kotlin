@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc2022.day14
+package aoc22.day14
 
 import lib.Path
 import lib.Point

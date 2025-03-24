@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc2022.day12
+package aoc22.day12
 
 import lib.Grid
 import lib.Point
