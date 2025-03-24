@@ -23,6 +23,7 @@ fun main(args: Array<String>) {
   val request: Request = Request.Builder()
     .url("https://adventofcode.com/20$year/day/$day/input")
     .header("Cookie", "session=${System.getenv("AOC_SESSION")}")
+    .header("User-Agent", "https://github.com/mihassan/aoc-kotlin by mihassan@gmail.com")
     .build()
 
   client.newCall(request).execute().use { response ->
