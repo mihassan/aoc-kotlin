@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc22.day06
+package aoc22.day08
 
 import kotlin.math.max
 import lib.Collections.suffixes
