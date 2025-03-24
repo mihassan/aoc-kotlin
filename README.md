@@ -17,6 +17,12 @@ Preferred approach is to load the project in IntelliJ IDEA and run the solutions
 For each day, there is a `main` function that reads the input data and prints the solution.
 You can run the `main` function from inside the IDE and see the output in the console.
 
+Alternatively, you can run the solutions from the command line using the following command:
+
+```shell
+./gradlew run --args="YY DD"
+```
+
 ## Philosophy
 
 1. **Readability**: The code should be easy to read and understand. 
