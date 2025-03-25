@@ -13,3 +13,6 @@
 
 # Ignore kotlin error reports
 .kotlin
+
+# Ignore environment files
+.env

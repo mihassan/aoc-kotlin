@@ -3,7 +3,7 @@
 [Advent of Code][aoc] – an annual event in December since 2015.
 This repository contains partial solutions to the problems in [kotlin].
 
-## How to setup input data
+## How to fetch input data
 
 The input data is not included in the repository to respect the [AoC][aoc] terms of service.
 So, you need to download the input data from the AoC website and save it in the `src/data` directory.
@@ -17,8 +17,16 @@ Alternatively, you can run the following command to download the input data for 
 ./gradlew fetchInput --args="--year=YY --day=DD"
 ```
 
-Make sure to set the `AOC_SESSION` environment variable to your AoC session cookie.
+This requires an AoC session cookie to be able to download the input data.
 You can retrieve the session cookie from your browser and export it as an environment variable.
+There are two ways to provide the session cookie:
+
+1. Set the `AOC_SESSION` environment variable to your AoC session cookie.
+2. Save the session cookie in a file named `.env` in the root directory of the project using the following format:
+
+```
+AOC_SESSION=your_session_cookie
+```
 
 ## How to run the solutions
 

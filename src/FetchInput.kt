@@ -1,30 +1,31 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.*
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.clikt.parameters.types.restrictTo
+import io.github.cdimascio.dotenv.dotenv
 import java.nio.file.Path
-import kotlin.io.path.*
-import okhttp3.*
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class AocClient {
-  val session: String
-
-  init {
-    if (System.getenv("AOC_SESSION") == null) {
-      error("AOC_SESSION environment variable not set")
-    }
-    session = System.getenv("AOC_SESSION")
-  }
+  private val session: String = dotenv { ignoreIfMissing = true }.get("AOC_SESSION")
+    ?: error("AOC_SESSION is neither found in .env nor set as an environment variable")
 
   fun getInput(year: Int, day: Int): String {
     val client = OkHttpClient()
     val request = makeRequest("https://adventofcode.com/20$year/day/$day/input")
 
     client.newCall(request).execute().use { response ->
-      if (!response.isSuccessful) error("Unexpected code $response")
+      if (!response.isSuccessful) error("Unexpected code $response while fetching input")
       response.body?.let {
         return it.string().trim()
-      } ?: error("Empty response")
+      } ?: error("Empty response body while fetching input")
     }
   }
 
@@ -36,7 +37,7 @@ class AocClient {
       .build()
 
   companion object {
-    private const val  REPOSITORY = "https://github.com/mihassan/aoc-kotlin"
+    private const val REPOSITORY = "https://github.com/mihassan/aoc-kotlin"
     private const val EMAIL = "mihassan@gmail.com"
   }
 }
