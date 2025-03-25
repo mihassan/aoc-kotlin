@@ -25,7 +25,7 @@ tasks.register<JavaExec>("solve") {
   group = "application"
   description = "Solve AoC problem for a given year and day"
   classpath = sourceSets["main"].runtimeClasspath
-  mainClass.set("SolveKt")
+  mainClass.set("Solve")
 }
 
 tasks.register<JavaExec>("fetchInput") {
