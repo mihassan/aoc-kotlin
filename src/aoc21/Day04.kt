@@ -79,7 +79,7 @@ private val solution = object : Solution<Input, Output>(2021, "Day03") {
   override fun parse(input: String): Input =
     BinaryNumberList(input.lines().map(BinaryNumber::parse))
 
-  override fun format(output: Output): String = "$output"
+  override fun format(output: Output): String = output.toString()
 
   override fun part1(input: Input): Output =
     input.gamma().toInt() * input.epsilon().toInt()

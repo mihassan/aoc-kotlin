@@ -5,19 +5,18 @@ package aoc21.day01
 import lib.Solution
 import lib.Strings.ints
 
-private val solution = object : Solution<List<Int>, Int>(2021, "Day01") {
-  override fun parse(input: String): List<Int> = input.ints()
+private typealias Input = List<Int>
 
-  override fun format(output: Int): String = output.toString()
+private typealias Output = Int
 
-  override fun part1(input: List<Int>): Int = input
-    .zipWithNext()
-    .count { (a, b) -> b > a }
+private val solution = object : Solution<Input, Output>(2021, "Day01") {
+  override fun parse(input: String): Input = input.ints()
 
-  override fun part2(input: List<Int>): Int = input
-    .windowed(3)
-    .map(List<Int>::sum)
-    .let(::part1)
+  override fun format(output: Output): String = "$output"
+
+  override fun part1(input: Input): Output = input.zipWithNext().count { (a, b) -> b > a }
+
+  override fun part2(input: Input): Output = input.windowed(3).map { it.sum() }.let(::part1)
 }
 
 fun main() = solution.run()

@@ -49,5 +49,12 @@ object Collections {
     return groups
   }
 
+  fun <T> List<List<T>>.transposed(): List<List<T>> =
+    List(first().size) { row ->
+      List(size) { col ->
+        this[col][row]
+      }
+    }
+
   fun <T> Sequence<T>.repeat() = sequence { while (true) yieldAll(this@repeat) }
 }
