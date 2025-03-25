@@ -11,6 +11,7 @@ sourceSets.main {
 
   dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
   }
 }
 
@@ -31,5 +32,5 @@ tasks.register<JavaExec>("fetchInput") {
   group = "application"
   description = "Fetch input for a given year and day"
   classpath = sourceSets["main"].runtimeClasspath
-  mainClass.set("FetchInputKt")
+  mainClass.set("FetchInput")
 }
