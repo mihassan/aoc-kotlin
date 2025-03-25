@@ -24,7 +24,7 @@ class AocClient {
     client.newCall(request).execute().use { response ->
       if (!response.isSuccessful) error("Unexpected code $response while fetching input")
       response.body?.let {
-        return it.string().trim()
+        return it.string().trimEnd()
       } ?: error("Empty response body while fetching input")
     }
   }
@@ -43,7 +43,7 @@ class AocClient {
 }
 
 private class DataClient {
-  fun save(year: Int, day: Int, input: String) = prepare(year, day).writeText(input.trim())
+  fun save(year: Int, day: Int, input: String) = prepare(year, day).writeText(input)
 
   private fun prepare(year: Int, day: Int): Path {
     val path = Path(String.format(PATH_FORMAT, year, day))
