@@ -32,7 +32,7 @@ class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
         path.parent.createDirectories()
       }
 
-      path.writeText(response.body!!.string())
+      path.writeText(response.body!!.string().trim())
       println("Input saved to $path")
     }
   }

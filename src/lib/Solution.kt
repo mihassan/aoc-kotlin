@@ -26,9 +26,9 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
       File("src/data/aoc${year % 100}/${it}.txt").reader()
     } ?: IO.reader
 
-    val input = reader.readText()
+    val input = reader.readText().trim()
 
-    Part.values().forEach { part ->
+    Part.entries.forEach { part ->
       var result: String
       val duration = measureTime {
         result = format(solve(part, parse(input)))
