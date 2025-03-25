@@ -14,7 +14,7 @@ For example, `src/data/aoc24/Day01.txt` contains the input data for day 1 of the
 Alternatively, you can run the following command to download the input data for a specific day:
 
 ```shell
-./gradlew fetchInput --args="YY DD"
+./gradlew fetchInput --args="--year=YY --day=DD"
 ```
 
 Make sure to set the `AOC_SESSION` environment variable to your AoC session cookie.
@@ -29,7 +29,7 @@ You can run the `main` function from inside the IDE and see the output in the co
 Alternatively, you can run the solutions from the command line using the following command:
 
 ```shell
-./gradlew solve --args="YY DD"
+./gradlew solve --args="--year=YY --day=DD"
 ```
 
 ## Philosophy
