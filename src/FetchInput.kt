@@ -63,9 +63,17 @@ private class DataClient {
 
 class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
   val year: Int by option().int().restrictTo(21..24).required()
-  val day: Int by option().int().restrictTo(1..25).required()
+  val day: Int? by option().int().restrictTo(1..25)
 
   override fun run() {
+    if (day == null) {
+      fetchAllInputs(year)
+    } else {
+      fetchInput(year, day!!)
+    }
+  }
+
+  private fun fetchInput(year: Int, day: Int) {
     println("Fetching input for $year day $day ...")
     val input = AocClient().getInput(year, day)
 
@@ -73,6 +81,21 @@ class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
     DataClient().save(year, day, input)
 
     println("Input saved")
+  }
+
+  private fun fetchAllInputs(year: Int) {
+    val aocClient = AocClient()
+    val dataClient = DataClient()
+
+    println("Fetching all inputs for $year ...")
+
+    (1..25).forEach { day ->
+      val input = aocClient.getInput(year, day)
+      println("Input for $year day $day fetched. Saving ...")
+      dataClient.save(year, day, input)
+    }
+
+    println("All inputs saved")
   }
 
   companion object {

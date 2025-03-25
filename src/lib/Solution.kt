@@ -33,7 +33,7 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
       val duration = measureTime {
         result = format(solve(part, parse(input)))
       }
-      println("Solution for $part: $result ($duration)")
+      println("Solution for $year $fileName $part: $result ($duration)")
     }
   }
 }
