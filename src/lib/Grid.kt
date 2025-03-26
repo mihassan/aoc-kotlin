@@ -1,6 +1,7 @@
 package lib
 
 import kotlin.math.abs
+import kotlin.math.sign
 
 enum class Direction {
   RIGHT, DOWN, LEFT, UP;
@@ -79,14 +80,47 @@ data class Point(val x: Int, val y: Int) : Comparable<Point> {
 
 data class Line(val start: Point, val end: Point) {
   init {
-    require(start.x == end.x || start.y == end.y) { "Line must be horizontal or vertical" }
+    require(start.x == end.x || start.y == end.y || abs(start.x - end.x) == abs(start.y - end.y)) {
+      "Line must be horizontal or vertical"
+    }
   }
 
-  private val xRange: IntRange = if (start.x < end.x) start.x..end.x else end.x..start.x
+  private val dx = (end.x - start.x).sign
 
-  private val yRange: IntRange = if (start.y < end.y) start.y..end.y else end.y..start.y
+  private val dy = (end.y - start.y).sign
 
-  fun expand(): List<Point> = xRange.flatMap { x -> yRange.map { y -> Point(x, y) } }
+  private val xRange: IntProgression = when {
+    dx > 0 -> start.x..end.x
+    dx < 0 -> start.x downTo end.x
+    else -> start.x..end.x
+  }
+
+  private val yRange: IntProgression = when {
+    dy > 0 -> start.y..end.y
+    dy < 0 -> start.y downTo end.y
+    else -> start.y..end.y
+  }
+
+  fun isHorizontal(): Boolean = start.y == end.y
+
+  fun isVertical(): Boolean = start.x == end.x
+
+  fun isDiagonal(): Boolean = abs(start.x - end.x) == abs(start.y - end.y)
+
+  fun length(): Int = when {
+    isHorizontal() -> abs(start.x - end.x) + 1
+    isVertical() -> abs(start.y - end.y) + 1
+    isDiagonal() -> abs(start.x - end.x) + 1
+    else -> throw IllegalArgumentException("Line must be horizontal, vertical, or diagonal")
+  }
+
+  fun expand(): List<Point> =
+    when {
+      isHorizontal() -> xRange.map { Point(it, start.y) }
+      isVertical() -> yRange.map { Point(start.x, it) }
+      isDiagonal() -> xRange.zip(yRange).map { (x, y) -> Point(x, y) }
+      else -> throw IllegalArgumentException("Line must be horizontal, vertical, or diagonal")
+    }
 
   companion object {
     fun parse(lineStr: String): Line {
