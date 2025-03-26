@@ -7,7 +7,7 @@ import lib.Point
 import lib.Solution
 import lib.Strings.ints
 
-private data class Board(val grid: Grid<Int>) {
+data class Board(val grid: Grid<Int>) {
   /**
    * Returns the 0-based index of the round where the board is winning.
    * Keep track of all unmarked cells. After marking each number check if the board is winning.
@@ -51,7 +51,7 @@ private data class Board(val grid: Grid<Int>) {
   }
 }
 
-private data class Input(val randomNumbers: List<Int>, val boards: List<Board>)
+data class Input(val randomNumbers: List<Int>, val boards: List<Board>)
 
 private typealias Output = Int
 
