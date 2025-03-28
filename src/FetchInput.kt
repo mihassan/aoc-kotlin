@@ -1,5 +1,6 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
@@ -43,6 +44,8 @@ class AocClient {
 }
 
 private class DataClient {
+  fun exists(year: Int, day: Int): Boolean = Path(String.format(PATH_FORMAT, year, day)).exists()
+
   fun save(year: Int, day: Int, input: String) = prepare(year, day).writeText(input)
 
   private fun prepare(year: Int, day: Int): Path {
@@ -64,6 +67,7 @@ private class DataClient {
 class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
   val year: Int by option().int().restrictTo(21..24).required()
   val day: Int? by option().int().restrictTo(1..25)
+  val overwrite: Boolean by option().flag(default = false)
 
   override fun run() {
     if (day == null) {
@@ -74,6 +78,11 @@ class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
   }
 
   private fun fetchInput(year: Int, day: Int) {
+    if (!overwrite && DataClient().exists(year, day)) {
+      println("Input for $year day $day already exists. Use --overwrite to overwrite.")
+      return
+    }
+
     println("Fetching input for $year day $day ...")
     val input = AocClient().getInput(year, day)
 
@@ -90,6 +99,11 @@ class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
     println("Fetching all inputs for $year ...")
 
     (1..25).forEach { day ->
+      if (!overwrite && dataClient.exists(year, day)) {
+        println("Input for $year day $day already exists. Use --overwrite to overwrite.")
+        return@forEach
+      }
+
       val input = aocClient.getInput(year, day)
       println("Input for $year day $day fetched. Saving ...")
       dataClient.save(year, day, input)
