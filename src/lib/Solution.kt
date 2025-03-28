@@ -27,13 +27,18 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
     } ?: IO.reader
 
     val input = reader.readText().trimEnd()
+    val durations = mutableMapOf<Part, kotlin.time.Duration>()
 
     Part.entries.forEach { part ->
       var result: String
-      val duration = measureTime {
+      durations[part] = measureTime {
         result = format(solve(part, parse(input)))
       }
-      println("Solution for $year $fileName $part: $result ($duration)")
+      println("Solution for $year $fileName $part: $result")
     }
+
+    println("\nDebug info:")
+    println("    Duration: [Part1] ${durations[PART1]!!.inWholeMilliseconds}ms + [Part2] ${durations[PART2]!!.inWholeMilliseconds}ms")
+    println(List(60) { "=" }.joinToString(""))
   }
 }
