@@ -2,6 +2,7 @@ package tool
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
@@ -9,6 +10,8 @@ import com.github.ajalt.clikt.parameters.types.restrictTo
 class Solve : CliktCommand(name = "./gradlew solve") {
   val year: Int? by option().int().restrictTo(21..24)
   val day: Int? by option().int().restrictTo(1..25)
+  val fetchInput: Boolean by option().flag(default = false)
+  val overwrite: Boolean by option().flag(default = false)
 
   override fun run() {
     when {
@@ -31,6 +34,12 @@ class Solve : CliktCommand(name = "./gradlew solve") {
   }
 
   private fun runSolution(year: Int, day: Int) {
+    if (fetchInput) {
+      if (overwrite)
+        FetchInput.main(arrayOf("--year=$year", "--day=$day", "--overwrite"))
+      else
+        FetchInput.main(arrayOf("--year=$year", "--day=$day"))
+    }
     when (year to day) {
       21 to 1 -> aoc21.day01.main()
       21 to 2 -> aoc21.day02.main()
