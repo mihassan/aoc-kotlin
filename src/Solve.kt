@@ -1,20 +1,31 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 
 class Solve : CliktCommand(name = "./gradlew solve") {
-  val year: Int by option().int().restrictTo(21..24).required()
+  val year: Int? by option().int().restrictTo(21..24)
   val day: Int? by option().int().restrictTo(1..25)
 
   override fun run() {
-    if (day == null) {
-      runAllSolutions(year)
-    } else {
-      runSolution(year, day!!)
+    when {
+      year == null -> runAllSolutions()
+      day == null -> runAllSolutionsForYear(year!!)
+      else -> runSolution(year!!, day!!)
     }
+  }
+
+  private fun runAllSolutions() {
+    SOLVED_DAYS.keys.forEach { year ->
+      runAllSolutionsForYear(year)
+    }
+  }
+
+  private fun runAllSolutionsForYear(year: Int) {
+    SOLVED_DAYS[year]?.forEach { day ->
+      runSolution(year, day)
+    } ?: error("No solved days for year $year")
   }
 
   private fun runSolution(year: Int, day: Int) {
@@ -93,92 +104,14 @@ class Solve : CliktCommand(name = "./gradlew solve") {
     }
   }
 
-  private fun runAllSolutions(year: Int) {
-    when(year) {
-      21 -> {
-        aoc21.day01.main()
-        aoc21.day02.main()
-        aoc21.day03.main()
-        aoc21.day04.main()
-        aoc21.day05.main()
-        aoc21.day06.main()
-        aoc21.day07.main()
-        aoc21.day08.main()
-      }
-      22 -> {
-        aoc22.day01.main()
-        aoc22.day02.main()
-        aoc22.day03.main()
-        aoc22.day04.main()
-        aoc22.day05.main()
-        aoc22.day04.main()
-        aoc22.day05.main()
-        aoc22.day06.main()
-        aoc22.day07.main()
-        aoc22.day08.main()
-        aoc22.day09.main()
-        aoc22.day10.main()
-        aoc22.day11.main()
-        aoc22.day12.main()
-        aoc22.day13.main()
-        aoc22.day14.main()
-        aoc22.day15.main()
-        aoc22.day16.main()
-        aoc22.day17.main()
-        aoc22.day18.main()
-        aoc22.day19.main()
-        aoc22.day20.main()
-        aoc22.day21.main()
-        aoc22.day22.main()
-      }
-      23 -> {
-        aoc23.day01.main()
-        aoc23.day02.main()
-        aoc23.day03.main()
-        aoc23.day04.main()
-        aoc23.day05.main()
-        aoc23.day06.main()
-        aoc23.day07.main()
-        aoc23.day08.main()
-        aoc23.day09.main()
-        aoc23.day10.main()
-        aoc23.day11.main()
-        aoc23.day12.main()
-        aoc23.day13.main()
-        aoc23.day14.main()
-        aoc23.day15.main()
-      }
-      24 -> {
-        aoc24.day01.main()
-        aoc24.day02.main()
-        aoc24.day03.main()
-        aoc24.day04.main()
-        aoc24.day05.main()
-        aoc24.day06.main()
-        aoc24.day07.main()
-        aoc24.day08.main()
-        aoc24.day09.main()
-        aoc24.day10.main()
-        aoc24.day11.main()
-        aoc24.day12.main()
-        aoc24.day13.main()
-        aoc24.day14.main()
-        aoc24.day15.main()
-        aoc24.day16.main()
-        aoc24.day17.main()
-        aoc24.day18.main()
-        aoc24.day19.main()
-        aoc24.day20.main()
-        aoc24.day21.main()
-        aoc24.day22.main()
-        aoc24.day23.main()
-        aoc24.day24.main()
-        aoc24.day25.main()
-      }
-    }
-  }
-
   companion object {
+    val SOLVED_DAYS: Map<Int, List<Int>> = mapOf(
+      21 to (1..8).toList(),
+      22 to (1..22).toList(),
+      23 to (1..15).toList(),
+      24 to (1..25).toList()
+    )
+
     @JvmStatic
     fun main(args: Array<String>) = Solve().main(args)
   }
