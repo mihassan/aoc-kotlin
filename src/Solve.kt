@@ -26,6 +26,7 @@ class Solve : CliktCommand(name = "./gradlew solve") {
       21 to 5 -> aoc21.day05.main()
       21 to 6 -> aoc21.day06.main()
       21 to 7 -> aoc21.day07.main()
+      21 to 8 -> aoc21.day08.main()
       22 to 1 -> aoc22.day01.main()
       22 to 2 -> aoc22.day02.main()
       22 to 3 -> aoc22.day03.main()
@@ -102,6 +103,7 @@ class Solve : CliktCommand(name = "./gradlew solve") {
         aoc21.day05.main()
         aoc21.day06.main()
         aoc21.day07.main()
+        aoc21.day08.main()
       }
       22 -> {
         aoc22.day01.main()
