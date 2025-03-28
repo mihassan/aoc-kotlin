@@ -26,12 +26,12 @@ tasks.register<JavaExec>("solve") {
   group = "application"
   description = "Solve AoC problem for a given year and day"
   classpath = sourceSets["main"].runtimeClasspath
-  mainClass.set("Solve")
+  mainClass.set("tool.Solve")
 }
 
 tasks.register<JavaExec>("fetchInput") {
   group = "application"
   description = "Fetch input for a given year and day"
   classpath = sourceSets["main"].runtimeClasspath
-  mainClass.set("FetchInput")
+  mainClass.set("tool.FetchInput")
 }
