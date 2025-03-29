@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 
@@ -12,6 +13,13 @@ class Solve : CliktCommand(name = "./gradlew solve") {
   val day: Int? by option().int().restrictTo(1..25)
   val fetchInput: Boolean by option().flag(default = false)
   val overwrite: Boolean by option().flag(default = false)
+    .validate {
+      require(it implies fetchInput) {
+        "--overwrite can be only used with --fetch-input"
+      }
+    }
+
+  private infix fun Boolean.implies(other: Boolean): Boolean = if (this) other else true
 
   override fun run() {
     when {
