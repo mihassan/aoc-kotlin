@@ -81,37 +81,38 @@ class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
 
   private fun fetchInput(year: Int, day: Int) {
     if (!overwrite && DataClient().exists(year, day)) {
-      println("Input for $year day $day already exists. Use --overwrite to overwrite.")
+      println("Input for 20$year Day$day already exists. Use --overwrite to overwrite.")
       return
     }
 
-    println("Fetching input for $year day $day ...")
+    println("Fetching input for 20$year Day$day...")
     val input = AocClient().getInput(year, day)
+    println("Input fetched.")
 
-    println("Input fetched. Saving ...")
+    println("Saving input...")
     DataClient().save(year, day, input)
-
-    println("Input saved")
+    println("Input saved.")
   }
 
   private fun fetchAllInputs(year: Int) {
     val aocClient = AocClient()
     val dataClient = DataClient()
 
-    println("Fetching all inputs for $year ...")
+    println("Fetching all inputs for 20$year...")
 
     (1..25).forEach { day ->
       if (!overwrite && dataClient.exists(year, day)) {
-        println("Input for $year day $day already exists. Use --overwrite to overwrite.")
+        println("Input for 20$year Day$day already exists. Use --overwrite to overwrite.")
         return@forEach
       }
 
       val input = aocClient.getInput(year, day)
-      println("Input for $year day $day fetched. Saving ...")
+      println("Input for 20$year Day$day fetched.")
+      println("Saving...")
       dataClient.save(year, day, input)
     }
 
-    println("All inputs saved")
+    println("All inputs saved.")
   }
 
   companion object {
