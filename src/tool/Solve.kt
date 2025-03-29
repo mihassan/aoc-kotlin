@@ -49,6 +49,7 @@ class Solve : CliktCommand(name = "./gradlew solve") {
       21 to 6 -> aoc21.day06.main()
       21 to 7 -> aoc21.day07.main()
       21 to 8 -> aoc21.day08.main()
+      21 to 9 -> aoc21.day09.main()
       22 to 1 -> aoc22.day01.main()
       22 to 2 -> aoc22.day02.main()
       22 to 3 -> aoc22.day03.main()
@@ -117,7 +118,7 @@ class Solve : CliktCommand(name = "./gradlew solve") {
 
   companion object {
     val SOLVED_DAYS: Map<Int, List<Int>> = mapOf(
-      21 to (1..8).toList(),
+      21 to (1..9).toList(),
       22 to (1..22).toList(),
       23 to (1..15).toList(),
       24 to (1..25).toList()
