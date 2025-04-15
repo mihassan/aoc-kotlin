@@ -2,7 +2,11 @@
 
 package aoc21.day16
 
+import lib.Parser
+import lib.ParserResult
 import lib.Solution
+import lib.ParserCombinators.many
+import lib.ParserCombinators.count
 
 private sealed class Packet(open val version: Long) {
   abstract fun totalVersion(): Long
@@ -86,36 +90,6 @@ private sealed class Packet(open val version: Long) {
     override fun calculateValue(): Long =
       if (subPackets[0].calculateValue() == subPackets[1].calculateValue()) 1 else 0
   }
-}
-
-private typealias ParserState = String
-
-private data class ParserResult<out T>(val value: T, val nextState: ParserState)
-
-private fun interface Parser<out T> {
-  fun parse(state: ParserState): ParserResult<T>?
-}
-
-private fun <T> Parser<T>.many(): Parser<List<T>> = Parser { state ->
-  val results = mutableListOf<T>()
-  var currentState = state
-  while (true) {
-    val result = parse(currentState) ?: break
-    results.add(result.value)
-    currentState = result.nextState
-  }
-  ParserResult(results, currentState)
-}
-
-private fun <T> Parser<T>.count(count: Int): Parser<List<T>> = Parser { state ->
-  val results = mutableListOf<T>()
-  var currentState = state
-  repeat(count) {
-    val result = parse(currentState) ?: return@Parser null
-    results.add(result.value)
-    currentState = result.nextState
-  }
-  ParserResult(results, currentState)
 }
 
 private fun packetParser(): Parser<Packet> = Parser { state ->
