@@ -2,11 +2,20 @@
 
 package aoc21.day16
 
+import lib.Parsers.anyOf
+import lib.ParserCombinators.map
 import lib.Parser
+import lib.ParserCombinators.and
 import lib.ParserResult
 import lib.Solution
 import lib.ParserCombinators.many
 import lib.ParserCombinators.count
+import lib.ParserCombinators.filter
+import lib.ParserCombinators.flatMap
+import lib.ParserCombinators.or
+import lib.ParserCombinators.skipAnd
+import lib.ParserCombinators.zip
+import lib.Parsers.char
 
 private sealed class Packet(open val version: Long) {
   abstract fun totalVersion(): Long
@@ -92,86 +101,70 @@ private sealed class Packet(open val version: Long) {
   }
 }
 
-private fun packetParser(): Parser<Packet> = Parser { state ->
-  if (state.length < 6) return@Parser null
+private fun bitsParser(n: Int): Parser<Long> =
+  anyOf("01").count(n).map { it.joinToString("") }.map { it.toLong(2) }
 
-  val version = state.take(3).toLong(2)
-  val typeId = state.drop(3).take(3).toLong(2)
-  val nextState = state.drop(6)
-  when (typeId) {
-    4L -> literalPacketParser(version).parse(nextState)
-    else -> operatorPacketParser(version, typeId).parse(nextState)
+private val versionParser: Parser<Long> = bitsParser(3)
+private val typeIdParser: Parser<Long> = bitsParser(3)
+
+private fun chunkParser(indicator: Char): Parser<String> =
+  char(indicator) skipAnd anyOf("01").count(4) map { it.joinToString("") }
+
+private val terminalChunkParser: Parser<String> = chunkParser('0')
+private val initialChunkParser: Parser<String> = chunkParser('1')
+private val initialChunksParser: Parser<String> =
+  initialChunkParser.many().map { it.joinToString("") }
+
+private val literalValueParser: Parser<Long> =
+  (initialChunksParser and terminalChunkParser).map {
+    (it.first + it.second).toLong(2)
   }
-}
 
-private fun literalPacketParser(version: Long): Parser<Packet.Literal> =
-  Parser { state ->
-    val (value, nextState) = literalValueParser.parse(state) ?: return@Parser null
-    ParserResult(Packet.Literal(version, value), nextState)
-  }
+private val literalPacketParser: Parser<Packet.Literal> =
+  zip(versionParser, typeIdParser, literalValueParser)
+    .filter { (_, typeId, _) -> typeId == 4L }
+    .map { (version, _, value) -> Packet.Literal(version, value) }
 
-private val literalValueParser: Parser<Long> = Parser { state ->
-  val chunked = state.chunked(5)
-  val chunksToConsume = chunked.indexOfFirst { it.first() == '0' } + 1
-  if (chunksToConsume == 0) return@Parser null
-
-  val value = chunked.take(chunksToConsume).joinToString("") { it.drop(1) }.toLong(2)
-  val nextState = state.drop(chunksToConsume * 5)
-
-  ParserResult(value, nextState)
-}
-
-private fun operatorPacketParser(version: Long, typeId: Long): Parser<Packet.Operator> =
-  Parser { state ->
-    if (state.isEmpty()) return@Parser null
-
-    val (subPackets, nextState) = when (state.first()) {
-      '0' -> {
-        if (state.length < 16) return@Parser null
-
-        val length = state.drop(1).take(15).toInt(2)
-        val subPacketsState = state.drop(16).take(length)
-        val (subPackets, _) = packetParser().many().parse(subPacketsState)
-          ?: return@Parser null
-        val nextState = state.drop(16 + length)
-
-        subPackets to nextState
-      }
-
-      '1' -> {
-        if (state.length < 12) return@Parser null
-
-        val count = state.drop(1).take(11).toInt(2)
-        val subPacketsState = state.drop(12)
-        val (subPackets, nextState) = packetParser().count(count).parse(subPacketsState)
-          ?: return@Parser null
-
-        subPackets to nextState
-      }
-
-      else -> error("Invalid operator packet")
+private val subPacketsByLengthParser: Parser<List<Packet>> =
+  (char('0') skipAnd bitsParser(15)).flatMap { length ->
+    Parser { state ->
+      val subPackets = packetParser.many().parse(state.take(length.toInt()))?.value ?: emptyList()
+      val nextState = state.drop(length.toInt())
+      ParserResult(subPackets, nextState)
     }
-
-    ParserResult(Packet.Operator.from(typeId, version, subPackets), nextState)
   }
+
+private val subPacketsByCountParser: Parser<List<Packet>> =
+  (char('1') skipAnd bitsParser(11)).flatMap { count ->
+    packetParser.count(count.toInt())
+  }
+
+private val subPacketsParser: Parser<List<Packet>> =
+  subPacketsByLengthParser or subPacketsByCountParser
+
+private val operatorPacketParser: Parser<Packet.Operator> =
+  zip(versionParser, typeIdParser, subPacketsParser)
+    .filter { (_, typeId, _) -> typeId != 4L }
+    .map { (version, typeId, subPackets) -> Packet.Operator.from(typeId, version, subPackets) }
+
+private val packetParser: Parser<Packet> = literalPacketParser or operatorPacketParser
 
 private typealias Input = String
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day16") {
-  override fun parse(input: String): Input {
-    return input.trim().map { it.digitToInt(16).toString(2).padStart(4, '0') }.joinToString("")
-  }
+  override fun parse(input: String): Input =
+    input.map { it.digitToInt(16).toString(2).padStart(4, '0') }.joinToString("")
 
   override fun format(output: Output): String = "$output"
 
   override fun part1(input: Input): Output {
-    val (packet, _) = packetParser().parse(input) ?: return 0
+    val (packet, _) = packetParser.parse(input) ?: return 0
     return packet.totalVersion()
   }
 
   override fun part2(input: Input): Output {
-    val (packet, _) = packetParser().parse(input) ?: return 0
+    val (packet, _) = packetParser.parse(input) ?: return 0
     return packet.calculateValue()
   }
 }

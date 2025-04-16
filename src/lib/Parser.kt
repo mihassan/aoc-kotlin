@@ -1,5 +1,7 @@
 package lib
 
+import lib.Tuples.to
+
 typealias ParserState = String
 
 data class ParserResult<out T>(val value: T, val nextState: ParserState)
@@ -13,7 +15,7 @@ object Parsers {
     ParserResult(value, state)
   }
 
-  val fail: Parser<Unit> = Parser { null }
+  val fail: Parser<Nothing> = Parser { null }
 
   val eof: Parser<Unit> = Parser { state ->
     if (state.isEmpty()) {
@@ -53,7 +55,7 @@ object Parsers {
 
   fun string(regex: Regex): Parser<String> = Parser { state ->
     val matchResult = regex.find(state)
-    if (matchResult != null &&  matchResult.range.first == 0) {
+    if (matchResult != null && matchResult.range.first == 0) {
       val match = matchResult.value
       ParserResult(match, state.drop(match.length))
     } else {
@@ -85,6 +87,39 @@ object ParserCombinators {
 
   infix fun <T> Parser<T>.or(other: Parser<T>): Parser<T> = Parser { state ->
     parse(state) ?: other.parse(state)
+  }
+
+  fun <T1, T2> zip(
+    p1: Parser<T1>,
+    p2: Parser<T2>,
+  ): Parser<Pair<T1, T2>> =
+    p1 and p2 map { it.first to it.second }
+
+  fun <T1, T2, T3> zip(
+    p1: Parser<T1>,
+    p2: Parser<T2>,
+    p3: Parser<T3>,
+  ): Parser<Triple<T1, T2, T3>> = p1 and p2 and p3 map {
+    it.first to it.second
+  }
+
+  fun <T1, T2, T3, T4> zip(
+    p1: Parser<T1>,
+    p2: Parser<T2>,
+    p3: Parser<T3>,
+    p4: Parser<T4>,
+  ): Parser<Quadruple<T1, T2, T3, T4>> = (p1 and p2) and (p3 and p4) map {
+    it.first to it.second
+  }
+
+  fun <T1, T2, T3, T4, T5> zip(
+    p1: Parser<T1>,
+    p2: Parser<T2>,
+    p3: Parser<T3>,
+    p4: Parser<T4>,
+    p5: Parser<T5>,
+  ): Parser<Quintuple<T1, T2, T3, T4, T5>> = (p1 and p2) and (p3 and p4 and p5) map {
+    it.first to it.second.first to it.second.second
   }
 
   fun <T> Parser<T>.optional(): Parser<T?> = Parser { state ->
