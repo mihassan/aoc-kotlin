@@ -2,19 +2,19 @@
 
 package aoc21.day16
 
-import lib.Parsers.anyOf
+import lib.Parsers.anyOfString
 import lib.ParserCombinators.map
 import lib.Parser
 import lib.ParserCombinators.and
+import lib.ParserCombinators.chain
 import lib.ParserResult
 import lib.Solution
 import lib.ParserCombinators.many
 import lib.ParserCombinators.count
 import lib.ParserCombinators.filter
-import lib.ParserCombinators.flatMap
 import lib.ParserCombinators.or
-import lib.ParserCombinators.skipAnd
-import lib.ParserCombinators.zip
+import lib.ParserCombinators.takeRight
+import lib.ParserCombinators.sequenceOf
 import lib.Parsers.char
 
 private sealed class Packet(open val version: Long, open val typeId: Long) {
@@ -50,7 +50,7 @@ private sealed class Packet(open val version: Long, open val typeId: Long) {
   }
 }
 
-private typealias Input = String
+private typealias Input = Packet
 private typealias Output = Long
 
 // region Packet Parsers
@@ -61,7 +61,7 @@ private typealias Output = Long
  * For example, if [n] is 3, it will parse 3 bits and convert them to a long value.
  */
 private fun bitsParser(n: Int): Parser<Long> =
-  anyOf("01").count(n).map { it.joinToString("") }.map { it.toLong(2) }
+  anyOfString("01") count n map { it.joinToString("").toLong(2) }
 
 /** Parses a 3-bit version number. */
 private val versionParser: Parser<Long> = bitsParser(3)
@@ -74,44 +74,41 @@ private val typeIdParser: Parser<Long> = bitsParser(3)
  * The chunk starts with a specified [indicator] character, followed by 4 bits (0 or 1).
  * For example, if [indicator] is '0', it will parse '0' followed by 4 bits.
  */
-private fun chunkParser(indicator: Char): Parser<String> =
-  char(indicator) skipAnd anyOf("01").count(4) map { it.joinToString("") }
+private fun chunkParser(indicator: Char): Parser<Long> = char(indicator) takeRight bitsParser(4)
 
 /**
  * Parses a terminal chunk of binary data for the literal value.
  * The terminal chunk starts with '0' followed by 4 bits (0 or 1).
  * For example, it will parse '0' followed by 4 bits.
  */
-private val terminalChunkParser: Parser<String> = chunkParser('0')
+private val terminalChunkParser: Parser<Long> = chunkParser('0')
 
 /**
  * Parses the initial chunk of binary data for the literal value. There are multiple initial chunks.
  * The initial chunk starts with '1' followed by 4 bits (0 or 1).
  * For example, it will parse '1' followed by 4 bits.
  */
-private val initialChunkParser: Parser<String> = chunkParser('1')
+private val initialChunkParser: Parser<Long> = chunkParser('1')
 
 /**
  * Parses the initial chunks of binary data for the literal value.
  * It parses multiple initial chunks and combines them into a single string.
  */
-private val initialChunksParser: Parser<String> =
-  initialChunkParser.many().map { it.joinToString("") }
+private val initialChunksParser: Parser<Long> =
+  initialChunkParser.many() map { chunks -> chunks.fold(0L) { acc, chunk -> (acc shl 4) + chunk } }
 
 /**
  * Parses the literal value of a packet by combining the initial chunks and the terminal chunk.
  */
 private val literalValueParser: Parser<Long> =
-  (initialChunksParser and terminalChunkParser).map {
-    (it.first + it.second).toLong(2)
-  }
+  initialChunksParser and terminalChunkParser map { (it.first shl 4) + it.second }
 
 /**
  * Parses a literal packet by combining the version, type ID, and literal value.
  * It filters the parsed packet to ensure that the type ID is 4 (indicating a literal packet).
  */
 private val literalPacketParser: Parser<Packet.Literal> =
-  zip(versionParser, typeIdParser, literalValueParser)
+  sequenceOf(versionParser, typeIdParser, literalValueParser)
     .filter { (_, typeId, _) -> typeId == 4L }
     .map { (version, typeId, value) -> Packet.Literal(version, typeId, value) }
 
@@ -120,7 +117,7 @@ private val literalPacketParser: Parser<Packet.Literal> =
  * The length is specified by 15 bits following the '0' indicator.
  */
 private val subPacketsByLengthParser: Parser<List<Packet>> =
-  (char('0') skipAnd bitsParser(15)).flatMap { length ->
+  char('0') takeRight bitsParser(15) chain { length ->
     Parser { state ->
       val subPackets = packetParser.many().parse(state.take(length.toInt()))?.value ?: emptyList()
       val nextState = state.drop(length.toInt())
@@ -133,9 +130,7 @@ private val subPacketsByLengthParser: Parser<List<Packet>> =
  * The number is specified by 11 bits following the '1' indicator.
  */
 private val subPacketsByCountParser: Parser<List<Packet>> =
-  (char('1') skipAnd bitsParser(11)).flatMap { count ->
-    packetParser.count(count.toInt())
-  }
+  char('1') takeRight bitsParser(11) chain { count -> packetParser count count.toInt() }
 
 /**
  * Parses the sub-packets of an operator packet by either length or count.
@@ -148,7 +143,7 @@ private val subPacketsParser: Parser<List<Packet>> =
  * It filters the parsed packet to ensure that the type ID is not 4 (indicating a literal packet).
  */
 private val operatorPacketParser: Parser<Packet.Operator> =
-  zip(versionParser, typeIdParser, subPacketsParser)
+  sequenceOf(versionParser, typeIdParser, subPacketsParser)
     .filter { (_, typeId, _) -> typeId != 4L }
     .map { (version, typeId, subPackets) -> Packet.Operator(version, typeId, subPackets) }
 
@@ -161,19 +156,16 @@ private val packetParser: Parser<Packet> = literalPacketParser or operatorPacket
 
 private val solution = object : Solution<Input, Output>(2021, "Day16") {
   override fun parse(input: String): Input =
-    input.map { it.digitToInt(16).toString(2).padStart(4, '0') }.joinToString("")
+    packetParser.parse(input.hexToBinary())?.value ?: error("Invalid input")
 
   override fun format(output: Output): String = "$output"
 
-  override fun part1(input: Input): Output {
-    val (packet, _) = packetParser.parse(input) ?: return 0
-    return packet.totalVersion()
-  }
+  override fun part1(input: Input): Output = input.totalVersion()
 
-  override fun part2(input: Input): Output {
-    val (packet, _) = packetParser.parse(input) ?: return 0
-    return packet.calculateValue()
-  }
+  override fun part2(input: Input): Output = input.calculateValue()
+
+  private fun String.hexToBinary(): String =
+    map { it.digitToInt(16).toString(2).padStart(4, '0') }.joinToString("")
 }
 
 fun main() = solution.run()

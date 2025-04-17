@@ -1,5 +1,7 @@
 package lib
 
+import lib.ParserCombinators.many1
+import lib.ParserCombinators.map
 import lib.Tuples.to
 
 typealias ParserState = String
@@ -11,11 +13,17 @@ fun interface Parser<out T> {
 }
 
 object Parsers {
-  fun <T> pure(value: T): Parser<T> = Parser { state ->
-    ParserResult(value, state)
-  }
+  fun <T> pure(value: T): Parser<T> = Parser { state -> ParserResult(value, state) }
 
   val fail: Parser<Nothing> = Parser { null }
+
+  /**
+   * Parses a parser recursively. This is useful for parsing recursive structures.
+   * @param parser A function that returns a parser.
+   */
+  fun <T> recursiveParser(parser: () -> Parser<T>): Parser<T> = Parser { state ->
+    parser().parse(state)
+  }
 
   val eof: Parser<Unit> = Parser { state ->
     if (state.isEmpty()) {
@@ -33,17 +41,19 @@ object Parsers {
     }
   }
 
-  fun char(c: Char): Parser<Char> = satisfy { it == c }
-
   fun anyChar(): Parser<Char> = satisfy { true }
 
-  fun anyOf(chars: String): Parser<Char> = satisfy { it in chars }
+  fun char(c: Char): Parser<Char> = satisfy { it == c }
 
-  fun anyOf(regex: Regex): Parser<Char> = satisfy { it.toString().matches(regex) }
+  fun exceptChar(c: Char): Parser<Char> = satisfy { it != c }
 
-  fun noneOf(chars: String): Parser<Char> = satisfy { it !in chars }
+  fun anyOfString(str: String): Parser<Char> = satisfy { it in str }
 
-  fun noneOf(regex: Regex): Parser<Char> = satisfy { it.toString().matches(regex).not() }
+  fun noneOfString(str: String): Parser<Char> = satisfy { it !in str }
+
+  fun regexChar(regex: Regex): Parser<Char> = satisfy { it.toString().matches(regex) }
+
+  fun regexChar(regex: String): Parser<Char> = regexChar(regex.toRegex())
 
   fun string(str: String): Parser<String> = Parser { state ->
     if (state.startsWith(str)) {
@@ -53,7 +63,7 @@ object Parsers {
     }
   }
 
-  fun string(regex: Regex): Parser<String> = Parser { state ->
+  fun regex(regex: Regex): Parser<String> = Parser { state ->
     val matchResult = regex.find(state)
     if (matchResult != null && matchResult.range.first == 0) {
       val match = matchResult.value
@@ -62,6 +72,24 @@ object Parsers {
       null
     }
   }
+
+  val digit: Parser<Char> = satisfy { it.isDigit() }
+
+  val digits: Parser<String> = digit.many1().map { it.joinToString("") }
+
+  val letter: Parser<Char> = satisfy { it.isLetter() }
+
+  val letters: Parser<String> = letter.many1().map { it.joinToString("") }
+
+  val int: Parser<Int> = digits map { it.toInt() }
+
+  val long: Parser<Long> = digits map { it.toLong() }
+
+  val whitespace: Parser<Char> = satisfy { it.isWhitespace() }
+
+  val whitespaces: Parser<String> = whitespace.many1().map { it.joinToString("") }
+
+  val newline: Parser<Char> = char('\n')
 }
 
 object ParserCombinators {
@@ -71,7 +99,7 @@ object ParserCombinators {
     }
   }
 
-  infix fun <T, R> Parser<T>.flatMap(transform: (T) -> Parser<R>): Parser<R> = Parser { state ->
+  infix fun <T, R> Parser<T>.chain(transform: (T) -> Parser<R>): Parser<R> = Parser { state ->
     parse(state)?.let { result ->
       transform(result.value).parse(result.nextState)
     }
@@ -89,13 +117,19 @@ object ParserCombinators {
     parse(state) ?: other.parse(state)
   }
 
-  fun <T1, T2> zip(
+  fun <T> choiceOf(parsers: List<Parser<T>>): Parser<T> = Parser { state ->
+    parsers.firstNotNullOfOrNull { it.parse(state) }
+  }
+
+  fun <T> choiceOf(vararg parsers: Parser<T>): Parser<T> = choiceOf(parsers.toList())
+
+  fun <T1, T2> sequenceOf(
     p1: Parser<T1>,
     p2: Parser<T2>,
   ): Parser<Pair<T1, T2>> =
     p1 and p2 map { it.first to it.second }
 
-  fun <T1, T2, T3> zip(
+  fun <T1, T2, T3> sequenceOf(
     p1: Parser<T1>,
     p2: Parser<T2>,
     p3: Parser<T3>,
@@ -103,7 +137,7 @@ object ParserCombinators {
     it.first to it.second
   }
 
-  fun <T1, T2, T3, T4> zip(
+  fun <T1, T2, T3, T4> sequenceOf(
     p1: Parser<T1>,
     p2: Parser<T2>,
     p3: Parser<T3>,
@@ -112,7 +146,7 @@ object ParserCombinators {
     it.first to it.second
   }
 
-  fun <T1, T2, T3, T4, T5> zip(
+  fun <T1, T2, T3, T4, T5> sequenceOf(
     p1: Parser<T1>,
     p2: Parser<T2>,
     p3: Parser<T3>,
@@ -138,7 +172,7 @@ object ParserCombinators {
     }
   }
 
-  infix fun <T1, T2> Parser<T1>.skipAnd(other: Parser<T2>): Parser<T2> = Parser { state ->
+  infix fun <T1, T2> Parser<T1>.takeRight(other: Parser<T2>): Parser<T2> = Parser { state ->
     parse(state)?.let { result ->
       other.parse(result.nextState)?.let { otherResult ->
         ParserResult(otherResult.value, otherResult.nextState)
@@ -146,13 +180,16 @@ object ParserCombinators {
     }
   }
 
-  infix fun <T1, T2> Parser<T1>.andSkip(other: Parser<T2>): Parser<T1> = Parser { state ->
+  infix fun <T1, T2> Parser<T1>.takeLeft(other: Parser<T2>): Parser<T1> = Parser { state ->
     parse(state)?.let { result ->
       other.parse(result.nextState)?.let { otherResult ->
         ParserResult(result.value, otherResult.nextState)
       }
     }
   }
+
+  infix fun <T1, T2, T3> Parser<T1>.between(others: Pair<Parser<T2>, Parser<T3>>): Parser<T1> =
+    others.first takeRight this takeLeft others.second
 
   fun <T> Parser<T>.many(): Parser<List<T>> = Parser { state ->
     val results = mutableListOf<T>()
@@ -165,20 +202,8 @@ object ParserCombinators {
     ParserResult(results, currentState)
   }
 
-  fun <T> Parser<T>.many1(): Parser<List<T>> = Parser { state ->
-    val results = mutableListOf<T>()
-    var currentState = state
-    val firstResult = parse(currentState) ?: return@Parser null
-    results.add(firstResult.value)
-    currentState = firstResult.nextState
-
-    while (true) {
-      val result = parse(currentState) ?: break
-      results.add(result.value)
-      currentState = result.nextState
-    }
-    ParserResult(results, currentState)
-  }
+  fun <T> Parser<T>.many1(): Parser<List<T>> =
+    this and many() map { (first, rest) -> listOf(first) + rest }
 
   infix fun <T1, T2> Parser<T1>.manyTill(other: Parser<T2>): Parser<List<T1>> = Parser { state ->
     val results = mutableListOf<T1>()
@@ -194,24 +219,8 @@ object ParserCombinators {
     ParserResult(results, currentState)
   }
 
-  infix fun <T1, T2> Parser<T1>.many1Till(other: Parser<T2>): Parser<List<T1>> = Parser { state ->
-    val results = mutableListOf<T1>()
-    var currentState = state
-    if (other.parse(currentState) != null) return@Parser null
-    val firstResult = parse(currentState) ?: return@Parser null
-    results.add(firstResult.value)
-    currentState = firstResult.nextState
-
-    while (true) {
-      if (other.parse(currentState) != null) {
-        break
-      }
-      val result = parse(currentState) ?: break
-      results.add(result.value)
-      currentState = result.nextState
-    }
-    ParserResult(results, currentState)
-  }
+  infix fun <T1, T2> Parser<T1>.many1Till(other: Parser<T2>): Parser<List<T1>> =
+    this and manyTill(other) map { (first, rest) -> listOf(first) + rest }
 
   infix fun <T> Parser<T>.count(count: Int): Parser<List<T>> = Parser { state ->
     val results = mutableListOf<T>()
@@ -223,4 +232,23 @@ object ParserCombinators {
     }
     ParserResult(results, currentState)
   }
+
+  infix fun <T1, T2> Parser<T1>.sepBy(sep: Parser<T2>): Parser<List<T1>> = Parser { state ->
+    val results = mutableListOf<T1>()
+    var currentState = state
+    while (true) {
+      val result = parse(currentState) ?: break
+      results.add(result.value)
+      currentState = result.nextState
+
+      if (sep.parse(currentState) == null) {
+        break
+      }
+      currentState = sep.parse(currentState)?.nextState ?: break
+    }
+    ParserResult(results, currentState)
+  }
+
+  infix fun <T1, T2> Parser<T1>.sepBy1(sep: Parser<T2>): Parser<List<T1>> =
+    this takeLeft sep and sepBy(sep) map { (first, rest) -> listOf(first) + rest }
 }
