@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 import java.lang.reflect.Method
+import lib.Solution
 
 class Solve : CliktCommand(name = "./gradlew solve") {
   val year: Int? by option().int().restrictTo(SOLVED_YEARS)
@@ -53,6 +54,12 @@ class Solve : CliktCommand(name = "./gradlew solve") {
       return
     }
     mainFunction.invoke(null)
+
+    val aocClient = AocClient()
+    val solution1 = aocClient.getSolution(year, day, Solution.Part.PART1) ?: "UNSOLVED"
+    val solution2 = aocClient.getSolution(year, day, Solution.Part.PART2) ?: "UNSOLVED"
+    println("    Solutions: [PART1] $solution1 | [PART2] $solution2")
+    println(List(60) { "=" }.joinToString(""))
   }
 
   fun findMainFunction(year: Int, day: Int): Method? {
