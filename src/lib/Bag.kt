@@ -95,9 +95,13 @@ value class Bag<T>(val entries: MutableMap<T, Int> = mutableMapOf()) {
     entries.replaceAll { _, c -> c * multiplicand }
   }
 
+  fun forEach(action: (T, Int) -> Unit) {
+    entries.forEach { (t, c) -> action(t, c) }
+  }
+
   companion object {
     fun <T> of(entries: Map<T, Int>): Bag<T> = Bag(entries.toMutableMap())
     fun <T> of(items: List<T>): Bag<T> = of(items.histogram())
-    fun <T> of(vararg items: T): Bag<T> = of(items.toList())
+    fun <T> of(vararg pairs: Pair<T, Int>): Bag<T> = Bag(mutableMapOf(*pairs))
   }
 }

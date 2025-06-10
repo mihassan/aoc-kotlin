@@ -2,7 +2,7 @@
 
 package aoc21.day22
 
-import aoc21.day22.Cuboid.Companion.splits
+import lib.Bag
 import lib.Solution
 
 private data class Point(val x: Int, val y: Int, val z: Int)
@@ -13,66 +13,85 @@ private data class Cuboid(
   val yRange: IntRange,
   val zRange: IntRange,
 ) {
-  fun expand(): List<Point> = buildList {
-    for (x in xRange) {
-      for (y in yRange) {
-        for (z in zRange) {
-          add(Point(x, y, z))
+  /**
+   * Calculates the volume of the [Cuboid] regardless of whether it is on or off.
+   */
+  val volume: Long
+    get() = xRange.count().toLong() * yRange.count() * zRange.count()
+
+  /**
+   * Calculates the signed volume of the [Cuboid].
+   * If the [Cuboid] is "on", the volume is positive; if "off", it is negative.
+   */
+  val signedVolume: Long
+    get() =
+      when (on) {
+        true -> volume
+        false -> -volume
+      }
+
+  /**
+   * Truncates the [Cuboid]'s ranges for each axis to the specified range.
+   */
+  fun truncate(range: IntRange): Cuboid =
+    Cuboid(on, xRange.truncate(range), yRange.truncate(range), zRange.truncate(range))
+
+  /**
+   * Expands the [Cuboid] into a sequence of [Point]s representing all points within the cuboid.
+   */
+  fun expand(): Sequence<Point> = sequence {
+    xRange.forEach { x ->
+      yRange.forEach { y ->
+        zRange.forEach { z ->
+          yield(Point(x, y, z))
         }
       }
     }
   }
 
-  fun volume(): Long = (xRange.count * yRange.count * zRange.count).coerceAtLeast(0L)
+  /**
+   * Intersects this [Cuboid] with another [Cuboid] and returns a new [Cuboid] representing the intersection.
+   * If there is no intersection, returns an empty [Cuboid].
+   * Whether the resulting [Cuboid] is "on" or "off" is determined by the original [Cuboid].
+   * If original [Cuboid] was "on", the resulting cuboid will be "off" and vice versa.
+   * This is useful for calculating the union of multiple [Cuboid]s.
+   * As a consequence, the [intersect] method is not reflexive, meaning `a intersect b` is not the same as `b intersect a`.
+   */
+  infix fun intersect(other: Cuboid): Cuboid {
+    val xOverlap = xRange intersect other.xRange
+    val yOverlap = yRange intersect other.yRange
+    val zOverlap = zRange intersect other.zRange
 
-  fun truncate(range: IntRange): Cuboid =
-    Cuboid(on, xRange.truncate(range), yRange.truncate(range), zRange.truncate(range))
-
-  operator fun contains(other: Cuboid): Boolean =
-    other.xRange in xRange && other.yRange in yRange && other.zRange in zRange
+    return if (xOverlap.isEmpty() || yOverlap.isEmpty() || zOverlap.isEmpty()) {
+      EMPTY
+    } else {
+      Cuboid(!on, xOverlap, yOverlap, zOverlap)
+    }
+  }
 
   companion object {
+    private val CUBOID_REGEX =
+      """(on|off) x=(-?\d+..-?\d+),y=(-?\d+..-?\d+),z=(-?\d+..-?\d+)""".toRegex()
+
+    private val EMPTY = Cuboid(false, IntRange.EMPTY, IntRange.EMPTY, IntRange.EMPTY)
+
     fun parse(line: String): Cuboid {
       val match = CUBOID_REGEX.matchEntire(line) ?: error("Invalid cuboid line: $line")
       val (onOff, xRange, yRange, zRange) = match.destructured
       return Cuboid(onOff == "on", xRange.parseRange(), yRange.parseRange(), zRange.parseRange())
     }
 
-    fun List<Cuboid>.splits(): Sequence<Cuboid> = sequence {
-      val xSplits = splits { it.xRange }
-      val ySplits = splits { it.yRange }
-      val zSplits = splits { it.zRange }
-
-      xSplits.forEach { x ->
-        ySplits.forEach { y ->
-          zSplits.forEach { z ->
-            yield(Cuboid(true, x, y, z))
-          }
-        }
-      }
-    }
-
-    private val IntRange.count: Long
-      get() = endInclusive - start + 1L
-
     private fun IntRange.truncate(range: IntRange): IntRange =
       start.coerceAtLeast(range.start)..endInclusive.coerceAtMost(range.endInclusive)
 
-    private operator fun IntRange.contains(other: IntRange): Boolean =
-      other.start in this && other.endInclusive in this
-
-    private fun List<Cuboid>.splits(selector: (Cuboid) -> IntRange): List<IntRange> {
-      val starts = map(selector).flatMap { listOf(it.start, it.endInclusive + 1) }
-      return starts.sorted().distinct().zipWithNext { start, end -> start until end }
-    }
+    private infix fun IntRange.intersect(range: IntRange): IntRange =
+      if (isEmpty() || range.isEmpty()) IntRange.EMPTY
+      else (start.coerceAtLeast(range.start)..endInclusive.coerceAtMost(range.endInclusive))
 
     private fun String.parseRange(): IntRange {
       val (start, end) = split("..").map { it.toInt() }
       return start..end
     }
-
-    private val CUBOID_REGEX =
-      """(on|off) x=(-?\d+..-?\d+),y=(-?\d+..-?\d+),z=(-?\d+..-?\d+)""".toRegex()
   }
 }
 
@@ -98,15 +117,33 @@ private val solution = object : Solution<Input, Output>(2021, "Day22") {
     return onCubes.size.toLong()
   }
 
-  override fun part2(input: Input): Output =
-    input.splits().sumOf { c ->
-      val lastOperation = input.lastOrNull { c in it }
-      if (lastOperation?.on == true) {
-        c.volume()
-      } else {
-        0L
+  override fun part2(input: Input): Output {
+    // Using a Bag to keep track of the cuboids and their counts. This is more efficient than using
+    // a List as there are many duplicate cuboids due to intersections. Also, Sets are not suitable
+    // because we need to keep track of the count of each cuboid.
+    val addedCuboids = Bag<Cuboid>()
+
+    // Use inclusion-exclusion principle to calculate the total volume of "on" cuboids.
+    // Start with an empty bag of cuboids.
+    // For each cuboid in the input, we will add it to the bag and also calculate the intersections
+    // with all existing cuboids in the bag.
+    input.forEach { cuboid ->
+      val cuboidsToAdd = Bag<Cuboid>()
+
+      // Only add the cuboid if it is to be turned on.
+      if (cuboid.on) cuboidsToAdd += cuboid
+
+      // For each existing cuboid, calculate the intersection with the new cuboid.
+      addedCuboids.entries.forEach { (existingCuboid, count) ->
+        val intersection = existingCuboid intersect cuboid
+        cuboidsToAdd += Bag.of(intersection to count)
       }
+
+      addedCuboids += cuboidsToAdd
     }
+
+    return addedCuboids.entries.entries.sumOf { it.key.signedVolume * it.value }
+  }
 }
 
 fun main() = solution.run()

@@ -148,7 +148,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day19") {
       return maxGeodes
     }
 
-    return step(Bag.of(Mineral.ORE), Bag.of(), totalMinutes)
+    return step(Bag.of(Mineral.ORE to 1), Bag.of(), totalMinutes)
   }
 }
 
