@@ -35,3 +35,10 @@ tasks.register<JavaExec>("fetchInput") {
   classpath = sourceSets["main"].runtimeClasspath
   mainClass.set("tool.FetchInput")
 }
+
+tasks.register<JavaExec>("prepareYear") {
+  group = "application"
+  description = "Prepare solution templates for a new AoC year"
+  classpath = sourceSets["main"].runtimeClasspath
+  mainClass.set("tool.PrepareYear")
+}

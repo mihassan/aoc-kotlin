@@ -28,6 +28,21 @@ There are two ways to provide the session cookie:
 AOC_SESSION=your_session_cookie
 ```
 
+## How to prepare for a new year
+
+To prepare for a new AoC year, you can run the following command to create the directory structure and solution templates:
+
+```shell
+./gradlew prepareYear --args="--year=YY"
+```
+
+This will:
+- Create the `src/aocYY` directory for solution files
+- Create the `src/data/aocYY` directory for input files
+- Generate template solution files for all 25 days
+
+Use `--overwrite` flag to replace existing solution files.
+
 ## How to run the solutions
 
 Preferred approach is to load the project in IntelliJ IDEA and run the solutions from there.
