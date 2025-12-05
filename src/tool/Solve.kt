@@ -75,7 +75,7 @@ class Solve : CliktCommand(name = "./gradlew solve") {
   }
 
   companion object {
-    val SOLVED_YEARS = 21..24
+    val SOLVED_YEARS = 21..25
     val DAYS_IN_YEAR = 1..25
 
     @JvmStatic

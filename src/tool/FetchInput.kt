@@ -35,7 +35,7 @@ private class DataClient {
 }
 
 class FetchInput : CliktCommand(name = "./gradlew fetchInput") {
-  val year: Int by option().int().restrictTo(21..24).required()
+  val year: Int by option().int().restrictTo(21..25).required()
   val day: Int? by option().int().restrictTo(1..25)
   val overwrite: Boolean by option().flag(default = false)
 
