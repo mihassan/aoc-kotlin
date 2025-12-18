@@ -40,7 +40,9 @@ class PrepareYear : CliktCommand(name = "./gradlew prepareYear") {
   }
 
   private fun createSolutionTemplates() {
-    (1..25).forEach { day ->
+    // AoC since 2025 introduces a new format with 12 days instead of 25.
+    val numberOfDays = if (year >= 25) 12 else 25
+    (1..numberOfDays).forEach { day ->
       createSolutionTemplate(day)
     }
   }
@@ -70,7 +72,7 @@ class PrepareYear : CliktCommand(name = "./gradlew prepareYear") {
       |
       |typealias Input = List<String>
       |
-      |typealias Output = Int
+      |typealias Output = Long
       |
       |private val solution = object : Solution<Input, Output>(20$year, "Day$dayFormatted") {
       |  override fun parse(input: String): Input = input.lines()
