@@ -16,6 +16,7 @@ object Strings {
   fun String.extractLongs() = Regex("[-+]?\\d+").findAll(this).map { it.value.toLong() }.toList()
 
   fun String.splitIn(parts: Int): List<String> = chunked(length / parts)
+  fun String.splitAt(index: Int): Pair<String, String> = substring(0, index) to substring(index)
 
   infix fun String.intersect(other: String): Set<Char> = toSet() intersect other.toSet()
   infix fun String.intersect(other: Set<Char>): Set<Char> = toSet() intersect other
