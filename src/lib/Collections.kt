@@ -17,6 +17,7 @@ object Collections {
   fun List<Long>.cumulativeSum() = cumulativeSum1().drop(1)
 
   fun <E> List<E>.isDistinct() = size == toSet().size
+  fun <E> List<E>.allEqual() = toSet().size == 1
 
   fun <T> List<T>.histogram() = groupingBy { it }.eachCount()
   fun String.histogram() = groupingBy { it }.eachCount()
