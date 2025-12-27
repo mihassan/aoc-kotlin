@@ -7,10 +7,10 @@ import aoc24.day24.Gate.Companion.fixOutputGates
 import lib.Solution
 
 /** A wire in the circuit denoted by its name. */
-data class Wire(val name: String)
+private data class Wire(val name: String)
 
 /** A group of wires with the same prefix id. */
-data class WireGroup(val id: String, val wires: Set<Wire>) {
+private data class WireGroup(val id: String, val wires: Set<Wire>) {
   /**
    * Get the value of the group of wires by checking signal for each wire and concatenating them.
    * The wires are sorted by name in descending order before concatenation, i.e., from the most
@@ -34,14 +34,14 @@ data class WireGroup(val id: String, val wires: Set<Wire>) {
 }
 
 /** A signal with a value of 0 or 1. A wire can carry a signal. */
-data class Signal(val value: Long) {
+private data class Signal(val value: Long) {
   init {
     require(value in 0..1) { "Signal value must be 0 or 1" }
   }
 }
 
 /** Possible gate types with their corresponding operation. */
-enum class GateType(val op: (Long, Long) -> Long) {
+private enum class GateType(val op: (Long, Long) -> Long) {
   AND(Long::and), OR(Long::or), XOR(Long::xor);
 
   companion object {
@@ -51,7 +51,7 @@ enum class GateType(val op: (Long, Long) -> Long) {
 }
 
 /** A gate with two input wires and one output wire. */
-data class Gate(val gateType: GateType, val input1: Wire, val input2: Wire, val output: Wire) {
+private data class Gate(val gateType: GateType, val input1: Wire, val input2: Wire, val output: Wire) {
   /** Compute the output signal of the gate based on the input signals. */
   fun computeOutputSignal(signals: Map<Wire, Signal>): Signal? {
     val signal1 = signals[input1]?.value ?: return null
@@ -104,7 +104,7 @@ data class Gate(val gateType: GateType, val input1: Wire, val input2: Wire, val 
 }
 
 /** A circuit with signals carried by input wires and all the gates. */
-data class Circuit(val signals: Map<Wire, Signal>, val gates: List<Gate>) {
+private data class Circuit(val signals: Map<Wire, Signal>, val gates: List<Gate>) {
   /** Run the circuit to compute the signals for all the wires. */
   fun runSignals(): Map<Wire, Signal> {
     val signals = signals.toMutableMap()
@@ -142,7 +142,7 @@ data class Circuit(val signals: Map<Wire, Signal>, val gates: List<Gate>) {
 }
 
 /** A half adder with two input wires, a sum wire, and a carry wire. */
-data class HalfAdder(val input1: Wire, val input2: Wire, val sum: Wire, val carry: Wire) {
+private data class HalfAdder(val input1: Wire, val input2: Wire, val sum: Wire, val carry: Wire) {
   companion object {
     /** Find a half adder with the given inputs and output wires. */
     fun findHalfAdder(
@@ -159,7 +159,7 @@ data class HalfAdder(val input1: Wire, val input2: Wire, val sum: Wire, val carr
 }
 
 /** A full adder with two input wires, a carry-in wire, a sum wire, and a carry-out wire. */
-data class FullAdder(
+private data class FullAdder(
   val input1: Wire,
   val input2: Wire,
   val carryIn: Wire,
@@ -224,9 +224,9 @@ data class FullAdder(
   }
 }
 
-typealias Input = Circuit
+private typealias Input = Circuit
 
-typealias Output = String
+private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2024, "Day24") {
   override fun parse(input: String): Input = Circuit.parse(input)

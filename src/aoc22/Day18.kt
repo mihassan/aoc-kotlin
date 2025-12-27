@@ -4,7 +4,7 @@ package aoc22.day18
 
 import lib.Solution
 
-data class Cube(val x: Int, val y: Int, val z: Int) {
+private data class Cube(val x: Int, val y: Int, val z: Int) {
   fun adjacentCubes(): Set<Cube> = setOf(
     Cube(x - 1, y, z),
     Cube(x + 1, y, z),
@@ -22,7 +22,7 @@ data class Cube(val x: Int, val y: Int, val z: Int) {
   }
 }
 
-data class Bound3D(val xRange: IntRange, val yRange: IntRange, val zRange: IntRange) {
+private data class Bound3D(val xRange: IntRange, val yRange: IntRange, val zRange: IntRange) {
   operator fun contains(cube: Cube): Boolean =
     cube.x in xRange && cube.y in yRange && cube.z in zRange
 
@@ -62,9 +62,9 @@ data class Bound3D(val xRange: IntRange, val yRange: IntRange, val zRange: IntRa
   }
 }
 
-typealias Input = Set<Cube>
+private typealias Input = Set<Cube>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day18") {
   override fun parse(input: String): Input = input.lines().map { Cube.parse(it) }.toSet()

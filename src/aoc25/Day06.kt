@@ -6,7 +6,7 @@ import lib.Collections.transposed
 import lib.Solution
 import lib.Strings.words
 
-enum class Operator(val symbol: Char) {
+private enum class Operator(val symbol: Char) {
   ADD('+'), MULTIPLY('*');
 
   companion object {
@@ -15,7 +15,7 @@ enum class Operator(val symbol: Char) {
   }
 }
 
-data class Equation(val operator: Operator, val operands: List<Long>) {
+private data class Equation(val operator: Operator, val operands: List<Long>) {
   fun evaluate(): Long = when (operator) {
     Operator.ADD -> operands.sum()
     Operator.MULTIPLY -> operands.reduce(Long::times)
@@ -31,9 +31,9 @@ data class Equation(val operator: Operator, val operands: List<Long>) {
   }
 }
 
-typealias Input = String
+private typealias Input = String
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day06") {
   override fun parse(input: String): Input = input

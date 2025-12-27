@@ -6,7 +6,7 @@ import lib.Collections.headTail
 import lib.Solution
 import lib.Strings.extractInts
 
-data class ConditionRecord(val conditions: String, val groups: List<Int>) {
+private data class ConditionRecord(val conditions: String, val groups: List<Int>) {
   fun unfold(times: Int): ConditionRecord {
     val newConditions = List(times) { conditions }.joinToString("?")
     val newGroups = List(times) { groups }.flatten()
@@ -21,9 +21,9 @@ data class ConditionRecord(val conditions: String, val groups: List<Int>) {
   }
 }
 
-typealias Input = List<ConditionRecord>
+private typealias Input = List<ConditionRecord>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day12") {
   override fun parse(input: String): Input = input.lines().map { ConditionRecord.parse(it) }

@@ -4,7 +4,7 @@ package aoc24.day19
 
 import lib.Solution
 
-data class Input(val patterns: List<String>, val designs: List<String>) {
+private data class Input(val patterns: List<String>, val designs: List<String>) {
   companion object {
     fun parse(input: String): Input {
       val (patterns, designs) = input.split("\n\n")
@@ -13,7 +13,7 @@ data class Input(val patterns: List<String>, val designs: List<String>) {
   }
 }
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day19") {
   override fun parse(input: String): Input = Input.parse(input)

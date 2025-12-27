@@ -8,11 +8,11 @@ import lib.Collections.headTail
 import lib.Solution
 import lib.Strings.extractLongs
 
-typealias RoomLabel = String
+private typealias RoomLabel = String
 
-typealias Distance = Long
+private typealias Distance = Long
 
-data class Room(val label: RoomLabel, val flowRate: Long, val tunnels: Map<RoomLabel, Distance>) {
+private data class Room(val label: RoomLabel, val flowRate: Long, val tunnels: Map<RoomLabel, Distance>) {
   val hasPositiveFlow by lazy { flowRate > 0 }
   val initialRoom by lazy { label == INITIAL_ROOM_LABEL }
 
@@ -32,9 +32,9 @@ data class Room(val label: RoomLabel, val flowRate: Long, val tunnels: Map<RoomL
   }
 }
 
-typealias Input = Map<RoomLabel, Room>
+private typealias Input = Map<RoomLabel, Room>
 
-typealias Output = String
+private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day16") {
   override fun parse(input: String): Input =

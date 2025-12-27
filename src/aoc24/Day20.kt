@@ -6,7 +6,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Tile {
+private enum class Tile {
   EMPTY, WALL, START, END;
 
   companion object {
@@ -20,7 +20,7 @@ enum class Tile {
   }
 }
 
-data class Input(val grid: Grid<Tile>) {
+private data class Input(val grid: Grid<Tile>) {
   val start: Point = grid.indexOf(Tile.START)
   val end: Point = grid.indexOf(Tile.END)
 
@@ -29,7 +29,7 @@ data class Input(val grid: Grid<Tile>) {
   }
 }
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day20") {
   override fun parse(input: String): Input = Input.parse(input)

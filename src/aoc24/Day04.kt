@@ -7,9 +7,9 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-typealias Input = Grid<Char>
+private typealias Input = Grid<Char>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day04") {
   override fun parse(input: String): Input = Grid.parse(input)

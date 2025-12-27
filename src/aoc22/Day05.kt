@@ -6,9 +6,9 @@ import lib.Collections.headTail
 import lib.Solution
 import lib.Strings.ints
 
-typealias StackIndex = Int
+private typealias StackIndex = Int
 
-data class Crate(private val char: Char) {
+private data class Crate(private val char: Char) {
   override fun toString(): String = "$char"
 
   companion object {
@@ -16,7 +16,7 @@ data class Crate(private val char: Char) {
   }
 }
 
-data class CrateStack(private val arrayDeque: ArrayDeque<Crate> = ArrayDeque()) {
+private data class CrateStack(private val arrayDeque: ArrayDeque<Crate> = ArrayDeque()) {
   fun copy() = CrateStack(ArrayDeque(this.arrayDeque))
 
   fun push(crate: Crate) = arrayDeque.addLast(crate)
@@ -29,7 +29,7 @@ data class CrateStack(private val arrayDeque: ArrayDeque<Crate> = ArrayDeque()) 
   fun top(): Crate = arrayDeque.last()
 }
 
-data class Cargo(
+private data class Cargo(
   private val stackCount: Int,
   private val stacks: List<CrateStack> = List(stackCount) { CrateStack() },
 ) {
@@ -56,7 +56,7 @@ data class Cargo(
   }
 }
 
-data class Step(val quantity: Int, val from: StackIndex, val to: StackIndex) {
+private data class Step(val quantity: Int, val from: StackIndex, val to: StackIndex) {
   companion object {
     fun parse(line: String): Step {
       val parts = line.split(" ")
@@ -68,7 +68,7 @@ data class Step(val quantity: Int, val from: StackIndex, val to: StackIndex) {
   }
 }
 
-data class Procedure(val steps: List<Step>) {
+private data class Procedure(val steps: List<Step>) {
   fun run(block: (step: Step) -> Unit) = steps.forEach(block)
 
   companion object {
@@ -77,9 +77,9 @@ data class Procedure(val steps: List<Step>) {
   }
 }
 
-data class Input(val cargo: Cargo, val procedure: Procedure)
+private data class Input(val cargo: Cargo, val procedure: Procedure)
 
-typealias Output = Cargo
+private typealias Output = Cargo
 
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: String): Input {

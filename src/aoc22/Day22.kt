@@ -7,7 +7,7 @@ import lib.Direction
 import lib.Point
 import lib.Solution
 
-enum class Tile(val symbol: Char) {
+private enum class Tile(val symbol: Char) {
   WALL('#'), OPEN('.');
 
   companion object {
@@ -15,7 +15,7 @@ enum class Tile(val symbol: Char) {
   }
 }
 
-enum class Turn(val symbol: Char) {
+private enum class Turn(val symbol: Char) {
   RIGHT('R'), LEFT('L');
 
   companion object {
@@ -23,7 +23,7 @@ enum class Turn(val symbol: Char) {
   }
 }
 
-fun Direction.turn(turn: Turn): Direction = when (turn) {
+private fun Direction.turn(turn: Turn): Direction = when (turn) {
   Turn.RIGHT -> when (this) {
     Direction.RIGHT -> Direction.DOWN
     Direction.DOWN -> Direction.LEFT
@@ -39,7 +39,7 @@ fun Direction.turn(turn: Turn): Direction = when (turn) {
   }
 }
 
-data class Board(val tiles: Map<Point, Tile>) {
+private data class Board(val tiles: Map<Point, Tile>) {
   private val xBoundary: Map<Int, IntRange> =
     tiles.keys.groupBy({ it.y }, { it.x }).mapValues { (_, xs) -> xs.min()..xs.max() }
 
@@ -59,7 +59,7 @@ data class Board(val tiles: Map<Point, Tile>) {
   }
 }
 
-sealed class MoveHandler(val board: Board) {
+private sealed class MoveHandler(val board: Board) {
   abstract fun moveSingleStep(from: Point, direction: Direction): Pair<Point, Direction>
 
   fun move(from: Point, direction: Direction, steps: Int): Pair<Point, Direction> {
@@ -232,7 +232,7 @@ sealed class MoveHandler(val board: Board) {
   }
 }
 
-sealed interface Instruction {
+private sealed interface Instruction {
   data class TurnInstruction(val turn: Turn) : Instruction
   data class MoveInstruction(val step: Int) : Instruction
 
@@ -247,9 +247,9 @@ sealed interface Instruction {
   }
 }
 
-typealias Input = Pair<Board, List<Instruction>>
+private typealias Input = Pair<Board, List<Instruction>>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day22") {
   override fun parse(input: String): Input {

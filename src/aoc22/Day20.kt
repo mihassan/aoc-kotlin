@@ -5,9 +5,9 @@ package aoc22.day20
 import lib.Solution
 import lib.Strings.longs
 
-typealias Input = List<Long>
+private typealias Input = List<Long>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day20") {
   override fun parse(input: String): Input = input.longs()

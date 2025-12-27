@@ -8,9 +8,9 @@ import lib.Solution
 import lib.Strings.longs
 import lib.Strings.splitIn
 
-typealias Input = List<Long>
+private typealias Input = List<Long>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day11") {
   override fun parse(input: String): Input = input.longs()

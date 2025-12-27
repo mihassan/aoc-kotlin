@@ -5,7 +5,7 @@ package aoc23.day08
 import lib.Maths.lcm
 import lib.Solution
 
-enum class Step(val symbol: Char) {
+private enum class Step(val symbol: Char) {
   LEFT('L'),
   RIGHT('R');
 
@@ -14,7 +14,7 @@ enum class Step(val symbol: Char) {
   }
 }
 
-data class Node(val label: String, val left: String, val right: String) {
+private data class Node(val label: String, val left: String, val right: String) {
   fun isSource(): Boolean = label == "AAA"
 
   fun isGhostSource(): Boolean = label.endsWith("A")
@@ -33,7 +33,7 @@ data class Node(val label: String, val left: String, val right: String) {
   }
 }
 
-data class Network(val nodes: Map<String, Node>) {
+private data class Network(val nodes: Map<String, Node>) {
   fun source(): Node = nodes.values.find { it.isSource() }!!
 
   fun ghostSources(): List<Node> = nodes.values.filter { it.isGhostSource() }
@@ -50,7 +50,7 @@ data class Network(val nodes: Map<String, Node>) {
   }
 }
 
-data class Input(val steps: List<Step>, val network: Network) {
+private data class Input(val steps: List<Step>, val network: Network) {
   fun countStepsToSink(source: Node): Long {
     var node = source
     var stepIndex = 0L
@@ -74,7 +74,7 @@ data class Input(val steps: List<Step>, val network: Network) {
   }
 }
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day08") {
   override fun parse(input: String) = Input.parse(input)

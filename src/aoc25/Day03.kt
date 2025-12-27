@@ -4,7 +4,7 @@ package aoc25.day03
 
 import lib.Solution
 
-data class Bank(val batteries: List<Int>) {
+private data class Bank(val batteries: List<Int>) {
   fun joltage(batteriesToTurnOn: Int): Long {
     var remainingBatteries = batteries
     var totalJoltage = 0L
@@ -39,9 +39,9 @@ data class Bank(val batteries: List<Int>) {
   }
 }
 
-typealias Input = List<Bank>
+private typealias Input = List<Bank>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day03") {
   private val PART1_BATTERIES = 2

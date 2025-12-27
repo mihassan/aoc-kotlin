@@ -7,11 +7,11 @@ import lib.Solution
 import lib.Strings.ints
 import lib.Strings.words
 
-data class Step(val quantity: Int, val from: Int, val to: Int)
+private data class Step(val quantity: Int, val from: Int, val to: Int)
 
-data class Input(val cargo: List<ArrayDeque<Char>>, val procedure: List<Step>)
+private data class Input(val cargo: List<ArrayDeque<Char>>, val procedure: List<Step>)
 
-typealias Output = List<ArrayDeque<Char>>
+private typealias Output = List<ArrayDeque<Char>>
 
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: String): Input {

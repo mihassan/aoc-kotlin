@@ -6,9 +6,9 @@ import kotlin.math.abs
 import lib.Solution
 import lib.Strings.ints
 
-typealias Input = List<List<Int>>
+private typealias Input = List<List<Int>>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day02") {
   override fun parse(input: String): Input = input.lines().map { it.ints() }

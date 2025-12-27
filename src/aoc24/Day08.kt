@@ -8,11 +8,11 @@ import lib.Maths.gcd
 import lib.Point
 import lib.Solution
 
-typealias Frequency = Char
-typealias Antenna = Point
-typealias Antinode = Point
+private typealias Frequency = Char
+private typealias Antenna = Point
+private typealias Antinode = Point
 
-data class Roof(
+private data class Roof(
   val height: Int,
   val width: Int,
   val antennasGroupedByFrequency: Map<Frequency, Set<Antenna>>,
@@ -74,9 +74,9 @@ data class Roof(
   }
 }
 
-typealias Input = Roof
+private typealias Input = Roof
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day08") {
   override fun parse(input: String): Input = Roof.parse(input)

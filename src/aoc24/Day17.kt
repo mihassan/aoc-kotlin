@@ -5,7 +5,7 @@ package aoc24.day17
 import lib.Maths.pow
 import lib.Solution
 
-enum class Register(val operand: Long) {
+private enum class Register(val operand: Long) {
   A(4), B(5), C(6);
 
   companion object {
@@ -22,11 +22,11 @@ enum class Register(val operand: Long) {
   }
 }
 
-enum class OperandType {
+private enum class OperandType {
   LITERAL, COMBO, IGNORED
 }
 
-enum class Instruction(val opcode: Long, val operandType: OperandType) {
+private enum class Instruction(val opcode: Long, val operandType: OperandType) {
   ADV(0, OperandType.COMBO),
   BXL(1, OperandType.LITERAL),
   BST(2, OperandType.COMBO),
@@ -56,14 +56,14 @@ enum class Instruction(val opcode: Long, val operandType: OperandType) {
   }
 }
 
-data class Program(val code: List<Long>) {
+private data class Program(val code: List<Long>) {
   companion object {
     fun parse(programStr: String): Program =
       Program(programStr.substringAfter("Program: ").split(",").map { it.toLong() })
   }
 }
 
-data class Computer(val program: Program, val registers: MutableMap<Register, Long>) {
+private data class Computer(val program: Program, val registers: MutableMap<Register, Long>) {
   private var ip = 0
   private val output = mutableListOf<Long>()
 
@@ -151,9 +151,9 @@ data class Computer(val program: Program, val registers: MutableMap<Register, Lo
   }
 }
 
-typealias Input = Computer
+private typealias Input = Computer
 
-typealias Output = List<Long>
+private typealias Output = List<Long>
 
 private val solution = object : Solution<Input, Output>(2024, "Day17") {
   override fun parse(input: String): Input = Computer.parse(input)

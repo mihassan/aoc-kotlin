@@ -6,13 +6,13 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Cell {
+private enum class Cell {
   SAFE, CORRUPTED;
 }
 
-typealias Input = List<Point>
+private typealias Input = List<Point>
 
-typealias Output = List<Int>
+private typealias Output = List<Int>
 
 private val solution = object : Solution<Input, Output>(2024, "Day18") {
   private val GRID_SIZE = 71

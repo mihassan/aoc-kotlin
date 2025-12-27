@@ -8,7 +8,7 @@ import lib.Line
 import lib.Point
 import lib.Solution
 
-data class PartNumber(val value: Int, val location: Line) {
+private data class PartNumber(val value: Int, val location: Line) {
   companion object {
     fun String.findAllPartNumbers(): List<PartNumber> =
       lines().flatMapIndexed { i, line ->
@@ -20,7 +20,7 @@ data class PartNumber(val value: Int, val location: Line) {
   }
 }
 
-data class Symbol(val value: Char, val location: Point) {
+private data class Symbol(val value: Char, val location: Point) {
   fun isStar() = value == '*'
 
   companion object {
@@ -34,7 +34,7 @@ data class Symbol(val value: Char, val location: Point) {
   }
 }
 
-data class Gear(val symbol: Symbol, val partNumbers: List<PartNumber>) {
+private data class Gear(val symbol: Symbol, val partNumbers: List<PartNumber>) {
   constructor(mapEntry: Map.Entry<Symbol, List<PartNumber>>) : this(mapEntry.key, mapEntry.value)
 
   fun value(): Int = partNumbers.map { it.value }.reduce(Int::times)
@@ -42,7 +42,7 @@ data class Gear(val symbol: Symbol, val partNumbers: List<PartNumber>) {
   fun isValidGear() = partNumbers.size == 2
 }
 
-data class EngineSchematic(val partNumbers: List<PartNumber>, val symbols: List<Symbol>) {
+private data class EngineSchematic(val partNumbers: List<PartNumber>, val symbols: List<Symbol>) {
   fun extractValidPartNumbers(): List<PartNumber> = partNumbers.filter(::isValidPartNumber)
 
   fun extractGears(): List<Gear> = symbols
@@ -73,9 +73,9 @@ data class EngineSchematic(val partNumbers: List<PartNumber>, val symbols: List<
   }
 }
 
-typealias Input = EngineSchematic
+private typealias Input = EngineSchematic
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day03") {
   override fun parse(input: String): Input = EngineSchematic.parse(input)

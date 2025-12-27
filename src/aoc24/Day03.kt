@@ -4,9 +4,9 @@ package aoc24.day03
 
 import lib.Solution
 
-typealias Input = List<Instruction>
+private typealias Input = List<Instruction>
 
-typealias Output = Int
+private typealias Output = Int
 
 sealed interface Instruction {
   data object DO : Instruction

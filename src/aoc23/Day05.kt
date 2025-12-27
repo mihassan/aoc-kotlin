@@ -9,7 +9,7 @@ import lib.Solution
 import lib.Strings.extractLongs
 import lib.Strings.longs
 
-enum class Category {
+private enum class Category {
   SEED, SOIL, FERTILIZER, WATER, LIGHT, TEMPERATURE, HUMIDITY, LOCATION;
 
   companion object {
@@ -17,9 +17,9 @@ enum class Category {
   }
 }
 
-data class Item(val category: Category, val number: Long)
+private data class Item(val category: Category, val number: Long)
 
-data class RangeMap(val srcRange: LongRange, val destRange: LongRange) {
+private data class RangeMap(val srcRange: LongRange, val destRange: LongRange) {
   constructor(destRangeStart: Long, srcRangeStart: Long, rangeLength: Long) :
     this(
       srcRangeStart..<srcRangeStart + rangeLength,
@@ -40,7 +40,7 @@ data class RangeMap(val srcRange: LongRange, val destRange: LongRange) {
   }
 }
 
-data class CategoryMap(
+private data class CategoryMap(
   val srcCategory: Category,
   val destCategory: Category,
   val rangeMaps: List<RangeMap>,
@@ -73,7 +73,7 @@ data class CategoryMap(
   }
 }
 
-data class Almanac(val seeds: List<Long>, val categoryMaps: List<CategoryMap>) {
+private data class Almanac(val seeds: List<Long>, val categoryMaps: List<CategoryMap>) {
   fun convert(item: Item, destCategory: Category): Item {
     var convertedItem = item
     while (convertedItem.category != destCategory) {
@@ -94,9 +94,9 @@ data class Almanac(val seeds: List<Long>, val categoryMaps: List<CategoryMap>) {
   }
 }
 
-typealias Input = Almanac
+private typealias Input = Almanac
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day05") {
   override fun parse(input: String): Input = Almanac.parse(input)

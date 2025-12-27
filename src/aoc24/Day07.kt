@@ -6,7 +6,7 @@ import lib.Combinatorics.permutationsWithReplacement
 import lib.Solution
 import lib.Strings.longs
 
-enum class Operator {
+private enum class Operator {
   PLUS, MULTIPLY, CONCAT;
 
   fun apply(op1: Long, op2: Long): Long =
@@ -22,7 +22,7 @@ enum class Operator {
   }
 }
 
-data class Equation(val result: Long, val operands: List<Long>) {
+private data class Equation(val result: Long, val operands: List<Long>) {
   init {
     require(operands.isNotEmpty()) { "Operands can not be empty." }
   }
@@ -51,9 +51,9 @@ data class Equation(val result: Long, val operands: List<Long>) {
   }
 }
 
-typealias Input = List<Equation>
+private typealias Input = List<Equation>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day07") {
   override fun parse(input: String): Input = input.lines().map { Equation.parse(it) }

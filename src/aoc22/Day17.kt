@@ -12,7 +12,7 @@ import lib.Solution
 import lib.Ranges.contains
 
 // Not using lib.Direction here as the y direction is inverted.
-enum class Direction {
+private enum class Direction {
   LEFT, // Decrement x
   RIGHT, // Increment x
   DOWN; // Decrement y
@@ -33,7 +33,7 @@ enum class Direction {
   }
 }
 
-enum class Rock(pattern: String) {
+private enum class Rock(pattern: String) {
   ROCK__("####"), ROCK_X(
     """
       .#.
@@ -76,7 +76,7 @@ enum class Rock(pattern: String) {
   }
 }
 
-data class FallingRock(private val rock: Rock, private var bottomLeft: Point) {
+private data class FallingRock(private val rock: Rock, private var bottomLeft: Point) {
   private var lastBottomLeft: Point? = null
 
   fun getCells(): List<Point> = rock.cells.map { it + bottomLeft }
@@ -100,7 +100,7 @@ data class FallingRock(private val rock: Rock, private var bottomLeft: Point) {
   }
 }
 
-data class Chamber(private val grid: MutableSet<Point> = EMPTY_GRID.toMutableSet()) {
+private data class Chamber(private val grid: MutableSet<Point> = EMPTY_GRID.toMutableSet()) {
   fun add(rock: Rock): FallingRock = FallingRock(rock, Point(2, height() + 4))
 
   fun canPlace(rock: FallingRock): Boolean {
@@ -123,9 +123,9 @@ data class Chamber(private val grid: MutableSet<Point> = EMPTY_GRID.toMutableSet
   }
 }
 
-typealias Input = List<Direction>
+private typealias Input = List<Direction>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day17") {
   override fun parse(input: String): Input = input.map { it.toDirection() }

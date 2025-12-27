@@ -8,7 +8,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-data class Plot(val point: Point) {
+private data class Plot(val point: Point) {
   fun edges(): List<Edge> = Direction.values().map { direction -> Edge(this, direction) }
 
   fun adjacents(): List<Plot> = point.adjacents().map { adjacent -> Plot(adjacent) }
@@ -16,7 +16,7 @@ data class Plot(val point: Point) {
   fun move(direction: Direction): Plot = Plot(point.move(direction))
 }
 
-data class Edge(val plot: Plot, val direction: Direction) {
+private data class Edge(val plot: Plot, val direction: Direction) {
   fun otherPlot(): Plot = Plot(plot.point.move(direction))
 
   fun adjacents(): List<Edge> =
@@ -26,7 +26,7 @@ data class Edge(val plot: Plot, val direction: Direction) {
       }
 }
 
-data class Region(val plots: Set<Plot>) {
+private data class Region(val plots: Set<Plot>) {
   fun getPrice(): Int = getArea() * getPerimeter()
 
   fun getBulkPrice(): Int = getArea() * getSides()
@@ -75,9 +75,9 @@ data class Region(val plots: Set<Plot>) {
   }
 }
 
-typealias Input = Grid<Char>
+private typealias Input = Grid<Char>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day12") {
   override fun parse(input: String): Input = Grid.parse(input)

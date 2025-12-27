@@ -9,8 +9,8 @@ import lib.Grid.Companion.max
 import lib.Solution
 
 
-typealias Input = Grid<Int>
-typealias Output = Int
+private typealias Input = Grid<Int>
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day08") {
   override fun parse(input: String): Input = Grid.parse(input).map(Char::digitToInt)

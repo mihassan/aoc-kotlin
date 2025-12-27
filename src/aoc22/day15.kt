@@ -11,7 +11,7 @@ import lib.Ranges.union
 import lib.Solution
 import lib.Strings.extractInts
 
-data class Sensor(
+private data class Sensor(
   val position: Point,
   val closestBeacon: Point,
 ) {
@@ -27,9 +27,9 @@ data class Sensor(
   }
 }
 
-typealias Input = List<Sensor>
+private typealias Input = List<Sensor>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day15") {
   override fun parse(input: String): Input = input.lines().map { Sensor.parse(it) }

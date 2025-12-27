@@ -6,9 +6,9 @@ import lib.Maths.isZero
 import lib.Solution
 import lib.Strings.longs
 
-typealias Input = List<List<Long>>
+private typealias Input = List<List<Long>>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day09") {
   override fun parse(input: String): Input = input.lines().map { it.longs() }

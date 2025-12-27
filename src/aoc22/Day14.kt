@@ -6,7 +6,7 @@ import lib.Path
 import lib.Point
 import lib.Solution
 
-data class Cave(
+private data class Cave(
   private val bricks: MutableSet<Point>,
   private val sands: MutableSet<Point>,
 ) {
@@ -57,9 +57,9 @@ data class Cave(
   }
 }
 
-typealias Input = Cave
+private typealias Input = Cave
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day14") {
   override fun parse(input: String): Input = Cave.parse(input)

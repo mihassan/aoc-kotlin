@@ -9,7 +9,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Tile(val char: Char) {
+private enum class Tile(val char: Char) {
   EMPTY('.'), WALL('#'), START('S'), END('E');
 
   companion object {
@@ -20,7 +20,7 @@ enum class Tile(val char: Char) {
   }
 }
 
-data class Maze(val grid: Grid<Tile>) {
+private data class Maze(val grid: Grid<Tile>) {
   val start: Point by lazy {
     grid.indexOfOrNull { it == Tile.START } ?: error("No start found")
   }
@@ -36,7 +36,7 @@ data class Maze(val grid: Grid<Tile>) {
   }
 }
 
-data class Pose(val point: Point, val direction: Direction) {
+private data class Pose(val point: Point, val direction: Direction) {
   fun neighborsWithCost(): List<Pair<Pose, Int>> = listOf(
     step() to 1, turnLeft() to 1000, turnRight() to 1000
   )
@@ -51,11 +51,11 @@ data class Pose(val point: Point, val direction: Direction) {
   private fun turnRight(): Pose = copy(direction = direction.turnRight())
 }
 
-data class PoseWithCost(val pose: Pose, val cost: Int)
+private data class PoseWithCost(val pose: Pose, val cost: Int)
 
-typealias Input = Maze
+private typealias Input = Maze
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day16") {
   override fun parse(input: String): Input = Maze.parse(input)

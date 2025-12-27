@@ -19,7 +19,7 @@ sealed interface Operation {
   }
 }
 
-data class Instruction(val raw: String, val label: String, val operation: Operation) {
+private data class Instruction(val raw: String, val label: String, val operation: Operation) {
   companion object {
     private val REGEX = Regex("""(\w+)([-=]\d*)""")
 
@@ -31,9 +31,9 @@ data class Instruction(val raw: String, val label: String, val operation: Operat
   }
 }
 
-data class Lens(val label: String, val focalLength: Int)
+private data class Lens(val label: String, val focalLength: Int)
 
-data class Box(val lenses: MutableList<Lens> = mutableListOf()) {
+private data class Box(val lenses: MutableList<Lens> = mutableListOf()) {
   fun runOperation(instruction: Instruction) {
     when (instruction.operation) {
       Operation.REMOVE -> remove(instruction.label)
@@ -56,9 +56,9 @@ data class Box(val lenses: MutableList<Lens> = mutableListOf()) {
   }
 }
 
-typealias Input = List<Instruction>
+private typealias Input = List<Instruction>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day15") {
   override fun parse(input: String): Input = input.split(",").map { Instruction.parse(it) }

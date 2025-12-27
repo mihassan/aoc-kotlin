@@ -20,13 +20,13 @@ sealed interface Instruction {
   }
 }
 
-typealias Signal = Int
+private typealias Signal = Int
 
-typealias Cycle = Int
+private typealias Cycle = Int
 
-typealias SignalTimeSeries = MutableMap<Cycle, Signal>
+private typealias SignalTimeSeries = MutableMap<Cycle, Signal>
 
-data class CPU(
+private data class CPU(
   private var signal: Int = 1,
   private var cycle: Int = 1,
   private var signalTimeSeries: SignalTimeSeries = mutableMapOf(),
@@ -54,9 +54,9 @@ data class CPU(
     signalTimeSeries[cycle] ?: signal
 }
 
-typealias Input = List<Instruction>
+private typealias Input = List<Instruction>
 
-typealias Output = String
+private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day10") {
   override fun parse(input: String): Input = input.lines().map { Instruction.parse(it) }

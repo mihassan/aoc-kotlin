@@ -7,7 +7,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Tile(val char: Char) {
+private enum class Tile(val char: Char) {
   WALL('#'), EMPTY('.'), ROBOT('@'), BOX('O'), LEFT_BOX('['), RIGHT_BOX(']');
 
   companion object {
@@ -24,10 +24,10 @@ fun Direction.Companion.parse(char: Char): Direction? = when (char) {
   else -> null
 }
 
-fun Grid<Tile>.render(): String =
+private fun Grid<Tile>.render(): String =
   map { it.char }.grid.joinToString("\n") { it.joinToString("") }
 
-data class Warehouse(val grid: Grid<Tile>, val movements: List<Direction>) {
+private data class Warehouse(val grid: Grid<Tile>, val movements: List<Direction>) {
   fun robotPosition(): Point = grid.indexOf { it == Tile.ROBOT }
 
   fun widenTiles(): Warehouse {
@@ -88,9 +88,9 @@ data class Warehouse(val grid: Grid<Tile>, val movements: List<Direction>) {
   }
 }
 
-typealias Input = Warehouse
+private typealias Input = Warehouse
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day15") {
   override fun parse(input: String): Input = Input.parse(input)

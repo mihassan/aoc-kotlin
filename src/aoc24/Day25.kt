@@ -25,13 +25,13 @@ sealed class Schematic(val pins: List<Int>) {
   }
 }
 
-data class Input(val schematics: List<Schematic>) {
+private data class Input(val schematics: List<Schematic>) {
   companion object {
     fun parse(inputStr: String): Input = Input(inputStr.split("\n\n").map { Schematic.parse(it) })
   }
 }
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day25") {
   override fun parse(input: String): Input = Input.parse(input)

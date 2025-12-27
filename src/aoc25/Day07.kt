@@ -6,7 +6,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Cell(val symbol: Char) {
+private enum class Cell(val symbol: Char) {
   EMPTY('.'), START('S'), SPLITTER('^'), BEAM('|');
 
   companion object {
@@ -16,9 +16,9 @@ enum class Cell(val symbol: Char) {
   }
 }
 
-typealias Input = Grid<Cell>
+private typealias Input = Grid<Cell>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day07") {
   override fun parse(input: String): Input = Grid.parse(input).map(Cell::parse)

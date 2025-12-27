@@ -5,7 +5,7 @@ package aoc24.day13
 import kotlin.math.floor
 import lib.Solution
 
-enum class ButtonType(val representation: Char, val cost: Long) {
+private enum class ButtonType(val representation: Char, val cost: Long) {
   A('A', 3),
   B('B', 1);
 
@@ -14,7 +14,7 @@ enum class ButtonType(val representation: Char, val cost: Long) {
   }
 }
 
-data class Button(val type: ButtonType, val x: Long, val y: Long) {
+private data class Button(val type: ButtonType, val x: Long, val y: Long) {
   companion object {
     private val BUTTON_REGEX = """Button ([A-Z]): X\+(\d+), Y\+(\d+)""".toRegex()
 
@@ -26,7 +26,7 @@ data class Button(val type: ButtonType, val x: Long, val y: Long) {
   }
 }
 
-data class Prize(val x: Long, val y: Long) {
+private data class Prize(val x: Long, val y: Long) {
   fun move(dx: Long, dy: Long): Prize = Prize(x + dx, y + dy)
 
   companion object {
@@ -40,7 +40,7 @@ data class Prize(val x: Long, val y: Long) {
   }
 }
 
-data class Machine(val buttonA: Button, val buttonB: Button, val prize: Prize) {
+private data class Machine(val buttonA: Button, val buttonB: Button, val prize: Prize) {
   companion object {
     fun parse(machineStr: String): Machine {
       val (buttonA, buttonB, prize) = machineStr.split("\n")
@@ -49,9 +49,9 @@ data class Machine(val buttonA: Button, val buttonB: Button, val prize: Prize) {
   }
 }
 
-typealias Input = List<Machine>
+private typealias Input = List<Machine>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day13") {
   override fun parse(input: String): Input = input.split("\n\n").map(Machine::parse)

@@ -8,7 +8,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-data class Image(val galaxies: List<Point>, val maxBound: Point) {
+private data class Image(val galaxies: List<Point>, val maxBound: Point) {
   fun expandRows(count: Int): Image {
     val rowSizes = (0..maxBound.y).map { if (isEmptyRow(it)) count else 1 }
     val lastRow = rowSizes.last()
@@ -35,9 +35,9 @@ data class Image(val galaxies: List<Point>, val maxBound: Point) {
   }
 }
 
-typealias Input = Image
+private typealias Input = Image
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day11") {
   override fun parse(input: String): Input = Image.parse(input)

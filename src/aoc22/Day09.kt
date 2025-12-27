@@ -7,28 +7,28 @@ import kotlin.math.sign
 import lib.Collections.headTail
 import lib.Solution
 
-data class Point(val x: Int, val y: Int) {
+private data class Point(val x: Int, val y: Int) {
   val absoluteValue by lazy { Point(abs(x), abs(y)) }
   val signValue by lazy { Point(sign(x.toDouble()).toInt(), sign(y.toDouble()).toInt()) }
 }
 
-operator fun Point.plus(o: Point): Point = Point(x + o.x, y + o.y)
+private operator fun Point.plus(o: Point): Point = Point(x + o.x, y + o.y)
 
-operator fun Point.minus(o: Point): Point = Point(x - o.x, y - o.y)
+private operator fun Point.minus(o: Point): Point = Point(x - o.x, y - o.y)
 
-operator fun Point.times(s: Int): Point = Point(x * s, y * s)
+private operator fun Point.times(s: Int): Point = Point(x * s, y * s)
 
-infix fun Point.touches(o: Point): Boolean =
+private infix fun Point.touches(o: Point): Boolean =
   (this - o).absoluteValue.let { (x, y) -> x <= 1 && y <= 1 }
 
-enum class Direction(val delta: Point) {
+private enum class Direction(val delta: Point) {
   R(Point(1, 0)),
   L(Point(-1, 0)),
   U(Point(0, 1)),
   D(Point(0, -1))
 }
 
-fun String.toDirection(): Direction = when (this) {
+private fun String.toDirection(): Direction = when (this) {
   "R" -> Direction.R
   "L" -> Direction.L
   "U" -> Direction.U
@@ -36,15 +36,15 @@ fun String.toDirection(): Direction = when (this) {
   else -> error("Invalid direction.")
 }
 
-data class Step(val direction: Direction, val stepCount: Int) {
+private data class Step(val direction: Direction, val stepCount: Int) {
   val breakdown: List<Direction> = List(stepCount) { direction }
 }
 
-fun String.toStep(): Step = split(" ").let { (d, s) -> Step(d.toDirection(), s.toInt()) }
+private fun String.toStep(): Step = split(" ").let { (d, s) -> Step(d.toDirection(), s.toInt()) }
 
-typealias Input = List<Direction>
+private typealias Input = List<Direction>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day09") {
   val KNOT_COUNT = mapOf(Part.PART1 to 2, Part.PART2 to 10)

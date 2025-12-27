@@ -8,7 +8,7 @@ import lib.Maths.isOdd
 import lib.Solution
 import lib.Strings.extractLongs
 
-data class Race(val time: Long, val distance: Long) {
+private data class Race(val time: Long, val distance: Long) {
   fun waysToWin(): Long {
     val discriminant = sqrt(1.0 * time * time - 4 * distance) / 2
     return when {
@@ -18,9 +18,9 @@ data class Race(val time: Long, val distance: Long) {
   }
 }
 
-typealias Input = List<Race>
+private typealias Input = List<Race>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day06") {
   override fun parse(input: String): Input =

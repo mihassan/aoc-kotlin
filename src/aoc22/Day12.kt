@@ -6,11 +6,11 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class PlotType {
+private enum class PlotType {
   START, END, MIDDLE
 }
 
-data class Plot(val plotType: PlotType, val height: Int) {
+private data class Plot(val plotType: PlotType, val height: Int) {
   infix fun canStepTo(other: Plot): Boolean = other.height <= height + 1
 
   companion object {
@@ -22,9 +22,9 @@ data class Plot(val plotType: PlotType, val height: Int) {
   }
 }
 
-typealias Input = Grid<Plot>
+private typealias Input = Grid<Plot>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day12") {
   override fun parse(input: String): Input = Grid.parse(input).map(Plot.Companion::parse)

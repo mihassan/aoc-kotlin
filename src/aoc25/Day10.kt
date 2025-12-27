@@ -4,9 +4,9 @@ package aoc25.day10
 
 import lib.Solution
 
-typealias Input = List<String>
+private typealias Input = List<String>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2025, "Day10") {
   override fun parse(input: String): Input = input.lines()

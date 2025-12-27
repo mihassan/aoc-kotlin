@@ -6,8 +6,8 @@ import lib.Collections.prefixes
 import lib.Solution
 import lib.Strings.isInt
 
-typealias Input = List<String>
-typealias Output = Int
+private typealias Input = List<String>
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day07") {
   // Only match cd command and file listings with size. Ignore ls command and dir listings.

@@ -14,7 +14,7 @@ import lib.Solution.Part.PART1
 import lib.Solution.Part.PART2
 
 
-enum class Hand(val score: Int) {
+private enum class Hand(val score: Int) {
   ROCK(1), PAPER(2), SCISSOR(3);
 
   fun beats(): Hand = when (this) {
@@ -39,7 +39,7 @@ enum class Hand(val score: Int) {
   }
 }
 
-enum class Strategy {
+private enum class Strategy {
   X, Y, Z;
 
   fun handToPlay(part: Part, opponent: Hand): Hand = when (part) {
@@ -69,17 +69,17 @@ enum class Strategy {
   }
 }
 
-enum class GameResult(val score: Int) {
+private enum class GameResult(val score: Int) {
   WIN(6), LOSS(0), DRAW(3)
 }
 
-fun Hand.play(other: Hand): GameResult = when (other) {
+private fun Hand.play(other: Hand): GameResult = when (other) {
   beats() -> WIN
   beatenBy() -> LOSS
   else -> DRAW
 }
 
-data class Game(val opponent: Hand, val strategy: Strategy) {
+private data class Game(val opponent: Hand, val strategy: Strategy) {
   fun totalScore(part: Part): Int {
     val myHand = strategy.handToPlay(part, opponent)
     return myHand.score + myHand.play(opponent).score

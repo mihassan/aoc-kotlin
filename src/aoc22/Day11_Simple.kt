@@ -8,7 +8,7 @@ import lib.Strings.extractInts
 import lib.Strings.extractLongs
 import lib.Strings.words
 
-data class Monkey(
+private data class Monkey(
   val startingItems: List<Long>,
   val operation: (Long) -> Long,
   val divisor: Long,
@@ -37,9 +37,9 @@ data class Monkey(
   }
 }
 
-typealias Input = List<Monkey>
+private typealias Input = List<Monkey>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
   val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)

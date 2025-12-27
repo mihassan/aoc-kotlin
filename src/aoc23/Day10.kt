@@ -8,7 +8,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Tile(val symbol: Char, val connections: Set<Direction>) {
+private enum class Tile(val symbol: Char, val connections: Set<Direction>) {
   GROUND('.', emptySet()),
   VERTICAL('|', setOf(UP, DOWN)),
   HORIZONTAL('-', setOf(LEFT, RIGHT)),
@@ -73,7 +73,7 @@ data class Pipe(val connections: List<Connection>) {
   private fun findTopLeftConnection() = connections.minWith(compareBy({ it.from.y }, { it.from.x }))
 }
 
-data class Field(val grid: Grid<Tile>) {
+private data class Field(val grid: Grid<Tile>) {
   private val start: Point by lazy { grid.indexOf(Tile.START) }
 
   fun findPipe(): Pipe = Pipe(buildList {
@@ -105,9 +105,9 @@ data class Field(val grid: Grid<Tile>) {
   }
 }
 
-typealias Input = Field
+private typealias Input = Field
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day10") {
   override fun parse(input: String): Input = Field.parse(input)

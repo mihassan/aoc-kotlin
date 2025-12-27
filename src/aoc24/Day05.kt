@@ -5,7 +5,7 @@ package aoc24.day05
 import java.util.Collections
 import lib.Solution
 
-data class Rule(val first: Int, val last: Int) {
+private data class Rule(val first: Int, val last: Int) {
   companion object {
     fun parse(ruleStr: String): Rule {
       val pages = ruleStr.split("|").map { it.toInt() }
@@ -15,7 +15,7 @@ data class Rule(val first: Int, val last: Int) {
   }
 }
 
-data class Update(val pages: List<Int>) {
+private data class Update(val pages: List<Int>) {
   private val pageCount: Int
     get() = pages.size
 
@@ -51,9 +51,9 @@ data class Update(val pages: List<Int>) {
   }
 }
 
-data class Input(val rules: Set<Rule>, val updates: List<Update>)
+private data class Input(val rules: Set<Rule>, val updates: List<Update>)
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day05") {
   override fun parse(input: String): Input {

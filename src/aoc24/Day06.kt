@@ -7,7 +7,7 @@ import lib.Grid
 import lib.Point
 import lib.Solution
 
-enum class Tile {
+private enum class Tile {
   EMPTY, BLOCKED;
 
   companion object {
@@ -19,11 +19,11 @@ enum class Tile {
   }
 }
 
-data class Pose(val position: Point, val direction: Direction)
+private data class Pose(val position: Point, val direction: Direction)
 
-data class Input(val grid: Grid<Tile>, val pose: Pose)
+private data class Input(val grid: Grid<Tile>, val pose: Pose)
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day06") {
   override fun parse(input: String): Input {

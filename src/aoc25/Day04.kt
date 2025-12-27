@@ -7,7 +7,7 @@ import lib.Solution
 import lib.Grid
 import lib.Point
 
-enum class Cell {
+private enum class Cell {
   EMPTY, PAPER;
 
   companion object {
@@ -19,9 +19,9 @@ enum class Cell {
   }
 }
 
-typealias Input = Grid<Cell>
+private typealias Input = Grid<Cell>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2025, "Day04") {
   private val MIN_ADJACENT_TO_STAY = 4

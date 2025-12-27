@@ -4,7 +4,7 @@ package aoc25.day05
 
 import lib.Solution
 
-data class Input(
+private data class Input(
   val freshIngredients: List<LongRange>,
   val ingredients: List<Long>,
 ) {
@@ -23,7 +23,7 @@ data class Input(
   }
 }
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day05") {
   override fun parse(input: String): Input = Input.parse(input)

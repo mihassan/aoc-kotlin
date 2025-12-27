@@ -7,7 +7,7 @@ import lib.Maths.divides
 import lib.Solution
 import lib.Strings.splitIn
 
-data class ProductIdRange(val start: Long, val end: Long) {
+private data class ProductIdRange(val start: Long, val end: Long) {
   val range: LongRange = start..end
 
   val digits: Int = end.toString().length
@@ -33,9 +33,9 @@ private fun Long.hasRepeatingPattern(repetition: Int): Boolean {
   return parts.size > 1 && parts.allEqual()
 }
 
-typealias Input = List<ProductIdRange>
+private typealias Input = List<ProductIdRange>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day02") {
   override fun parse(input: String): Input = input.split(",").map(ProductIdRange.Companion::parse)

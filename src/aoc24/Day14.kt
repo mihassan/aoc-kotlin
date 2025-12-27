@@ -5,13 +5,13 @@ package aoc24.day14
 import lib.Point
 import lib.Solution
 
-typealias Vector = Point
+private typealias Vector = Point
 
-enum class Quadrant {
+private enum class Quadrant {
   TopLeft, TopRight, BottomRight, BottomLeft
 }
 
-data class Robot(val position: Point, val velocity: Vector) {
+private data class Robot(val position: Point, val velocity: Vector) {
   fun move(width: Int, height: Int, n: Int): Robot {
     val x = (position.x + velocity.x * n).mod(width)
     val y = (position.y + velocity.y * n).mod(height)
@@ -31,7 +31,7 @@ data class Robot(val position: Point, val velocity: Vector) {
   }
 }
 
-data class Grid(val width: Int, val height: Int, val robots: List<Robot>) {
+private data class Grid(val width: Int, val height: Int, val robots: List<Robot>) {
   init {
     require(robots.all { it.position.x in 0 until width && it.position.y in 0 until height })
   }
@@ -61,9 +61,9 @@ data class Grid(val width: Int, val height: Int, val robots: List<Robot>) {
   }
 }
 
-typealias Input = Grid
+private typealias Input = Grid
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day14") {
   override fun parse(input: String): Input {

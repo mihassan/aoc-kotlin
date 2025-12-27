@@ -4,11 +4,11 @@ package aoc23.day13
 
 import lib.Solution
 
-typealias Pattern = List<String>
+private typealias Pattern = List<String>
 
-typealias Input = List<Pattern>
+private typealias Input = List<Pattern>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day13") {
   override fun parse(input: String): Input = input.split("\n\n").map { it.lines() }

@@ -10,12 +10,12 @@ import lib.Collections.histogram
 import lib.Point
 import lib.Solution
 
-typealias Input = List<String>
+private typealias Input = List<String>
 
-typealias Output = Long
+private typealias Output = Long
 
-typealias Move = Char
-typealias Moves = String
+private typealias Move = Char
+private typealias Moves = String
 
 sealed class Keypad() {
   abstract val layout: Map<Move, Point>
@@ -111,7 +111,7 @@ sealed class Keypad() {
 
 /** A segment is a sequence of moves that ends with 'A'. */
 @ConsistentCopyVisibility
-data class Segment private constructor(val moves: Moves) {
+private data class Segment private constructor(val moves: Moves) {
   val length: Int get() = moves.length
 
   companion object {
@@ -127,7 +127,7 @@ data class Segment private constructor(val moves: Moves) {
  * We can compress like this because the order of segments does not matter to the final count.
  */
 @ConsistentCopyVisibility
-data class CompressedMoves private constructor(private val segments: Map<Segment, Long>) {
+private data class CompressedMoves private constructor(private val segments: Map<Segment, Long>) {
   val length: Long get() = segments.entries.sumOf { (segment, count) -> segment.length * count }
 
   /**

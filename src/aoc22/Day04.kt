@@ -7,7 +7,7 @@ import lib.Ranges.contains
 import lib.Solution
 
 
-typealias InputLine = Pair<IntRange, IntRange>
+private typealias InputLine = Pair<IntRange, IntRange>
 
 private val solution = object : Solution<List<InputLine>, Int>(2022, "Day04") {
   override fun parse(input: String): List<InputLine> = input.lines().map { line ->

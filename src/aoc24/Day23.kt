@@ -4,12 +4,12 @@ package aoc24.day23
 
 import lib.Solution
 
-data class Node(val node: String) : Comparable<Node> {
+private data class Node(val node: String) : Comparable<Node> {
   fun isChiefNode(): Boolean = node.startsWith("t")
   override fun compareTo(other: Node): Int = node.compareTo(other.node)
 }
 
-data class Graph(val nodes: Set<Node>, val edges: Map<Node, Set<Node>>) {
+private data class Graph(val nodes: Set<Node>, val edges: Map<Node, Set<Node>>) {
   companion object {
     fun parse(graphStr: String): Graph {
       val nodes = mutableSetOf<Node>()
@@ -32,9 +32,9 @@ data class Graph(val nodes: Set<Node>, val edges: Map<Node, Set<Node>>) {
   }
 }
 
-typealias Input = Graph
+private typealias Input = Graph
 
-typealias Output = String
+private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2024, "Day23") {
   override fun parse(input: String): Input = Graph.parse(input)

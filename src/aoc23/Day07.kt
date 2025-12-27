@@ -5,7 +5,7 @@ package aoc23.day07
 import lib.Collections.histogram
 import lib.Solution
 
-enum class Card(val symbol: Char) {
+private enum class Card(val symbol: Char) {
   JOKER('X'),
   TWO('2'),
   THREE('3'),
@@ -28,7 +28,7 @@ enum class Card(val symbol: Char) {
   }
 }
 
-enum class HandType {
+private enum class HandType {
   HIGH_CARD,
   ONE_PAIR,
   TWO_PAIRS,
@@ -38,7 +38,7 @@ enum class HandType {
   FIVE_OF_A_KIND
 }
 
-data class Hand(val cards: List<Card>, val bid: Long) {
+private data class Hand(val cards: List<Card>, val bid: Long) {
   fun type(): HandType {
     val counts = cards.histogram()
 
@@ -108,9 +108,9 @@ data class Hand(val cards: List<Card>, val bid: Long) {
   }
 }
 
-typealias Input = List<Hand>
+private typealias Input = List<Hand>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day07") {
   override fun parse(input: String): Input = input.lines().map { Hand.parse(it) }

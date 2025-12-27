@@ -6,7 +6,7 @@ import lib.Bag
 import lib.Solution
 import lib.Strings.words
 
-enum class Mineral {
+private enum class Mineral {
   ORE, CLAY, OBSIDIAN, GEODE;
 
   companion object {
@@ -15,9 +15,9 @@ enum class Mineral {
   }
 }
 
-typealias Minerals = Bag<Mineral>
+private typealias Minerals = Bag<Mineral>
 
-data class Rule(val robot: Mineral, val cost: Minerals) {
+private data class Rule(val robot: Mineral, val cost: Minerals) {
   companion object {
     fun parse(rule: String): Rule {
       val (robotPart, costPart) = rule.removePrefix("Each ").removeSuffix(".")
@@ -35,7 +35,7 @@ data class Rule(val robot: Mineral, val cost: Minerals) {
   }
 }
 
-data class Blueprint(val rules: List<Rule>) {
+private data class Blueprint(val rules: List<Rule>) {
   companion object {
     fun parse(blueprint: String): Blueprint {
       val rules = blueprint.substringAfter(": ").split(". ").map { Rule.parse(it) }
@@ -44,9 +44,9 @@ data class Blueprint(val rules: List<Rule>) {
   }
 }
 
-typealias Input = List<Blueprint>
+private typealias Input = List<Blueprint>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day19") {
   override fun parse(input: String): Input {

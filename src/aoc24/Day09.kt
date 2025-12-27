@@ -36,9 +36,9 @@ data class FileBlock(override val size: Long, val id: Long) : Block {
     copy(size = freeBlock.size) to copy(size = size - freeBlock.size)
 }
 
-typealias Input = List<Block>
+private typealias Input = List<Block>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day09") {
   override fun parse(input: String): Input {

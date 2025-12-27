@@ -78,8 +78,8 @@ sealed interface Value : Comparable<Value> {
   }
 }
 
-typealias Input = List<Pair<Value, Value>>
-typealias Output = Int
+private typealias Input = List<Pair<Value, Value>>
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day13") {
   val DIVIDER_PACKETS = listOf(Value.parse("[[2]]"), Value.parse("[[6]]"))

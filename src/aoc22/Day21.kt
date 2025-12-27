@@ -6,7 +6,7 @@ import kotlin.math.sign
 import lib.Solution
 import lib.Strings.isLong
 
-enum class Operation(val symbol: String, val op: (Long, Long) -> Long) {
+private enum class Operation(val symbol: String, val op: (Long, Long) -> Long) {
   ADD("+", Long::plus),
   SUBTRACT("-", Long::minus),
   MULTIPLY("*", Long::times),
@@ -22,7 +22,7 @@ enum class Operation(val symbol: String, val op: (Long, Long) -> Long) {
   }
 }
 
-sealed interface Job {
+private sealed interface Job {
   data class FixedNumber(val num: Long) : Job
   data class RunOperation(val op: Operation, val op1: String, val op2: String) : Job
 
@@ -37,7 +37,7 @@ sealed interface Job {
   }
 }
 
-data class Monkey(val name: String, val job: Job) {
+private data class Monkey(val name: String, val job: Job) {
   companion object {
     fun parse(monkeyStr: String): Monkey {
       val (name, jobPart) = monkeyStr.split(": ")
@@ -46,9 +46,9 @@ data class Monkey(val name: String, val job: Job) {
   }
 }
 
-typealias Input = List<Monkey>
+private typealias Input = List<Monkey>
 
-typealias Output = Long
+private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day21") {
   override fun parse(input: String): Input {

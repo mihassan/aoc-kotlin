@@ -6,7 +6,7 @@ import lib.Collections.partitions
 import lib.Solution
 import lib.Strings.words
 
-sealed interface Command {
+private sealed interface Command {
   data object LsCommand : Command
 
   data class CdCommand(val path: String) : Command
@@ -26,7 +26,7 @@ sealed interface Command {
   }
 }
 
-sealed class Entry {
+private sealed class Entry {
   abstract val path: String
 
   class FileEntry(override val path: String, val size: Int) : Entry()
@@ -44,7 +44,7 @@ sealed class Entry {
   }
 }
 
-data class CommandResult(val entries: List<Entry>) {
+private data class CommandResult(val entries: List<Entry>) {
   companion object {
     fun parse(lines: List<String>): CommandResult {
       val entries = lines.map { line -> Entry.parse(line) }
@@ -53,7 +53,7 @@ data class CommandResult(val entries: List<Entry>) {
   }
 }
 
-data class ExecutedCommand(val command: Command, val result: CommandResult) {
+private data class ExecutedCommand(val command: Command, val result: CommandResult) {
   companion object {
     fun parse(lines: List<String>): ExecutedCommand {
       val command = Command.parse(lines.first())
@@ -63,11 +63,11 @@ data class ExecutedCommand(val command: Command, val result: CommandResult) {
   }
 }
 
-typealias Input = List<ExecutedCommand>
+private typealias Input = List<ExecutedCommand>
 
-typealias Output = Int
+private typealias Output = Int
 
-sealed class FileTree : Iterable<FileTree> {
+private sealed class FileTree : Iterable<FileTree> {
   abstract val fullPath: String
   abstract val parent: FileTree?
   abstract val totalSize: Int
@@ -110,7 +110,7 @@ sealed class FileTree : Iterable<FileTree> {
   }
 }
 
-class FileTreeWalker constructor(private val executedCommands: List<ExecutedCommand>) {
+private class FileTreeWalker constructor(private val executedCommands: List<ExecutedCommand>) {
   private val cwd = mutableListOf<String>()
 
   fun onVisit(block: (parentPath: String, fullPath: String, entry: Entry) -> Unit) {
@@ -161,7 +161,7 @@ private fun constructFileTreeNodes(walker: FileTreeWalker): Map<String, FileTree
   }
 
 
-fun constructFileTree(executedCommands: List<ExecutedCommand>): FileTree {
+private fun constructFileTree(executedCommands: List<ExecutedCommand>): FileTree {
   val walker = FileTreeWalker(executedCommands)
   val graph = constructFileTreeNodes(walker)
 

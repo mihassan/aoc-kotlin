@@ -5,7 +5,7 @@ package aoc23.day02
 import java.lang.Integer.max
 import lib.Solution
 
-enum class Cube {
+private enum class Cube {
   RED, GREEN, BLUE;
 
   companion object {
@@ -13,7 +13,7 @@ enum class Cube {
   }
 }
 
-data class Cubes(val cubes: Map<Cube, Int>) {
+private data class Cubes(val cubes: Map<Cube, Int>) {
   fun isPossible(maxCubes: Cubes) = cubes.all { (cube, count) ->
     count <= (maxCubes.cubes[cube] ?: Int.MIN_VALUE)
   }
@@ -30,7 +30,7 @@ data class Cubes(val cubes: Map<Cube, Int>) {
   }
 }
 
-data class Game(val id: Int, val cubesList: List<Cubes>) {
+private data class Game(val id: Int, val cubesList: List<Cubes>) {
   fun isPossible(maxCubes: Cubes) = cubesList.all { it.isPossible(maxCubes) }
 
   fun power() = cubesList
@@ -52,9 +52,9 @@ data class Game(val id: Int, val cubesList: List<Cubes>) {
   }
 }
 
-typealias Input = List<Game>
+private typealias Input = List<Game>
 
-typealias Output = Int
+private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day02") {
   override fun parse(input: String): Input = input.lines().map { Game.parse(it) }
