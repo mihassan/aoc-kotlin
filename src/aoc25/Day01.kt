@@ -6,8 +6,7 @@ import lib.Solution
 import lib.Strings.splitAt
 
 private enum class Direction(val symbol: Char, val delta: Int) {
-  LEFT('L', -1),
-  RIGHT('R', 1);
+  LEFT('L', -1), RIGHT('R', 1);
 
   companion object {
     fun parse(directionChar: Char): Direction = entries.firstOrNull { it.symbol == directionChar }
@@ -50,13 +49,19 @@ private data class Clock(
     )
   }
 
-  /** Applies a full rotation, returning the updated clock. */
+  /** Applies the given rotation, returning the updated clock. */
   fun rotate(rotation: Rotation): Clock {
-    val afterSteps = (1..rotation.steps).fold(this) { clock, _ -> clock.step(rotation.direction) }
-    val landedOnZero = afterSteps.position == 0
-    return afterSteps.copy(
-      zeroLandings = if (landedOnZero) afterSteps.zeroLandings + 1 else afterSteps.zeroLandings,
-    )
+    val fullLaps = rotation.steps / size
+    val remainingSteps = rotation.steps % size
+
+    val afterFullLaps = copy(zeroPassings = zeroPassings + fullLaps)
+    val afterRemainingSteps = (1..remainingSteps).fold(afterFullLaps) { clock, _ ->
+        clock.step(rotation.direction)
+      }
+
+    val zeroLandingsIncrement = if (afterRemainingSteps.position == 0) 1 else 0
+
+    return afterRemainingSteps.copy(zeroLandings = afterRemainingSteps.zeroLandings + zeroLandingsIncrement)
   }
 
   companion object {
