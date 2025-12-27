@@ -23,7 +23,7 @@ class AocClient {
 
   fun getSolution(year: Int, day: Int, part: Solution.Part): String? {
     val problemStatement = getProblemStatement(year, day)
-    val matches =  SOLUTION_REGEX.findAll(problemStatement)
+    val matches = SOLUTION_REGEX.findAll(problemStatement)
     return when (part) {
       Solution.Part.PART1 -> matches.elementAtOrNull(0)?.groupValues?.get(1)
       Solution.Part.PART2 -> matches.elementAtOrNull(1)?.groupValues?.get(1)
@@ -43,15 +43,12 @@ class AocClient {
   }
 
   private fun makeRequest(url: String): Request =
-    Request.Builder()
-      .url(url)
-      .header("Cookie", "session=$session")
-      .header("User-Agent", "$REPOSITORY by $EMAIL")
-      .build()
+    Request.Builder().url(url).header("Cookie", "session=$session")
+      .header("User-Agent", "$REPOSITORY by $EMAIL").build()
 
   companion object {
     private const val REPOSITORY = "https://github.com/mihassan/aoc-kotlin"
     private const val EMAIL = "mihassan@gmail.com"
-    private val SOLUTION_REGEX = Regex("""<p>Your puzzle answer was <code>(\w+)</code>.""")
+    private val SOLUTION_REGEX = Regex("""<p>Your puzzle answer was <code>(\S+)</code>.""")
   }
 }
