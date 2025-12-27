@@ -15,14 +15,16 @@ class Solve : CliktCommand(name = "./gradlew solve") {
   val day: Int? by option().int().restrictTo(DAYS_IN_YEAR)
   val fetchInput: Boolean by option().flag(default = false)
   val overwrite: Boolean by option().flag(default = false).validate {
-      require(it implies fetchInput) {
-        "--overwrite can be only used with --fetch-input"
-      }
+    require(it implies fetchInput) {
+      "--overwrite can be only used with --fetch-input"
     }
+  }
+  val debug: Boolean by option().flag(default = false)
 
   private infix fun Boolean.implies(other: Boolean): Boolean = if (this) other else true
 
   override fun run() {
+    Solution.debug = debug
     when {
       year == null -> runAllSolutions()
       day == null -> runAllSolutionsForYear(year!!)
@@ -55,10 +57,13 @@ class Solve : CliktCommand(name = "./gradlew solve") {
     }
     mainFunction.invoke(null)
 
-    val aocClient = AocClient()
-    val solution1 = aocClient.getSolution(year, day, Solution.Part.PART1) ?: "UNSOLVED"
-    val solution2 = aocClient.getSolution(year, day, Solution.Part.PART2) ?: "UNSOLVED"
-    println("    Solutions: [PART1] $solution1 | [PART2] $solution2")
+    if (debug) {
+      val aocClient = AocClient()
+      val solution1 = aocClient.getSolution(year, day, Solution.Part.PART1) ?: "UNSOLVED"
+      val solution2 = aocClient.getSolution(year, day, Solution.Part.PART2) ?: "UNSOLVED"
+      println("    Solutions: [PART1] $solution1 | [PART2] $solution2")
+    }
+
     println(List(60) { "=" }.joinToString(""))
   }
 

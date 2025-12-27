@@ -37,7 +37,13 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
       println("Solution for $year $fileName $part: $result")
     }
 
-    println("\nDebug info:")
-    println("    Duration: [Part1] ${durations[PART1]!!.inWholeMilliseconds}ms + [Part2] ${durations[PART2]!!.inWholeMilliseconds}ms")
+    if (debug) {
+      println("\nDebug info:")
+      println("    Duration: [Part1] ${durations[PART1]!!.inWholeMilliseconds}ms + [Part2] ${durations[PART2]!!.inWholeMilliseconds}ms")
+    }
+  }
+
+  companion object {
+    var debug: Boolean = false
   }
 }
