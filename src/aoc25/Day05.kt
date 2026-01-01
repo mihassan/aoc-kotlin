@@ -2,32 +2,24 @@
 
 package aoc25.day05
 
+import kotlin.collections.component1
 import lib.ProblemInput
 import lib.Solution
 
-private data class Input(
-  val freshIngredients: List<LongRange>,
-  val ingredients: List<Long>,
-) {
-  companion object {
-    const val SECTION_DELIMITER = "\n\n"
-
-    fun parse(inputStr: String): Input {
-      val (freshIngredientsStr, ingredientsStr) = inputStr.split(SECTION_DELIMITER)
-      val freshIngredients = freshIngredientsStr.lines().map { line ->
-        val (start, end) = line.split("-").map { it.toLong() }
-        start..end
-      }
-      val ingredients = ingredientsStr.lines().map { it.toLong() }
-      return Input(freshIngredients, ingredients)
-    }
-  }
-}
+private data class Input(val freshIngredients: List<LongRange>, val ingredients: List<Long>)
 
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day05") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (freshIngredientsSection, ingredientsSection) ->
+      val freshIngredients = freshIngredientsSection.linesAs { line ->
+        val (start, end) = line.split("-").map { it.toLong() }
+        start..end
+      }
+      val ingredients = ingredientsSection.linesAs { it.toLong() }
+      Input(freshIngredients, ingredients)
+    }
 
   override fun format(output: Output): String = "$output"
 
