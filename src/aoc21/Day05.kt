@@ -4,6 +4,7 @@ package aoc21.day05
 
 import lib.Collections.histogram
 import lib.Line
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = List<Line>
@@ -11,8 +12,8 @@ private typealias Input = List<Line>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day05") {
-  override fun parse(input: String): Input {
-    return input.lines().map(Line.Companion::parse)
+  override fun parse(input: ProblemInput): Input {
+    return input.linesAs(Line.Companion::parse)
   }
 
   override fun format(output: Output): String = "$output"

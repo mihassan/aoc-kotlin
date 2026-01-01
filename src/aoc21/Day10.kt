@@ -2,6 +2,7 @@
 
 package aoc21.day10
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Symbol(val char: Char) {
@@ -100,7 +101,7 @@ private typealias Input = List<Chunk>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day10") {
-  override fun parse(input: String): Input = input.lines().map(Chunk::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(Chunk::parse)
 
   override fun format(output: Output): String = "$output"
 

@@ -5,6 +5,7 @@ package aoc24.day04
 import lib.Adjacency
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = Grid<Char>
@@ -12,7 +13,7 @@ private typealias Input = Grid<Char>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day04") {
-  override fun parse(input: String): Input = Grid.parse(input)
+  override fun parse(input: ProblemInput): Input = input.charGrid()
 
   override fun format(output: Output): String = "$output"
 

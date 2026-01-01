@@ -5,6 +5,7 @@ package aoc22.day09
 import kotlin.math.abs
 import kotlin.math.sign
 import lib.Collections.headTail
+import lib.ProblemInput
 import lib.Solution
 
 private data class Point(val x: Int, val y: Int) {
@@ -49,7 +50,7 @@ private typealias Output = Int
 private val solution = object : Solution<Input, Output>(2022, "Day09") {
   val KNOT_COUNT = mapOf(Part.PART1 to 2, Part.PART2 to 10)
 
-  override fun parse(input: String): Input = input.lines().flatMap { it.toStep().breakdown }
+  override fun parse(input: ProblemInput): Input = input.lines().flatMap { it.toStep().breakdown }
 
   override fun format(output: Output): String = "$output"
 

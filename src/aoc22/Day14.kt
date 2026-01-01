@@ -4,6 +4,7 @@ package aoc22.day14
 
 import lib.Path
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class Cave(
@@ -62,7 +63,7 @@ private typealias Input = Cave
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day14") {
-  override fun parse(input: String): Input = Cave.parse(input)
+  override fun parse(input: ProblemInput): Input = Cave.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

@@ -8,6 +8,7 @@ import aoc24.day21.Keypad.NumericKeypad
 import kotlin.math.absoluteValue
 import lib.Collections.histogram
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = List<String>
@@ -160,7 +161,7 @@ private data class CompressedMoves private constructor(private val segments: Map
 
 
 private val solution = object : Solution<Input, Output>(2024, "Day21") {
-  override fun parse(input: String): Input = input.lines()
+  override fun parse(input: ProblemInput): Input = input.lines()
 
   override fun format(output: Output): String = "$output"
 

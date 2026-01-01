@@ -2,6 +2,7 @@
 
 package aoc21.day08
 
+import lib.ProblemInput
 import lib.Solution
 
 /** A digit is a set of segments, where each segment is represented by a character. */
@@ -82,7 +83,7 @@ private typealias Input = List<Entry>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day08") {
-  override fun parse(input: String): Input = input.lines().map(Entry::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(Entry::parse)
 
   override fun format(output: Output): String = "$output"
 

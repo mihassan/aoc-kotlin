@@ -6,6 +6,7 @@ import aoc23.day03.PartNumber.Companion.findAllPartNumbers
 import aoc23.day03.Symbol.Companion.findAllSymbols
 import lib.Line
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class PartNumber(val value: Int, val location: Line) {
@@ -78,7 +79,7 @@ private typealias Input = EngineSchematic
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day03") {
-  override fun parse(input: String): Input = EngineSchematic.parse(input)
+  override fun parse(input: ProblemInput): Input = EngineSchematic.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

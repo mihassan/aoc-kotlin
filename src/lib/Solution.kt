@@ -8,7 +8,7 @@ import lib.Solution.Part.PART2
 abstract class Solution<P, R>(private val year: Int, private val fileName: String? = null) {
   enum class Part { PART1, PART2 }
 
-  abstract fun parse(input: String): P
+  abstract fun parse(input: ProblemInput): P
 
   abstract fun format(output: R): String
 
@@ -26,7 +26,8 @@ abstract class Solution<P, R>(private val year: Int, private val fileName: Strin
       File("src/data/aoc${year % 100}/${it}.txt").reader()
     } ?: IO.reader
 
-    val input = reader.readText().trimEnd()
+    val rawInput = reader.readText().trimEnd()
+    val input = ProblemInput(rawInput)
     val durations = mutableMapOf<Part, kotlin.time.Duration>()
 
     Part.entries.forEach { part ->

@@ -2,6 +2,7 @@
 
 package aoc25.day01
 
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.splitAt
 
@@ -74,7 +75,7 @@ private typealias Input = List<Rotation>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2025, "Day01") {
-  override fun parse(input: String): Input = input.lines().map(Rotation::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(Rotation::parse)
 
   override fun format(output: Output): String = "$output"
 

@@ -3,6 +3,7 @@
 package aoc23.day12
 
 import lib.Collections.headTail
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractInts
 
@@ -26,7 +27,7 @@ private typealias Input = List<ConditionRecord>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day12") {
-  override fun parse(input: String): Input = input.lines().map { ConditionRecord.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { ConditionRecord.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

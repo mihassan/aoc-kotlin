@@ -4,6 +4,7 @@ package aoc21.day07
 
 import kotlin.math.abs
 import lib.Maths.pow
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = List<Int>
@@ -11,7 +12,7 @@ private typealias Input = List<Int>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day07") {
-  override fun parse(input: String): Input = input.split(",").map(String::toInt)
+  override fun parse(input: ProblemInput): Input = input.ints()
 
   override fun format(output: Output): String = "$output"
 

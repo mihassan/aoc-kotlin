@@ -3,6 +3,7 @@
 package aoc22.day19
 
 import lib.Bag
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.words
 
@@ -49,8 +50,8 @@ private typealias Input = List<Blueprint>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day19") {
-  override fun parse(input: String): Input {
-    return input.lines().map { Blueprint.parse(it) }
+  override fun parse(input: ProblemInput): Input {
+    return input.linesAs { Blueprint.parse(it) }
   }
 
   override fun format(output: Output): String {

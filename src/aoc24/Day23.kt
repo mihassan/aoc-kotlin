@@ -2,6 +2,7 @@
 
 package aoc24.day23
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Node(val node: String) : Comparable<Node> {
@@ -37,7 +38,7 @@ private typealias Input = Graph
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2024, "Day23") {
-  override fun parse(input: String): Input = Graph.parse(input)
+  override fun parse(input: ProblemInput): Input = Graph.parse(input.raw)
 
   override fun format(output: Output): String = output
 

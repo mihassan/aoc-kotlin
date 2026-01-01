@@ -3,6 +3,7 @@
 package aoc21.day20
 
 import aoc21.day20.Pixel.Companion.toInt
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Pixel(val char: Char, val value: Int) {
@@ -106,7 +107,7 @@ private data class Input(
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day20") {
-  override fun parse(input: String): Input = Input.parse(input)
+  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

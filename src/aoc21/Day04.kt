@@ -4,6 +4,7 @@ package aoc21.day04
 
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.ints
 
@@ -56,10 +57,10 @@ private data class Input(val randomNumbers: List<Int>, val boards: List<Board>)
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day04") {
-  override fun parse(input: String): Input {
-    val (randomNumbersStr, boardsStr) = input.split("\n\n", limit = 2)
-    val randomNumbers = randomNumbersStr.split(",").map { it.toInt() }
-    val boards = boardsStr.split("\n\n").map { Board.parse(it) }
+  override fun parse(input: ProblemInput): Input {
+    val (randomNumbersSection, boardsSection) = input.sections().let { it.first() to it.drop(1) }
+    val randomNumbers = randomNumbersSection.ints()
+    val boards = boardsSection.map { Board.parse(it.raw) }
 
     return Input(randomNumbers, boards)
   }

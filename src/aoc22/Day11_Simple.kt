@@ -3,6 +3,7 @@
 package aoc22.day11_simple
 
 import lib.Maths.divisibleBy
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractInts
 import lib.Strings.extractLongs
@@ -44,7 +45,7 @@ private typealias Output = Long
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
   val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)
 
-  override fun parse(input: String): Input = input.split("\n\n").map { Monkey.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.sectionsAs { Monkey.parse(it.raw) }
 
   override fun format(output: Output): String = "$output"
 

@@ -2,6 +2,7 @@
 
 package aoc25.day05
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Input(
@@ -26,7 +27,7 @@ private data class Input(
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day05") {
-  override fun parse(input: String): Input = Input.parse(input)
+  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

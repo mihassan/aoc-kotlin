@@ -3,6 +3,7 @@
 package aoc22.day07
 
 import lib.Collections.partitions
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.words
 
@@ -175,7 +176,7 @@ private fun constructFileTree(executedCommands: List<ExecutedCommand>): FileTree
 }
 
 private val solution = object : Solution<Input, Output>(2022, "Day07") {
-  override fun parse(input: String): Input =
+  override fun parse(input: ProblemInput): Input =
     input
       .lines()
       .partitions { it.startsWith(Command.PREFIX) }

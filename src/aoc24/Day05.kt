@@ -3,6 +3,7 @@
 package aoc24.day05
 
 import java.util.Collections
+import lib.ProblemInput
 import lib.Solution
 
 private data class Rule(val first: Int, val last: Int) {
@@ -56,10 +57,10 @@ private data class Input(val rules: Set<Rule>, val updates: List<Update>)
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day05") {
-  override fun parse(input: String): Input {
-    val (ruleStr, updateStr) = input.split("\n\n")
-    val rules = ruleStr.lines().map { Rule.parse(it) }.toSet()
-    val updates = updateStr.lines().map { Update.parse(it) }
+  override fun parse(input: ProblemInput): Input {
+    val (ruleSection, updateSection) = input.sections()
+    val rules = ruleSection.linesAs { Rule.parse(it) }.toSet()
+    val updates = updateSection.linesAs { Update.parse(it) }
     return Input(rules, updates)
   }
 

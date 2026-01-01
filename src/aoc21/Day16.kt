@@ -8,6 +8,7 @@ import lib.Parser
 import lib.ParserCombinators.and
 import lib.ParserCombinators.chain
 import lib.ParserResult
+import lib.ProblemInput
 import lib.Solution
 import lib.ParserCombinators.many
 import lib.ParserCombinators.count
@@ -155,8 +156,8 @@ private val packetParser: Parser<Packet> = literalPacketParser or operatorPacket
 // endregion
 
 private val solution = object : Solution<Input, Output>(2021, "Day16") {
-  override fun parse(input: String): Input =
-    packetParser.parse(input.hexToBinary())?.value ?: error("Invalid input")
+  override fun parse(input: ProblemInput): Input =
+    packetParser.parse(input.raw.hexToBinary())?.value ?: error("Invalid input")
 
   override fun format(output: Output): String = "$output"
 

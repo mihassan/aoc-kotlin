@@ -8,6 +8,7 @@ import aoc22.day02.GameResult.WIN
 import aoc22.day02.Hand.PAPER
 import aoc22.day02.Hand.ROCK
 import aoc22.day02.Hand.SCISSOR
+import lib.ProblemInput
 import lib.Solution
 import lib.Solution.Part
 import lib.Solution.Part.PART1
@@ -95,7 +96,7 @@ private data class Game(val opponent: Hand, val strategy: Strategy) {
 
 
 private val solution = object : Solution<List<Game>, Int>(2022, "Day02") {
-  override fun parse(input: String): List<Game> =
+  override fun parse(input: ProblemInput): List<Game> =
     input.lines().filter { it.isNotBlank() }.map { Game.of(it) }
 
   override fun format(output: Int): String = output.toString()

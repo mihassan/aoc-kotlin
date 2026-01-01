@@ -4,6 +4,7 @@ package aoc21.day03
 
 import lib.Collections.histogram
 import lib.Collections.transposed
+import lib.ProblemInput
 import lib.Solution
 
 private data class BinaryNumber(val bits: List<Int>) {
@@ -76,8 +77,8 @@ private typealias Input = BinaryNumberList
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day03") {
-  override fun parse(input: String): Input =
-    BinaryNumberList(input.lines().map(BinaryNumber::parse))
+  override fun parse(input: ProblemInput): Input =
+    BinaryNumberList(input.linesAs(BinaryNumber::parse))
 
   override fun format(output: Output): String = "$output"
 

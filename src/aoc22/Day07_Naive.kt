@@ -3,6 +3,7 @@
 package aoc22.day07_naive
 
 import lib.Collections.prefixes
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.isInt
 
@@ -13,7 +14,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day07") {
   // Only match cd command and file listings with size. Ignore ls command and dir listings.
   val REGEX = """[$] cd (.+)|(\d+) .*""".toRegex()
 
-  override fun parse(input: String): Input =
+  override fun parse(input: ProblemInput): Input =
     input.lines().mapNotNull { line ->
       REGEX.matchEntire(line)?.destructured?.let { (cdPath, fileSize) ->
         cdPath + fileSize

@@ -3,6 +3,7 @@
 package aoc23.day07
 
 import lib.Collections.histogram
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Card(val symbol: Char) {
@@ -113,7 +114,7 @@ private typealias Input = List<Hand>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day07") {
-  override fun parse(input: String): Input = input.lines().map { Hand.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Hand.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

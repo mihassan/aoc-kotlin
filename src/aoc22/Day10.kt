@@ -2,6 +2,7 @@
 
 package aoc22.day10
 
+import lib.ProblemInput
 import lib.Solution
 
 sealed interface Instruction {
@@ -59,7 +60,7 @@ private typealias Input = List<Instruction>
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day10") {
-  override fun parse(input: String): Input = input.lines().map { Instruction.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Instruction.parse(it) }
 
   override fun format(output: Output): String = output
 

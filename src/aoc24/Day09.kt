@@ -3,6 +3,7 @@
 package aoc24.day09
 
 import java.util.LinkedList
+import lib.ProblemInput
 import lib.Solution
 
 sealed interface Block {
@@ -41,12 +42,12 @@ private typealias Input = List<Block>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day09") {
-  override fun parse(input: String): Input {
+  override fun parse(input: ProblemInput): Input {
     var nextFileId = 0L
     var nextIsFileBlock = true
 
     return buildList {
-      input.forEach {
+      input.raw.forEach {
         val size = it.digitToInt().toLong()
 
         add(Block.newBlock(nextIsFileBlock, size, nextFileId))

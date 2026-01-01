@@ -5,6 +5,7 @@ package aoc22.day16
 import kotlin.math.max
 import kotlin.math.min
 import lib.Collections.headTail
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractLongs
 
@@ -37,8 +38,8 @@ private typealias Input = Map<RoomLabel, Room>
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day16") {
-  override fun parse(input: String): Input =
-    input.lines().map { Room.parse(it) }.associateBy { it.label }
+  override fun parse(input: ProblemInput): Input =
+    input.linesAs { Room.parse(it) }.associateBy { it.label }
 
   override fun format(output: Output): String {
     return output

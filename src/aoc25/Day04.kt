@@ -3,6 +3,7 @@
 package aoc25.day04
 
 import lib.Adjacency
+import lib.ProblemInput
 import lib.Solution
 import lib.Grid
 import lib.Point
@@ -26,7 +27,7 @@ private typealias Output = Int
 private val solution = object : Solution<Input, Output>(2025, "Day04") {
   private val MIN_ADJACENT_TO_STAY = 4
 
-  override fun parse(input: String): Input = Grid.parse(input).map(Cell::fromChar)
+  override fun parse(input: ProblemInput): Input = input.gridAs(Cell::fromChar)
 
   override fun format(output: Output): String = "$output"
 

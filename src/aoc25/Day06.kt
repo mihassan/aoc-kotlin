@@ -3,6 +3,7 @@
 package aoc25.day06
 
 import lib.Collections.transposed
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.words
 
@@ -36,7 +37,7 @@ private typealias Input = String
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day06") {
-  override fun parse(input: String): Input = input
+  override fun parse(input: ProblemInput): Input = input.raw
 
   override fun format(output: Output): String = "$output"
 

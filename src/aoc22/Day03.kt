@@ -2,13 +2,14 @@
 
 package aoc22.day03
 
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.intersect
 import lib.Strings.splitIn
 
 
 private val solution = object : Solution<List<String>, Int>(2022, "Day03") {
-  override fun parse(input: String): List<String> = input.lines()
+  override fun parse(input: ProblemInput): List<String> = input.lines()
 
   override fun format(output: Int): String = output.toString()
 

@@ -8,6 +8,7 @@ import lib.Ranges.size
 import lib.Ranges.overlaps
 import lib.Ranges.intersect
 import lib.Ranges.union
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractInts
 
@@ -32,7 +33,7 @@ private typealias Input = List<Sensor>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day15") {
-  override fun parse(input: String): Input = input.lines().map { Sensor.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Sensor.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

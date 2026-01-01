@@ -3,12 +3,13 @@
 package aoc22.day06
 
 import lib.Collections.isDistinct
+import lib.ProblemInput
 import lib.Solution
 import lib.Solution.Part.PART1
 import lib.Solution.Part.PART2
 
 private val solution = object : Solution<String, Int>(2022, "Day06") {
-  override fun parse(input: String): String = input
+  override fun parse(input: ProblemInput): String = input.raw
 
   override fun format(output: Int): String = "$output"
 

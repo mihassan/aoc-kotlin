@@ -2,6 +2,7 @@
 
 package aoc22.day20
 
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.longs
 
@@ -10,7 +11,7 @@ private typealias Input = List<Long>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day20") {
-  override fun parse(input: String): Input = input.longs()
+  override fun parse(input: ProblemInput): Input = input.longs()
 
   override fun format(output: Output): String = "$output"
 

@@ -6,6 +6,7 @@ import aoc24.day12.Region.Companion.flatten
 import lib.Direction
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class Plot(val point: Point) {
@@ -80,7 +81,7 @@ private typealias Input = Grid<Char>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day12") {
-  override fun parse(input: String): Input = Grid.parse(input)
+  override fun parse(input: ProblemInput): Input = input.charGrid()
 
   override fun format(output: Output): String = "$output"
 

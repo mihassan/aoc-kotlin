@@ -2,6 +2,7 @@
 
 package aoc22.day11
 
+import lib.ProblemInput
 import lib.Solution
 
 private class Game private constructor(
@@ -134,7 +135,7 @@ private typealias Output = Long
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
   val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)
 
-  override fun parse(input: String): Input = Game.parse(input)
+  override fun parse(input: ProblemInput): Input = Game.parse(input.raw)
 
   override fun format(output: Output): String {
     return "$output"

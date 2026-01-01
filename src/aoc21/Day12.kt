@@ -2,6 +2,7 @@
 
 package aoc21.day12
 
+import lib.ProblemInput
 import lib.Solution
 
 private sealed interface Node {
@@ -41,7 +42,7 @@ private typealias Input = Graph
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day12") {
-  override fun parse(input: String): Input = Graph.parse(input)
+  override fun parse(input: ProblemInput): Input = Graph.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

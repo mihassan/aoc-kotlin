@@ -6,6 +6,7 @@ import kotlin.math.max
 import lib.Collections.suffixes
 import lib.Grid
 import lib.Grid.Companion.max
+import lib.ProblemInput
 import lib.Solution
 
 
@@ -13,7 +14,7 @@ private typealias Input = Grid<Int>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day08") {
-  override fun parse(input: String): Input = Grid.parse(input).map(Char::digitToInt)
+  override fun parse(input: ProblemInput): Input = input.digitGrid()
 
   override fun format(output: Output): String = "$output"
 

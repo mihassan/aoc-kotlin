@@ -3,6 +3,7 @@
 package aoc21.day06
 
 import lib.Collections.histogram
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = List<Int>
@@ -10,8 +11,7 @@ private typealias Input = List<Int>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day06") {
-  override fun parse(input: String): Input =
-    input.split(",").map(String::toInt)
+  override fun parse(input: ProblemInput): Input = input.ints()
 
   override fun format(output: Output): String = "$output"
 

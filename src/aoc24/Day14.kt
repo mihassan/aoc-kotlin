@@ -3,6 +3,7 @@
 package aoc24.day14
 
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Vector = Point
@@ -66,8 +67,8 @@ private typealias Input = Grid
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day14") {
-  override fun parse(input: String): Input {
-    return input.lines().map { Robot.parse(it) }.let { Grid(101, 103, it) }
+  override fun parse(input: ProblemInput): Input {
+    return input.linesAs { Robot.parse(it) }.let { Grid(101, 103, it) }
   }
 
   override fun format(output: Output): String = "$output"

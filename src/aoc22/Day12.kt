@@ -4,6 +4,7 @@ package aoc22.day12
 
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private enum class PlotType {
@@ -27,7 +28,7 @@ private typealias Input = Grid<Plot>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day12") {
-  override fun parse(input: String): Input = Grid.parse(input).map(Plot.Companion::parse)
+  override fun parse(input: ProblemInput): Input = input.gridAs(Plot::parse)
 
   override fun format(output: Output): String = "$output"
 

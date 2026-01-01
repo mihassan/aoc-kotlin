@@ -7,6 +7,7 @@ import kotlin.math.abs
 import lib.Combinatorics.combinations
 import lib.Combinatorics.permutations
 import lib.Combinatorics.permutationsWithReplacement
+import lib.ProblemInput
 import lib.Solution
 
 /**
@@ -285,7 +286,7 @@ private typealias Input = List<Scanner>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day19") {
-  override fun parse(input: String): Input = Scanner.parseScanners(input)
+  override fun parse(input: ProblemInput): Input = Scanner.parseScanners(input.raw)
 
   override fun format(output: Output): String = "$output"
 

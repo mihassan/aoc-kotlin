@@ -3,6 +3,7 @@
 package aoc24.day13
 
 import kotlin.math.floor
+import lib.ProblemInput
 import lib.Solution
 
 private enum class ButtonType(val representation: Char, val cost: Long) {
@@ -54,7 +55,7 @@ private typealias Input = List<Machine>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day13") {
-  override fun parse(input: String): Input = input.split("\n\n").map(Machine::parse)
+  override fun parse(input: ProblemInput): Input = input.sectionsAs { Machine.parse(it.raw) }
 
   override fun format(output: Output): String = "$output"
 

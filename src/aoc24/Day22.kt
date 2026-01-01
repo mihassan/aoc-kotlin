@@ -2,6 +2,7 @@
 
 package aoc24.day22
 
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.longs
 
@@ -47,7 +48,7 @@ fun Long.pricesWithLastNChanges(steps: Int, n: Int): List<Pair<Long, List<Long>>
 }
 
 private val solution = object : Solution<Input, Output>(2024, "Day22") {
-  override fun parse(input: String): Input = input.longs()
+  override fun parse(input: ProblemInput): Input = input.longs()
 
   override fun format(output: Output): String = "$output"
 

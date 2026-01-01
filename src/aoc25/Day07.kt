@@ -4,6 +4,7 @@ package aoc25.day07
 
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Cell(val symbol: Char) {
@@ -21,7 +22,7 @@ private typealias Input = Grid<Cell>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day07") {
-  override fun parse(input: String): Input = Grid.parse(input).map(Cell::parse)
+  override fun parse(input: ProblemInput): Input = input.gridAs(Cell::parse)
 
   override fun format(output: Output): String = "$output"
 

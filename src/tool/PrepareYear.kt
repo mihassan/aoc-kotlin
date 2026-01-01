@@ -68,6 +68,7 @@ class PrepareYear : CliktCommand(name = "./gradlew prepareYear") {
       |
       |package aoc$year.day$dayFormatted
       |
+      |import lib.ProblemInput
       |import lib.Solution
       |
       |typealias Input = List<String>
@@ -75,7 +76,7 @@ class PrepareYear : CliktCommand(name = "./gradlew prepareYear") {
       |typealias Output = Long
       |
       |private val solution = object : Solution<Input, Output>(20$year, "Day$dayFormatted") {
-      |  override fun parse(input: String): Input = input.lines()
+      |  override fun parse(input: ProblemInput): Input = input.lines()
       |
       |  override fun format(output: Output): String = "${"$"}output"
       |

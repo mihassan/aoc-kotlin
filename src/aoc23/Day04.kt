@@ -3,6 +3,7 @@
 package aoc23.day04
 
 import kotlin.math.min
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractInts
 import lib.Strings.ints
@@ -30,7 +31,7 @@ private typealias Input = List<Card>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day04") {
-  override fun parse(input: String): Input = input.lines().map { Card.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Card.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

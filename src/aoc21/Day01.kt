@@ -2,15 +2,15 @@
 
 package aoc21.day01
 
+import lib.ProblemInput
 import lib.Solution
-import lib.Strings.ints
 
 private typealias Input = List<Int>
 
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day01") {
-  override fun parse(input: String): Input = input.ints()
+  override fun parse(input: ProblemInput): Input = input.ints()
 
   override fun format(output: Output): String = "$output"
 

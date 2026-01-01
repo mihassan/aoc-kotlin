@@ -5,6 +5,7 @@ package aoc21.day21
 import kotlin.math.max
 import lib.Collections.histogram
 import lib.Combinatorics.permutationsWithReplacement
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Player { PLAYER1, PLAYER2 }
@@ -88,7 +89,7 @@ private typealias Input = GameState
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day21") {
-  override fun parse(input: String): Input = GameState.parse(input)
+  override fun parse(input: ProblemInput): Input = GameState.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

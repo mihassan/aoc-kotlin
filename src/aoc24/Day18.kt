@@ -4,6 +4,7 @@ package aoc24.day18
 
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Cell {
@@ -17,8 +18,8 @@ private typealias Output = List<Int>
 private val solution = object : Solution<Input, Output>(2024, "Day18") {
   private val GRID_SIZE = 71
 
-  override fun parse(input: String): Input {
-    return input.lines().map { Point.parse(it) }
+  override fun parse(input: ProblemInput): Input {
+    return input.linesAs { Point.parse(it) }
   }
 
   override fun format(output: Output): String = output.joinToString(",")

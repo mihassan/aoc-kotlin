@@ -5,6 +5,7 @@ package aoc23.day05
 import kotlin.math.max
 import kotlin.math.min
 import lib.Collections.headTail
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractLongs
 import lib.Strings.longs
@@ -99,7 +100,7 @@ private typealias Input = Almanac
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day05") {
-  override fun parse(input: String): Input = Almanac.parse(input)
+  override fun parse(input: ProblemInput): Input = Almanac.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

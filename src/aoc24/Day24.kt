@@ -4,6 +4,7 @@ package aoc24.day24
 
 import aoc24.day24.Gate.Companion.findGate
 import aoc24.day24.Gate.Companion.fixOutputGates
+import lib.ProblemInput
 import lib.Solution
 
 /** A wire in the circuit denoted by its name. */
@@ -229,7 +230,7 @@ private typealias Input = Circuit
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2024, "Day24") {
-  override fun parse(input: String): Input = Circuit.parse(input)
+  override fun parse(input: ProblemInput): Input = Circuit.parse(input.raw)
 
   override fun format(output: Output): String = output
 

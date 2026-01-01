@@ -2,6 +2,7 @@
 
 package aoc23.day13
 
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Pattern = List<String>
@@ -11,7 +12,7 @@ private typealias Input = List<Pattern>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day13") {
-  override fun parse(input: String): Input = input.split("\n\n").map { it.lines() }
+  override fun parse(input: ProblemInput): Input = input.sectionsAs { it.lines() }
 
   override fun format(output: Output): String {
     return "$output"

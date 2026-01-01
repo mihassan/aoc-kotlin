@@ -3,6 +3,7 @@
 package aoc24.day07
 
 import lib.Combinatorics.permutationsWithReplacement
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.longs
 
@@ -56,7 +57,7 @@ private typealias Input = List<Equation>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day07") {
-  override fun parse(input: String): Input = input.lines().map { Equation.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Equation.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

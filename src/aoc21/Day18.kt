@@ -14,6 +14,7 @@ import lib.Parsers.char
 import lib.Parsers.int
 import lib.Parsers.newline
 import lib.Parsers.recursiveParser
+import lib.ProblemInput
 import lib.Solution
 
 private sealed class Tree(var parent: Tree? = null) {
@@ -242,8 +243,8 @@ private typealias Input = List<Tree>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day18") {
-  override fun parse(input: String): Input =
-    treeParsers.parse(input)?.value ?: error("Invalid input")
+  override fun parse(input: ProblemInput): Input =
+    treeParsers.parse(input.raw)?.value ?: error("Invalid input")
 
   override fun format(output: Output): String = "$output"
 

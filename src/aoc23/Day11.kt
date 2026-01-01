@@ -6,6 +6,7 @@ import kotlin.math.abs
 import lib.Collections.cumulativeSum1
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class Image(val galaxies: List<Point>, val maxBound: Point) {
@@ -40,7 +41,7 @@ private typealias Input = Image
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day11") {
-  override fun parse(input: String): Input = Image.parse(input)
+  override fun parse(input: ProblemInput): Input = Image.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

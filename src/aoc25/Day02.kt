@@ -4,6 +4,7 @@ package aoc25.day02
 
 import lib.Collections.allEqual
 import lib.Maths.divides
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.splitIn
 
@@ -38,7 +39,7 @@ private typealias Input = List<ProductIdRange>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day02") {
-  override fun parse(input: String): Input = input.split(",").map(ProductIdRange.Companion::parse)
+  override fun parse(input: ProblemInput): Input = input.commaSplitAs(ProductIdRange::parse)
 
   override fun format(output: Output): String = "$output"
 

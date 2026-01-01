@@ -8,6 +8,7 @@ import kotlin.collections.isNotEmpty
 import lib.Adjacency
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class PointWithRisk(val point: Point, val risk: Long) : Comparable<PointWithRisk> {
@@ -72,7 +73,7 @@ private typealias Input = Cave
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day15") {
-  override fun parse(input: String): Input = Cave.parse(input)
+  override fun parse(input: ProblemInput): Input = Cave.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

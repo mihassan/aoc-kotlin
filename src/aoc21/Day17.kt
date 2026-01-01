@@ -3,6 +3,7 @@
 package aoc21.day17
 
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private data class Input(val left: Int, val right: Int, val bottom: Int, val top: Int) {
@@ -16,9 +17,9 @@ private data class Input(val left: Int, val right: Int, val bottom: Int, val top
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day17") {
-  override fun parse(input: String): Input {
+  override fun parse(input: ProblemInput): Input {
     val regex = """target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)""".toRegex()
-    val (x1, x2, y1, y2) = (regex.matchEntire(input) ?: error("Invalid input format")).destructured
+    val (x1, x2, y1, y2) = (regex.matchEntire(input.raw) ?: error("Invalid input format")).destructured
     return Input(
       left = x1.toInt(),
       right = x2.toInt(),

@@ -2,13 +2,12 @@
 
 package aoc22.day01
 
+import lib.ProblemInput
 import lib.Solution
 
 private val solution = object : Solution<List<List<Int>>, Int>(2022, "Day01") {
-  override fun parse(input: String): List<List<Int>> =
-    input.split("\n\n").map {
-      it.trim().split("\n").map(String::toInt)
-    }
+  override fun parse(input: ProblemInput): List<List<Int>> =
+    input.sectionsAs { it.ints() }
 
   override fun format(output: Int): String = output.toString()
 

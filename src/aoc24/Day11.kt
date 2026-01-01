@@ -4,6 +4,7 @@ package aoc24.day11
 
 import lib.Collections.histogram
 import lib.Maths.isEven
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.longs
 import lib.Strings.splitIn
@@ -13,7 +14,7 @@ private typealias Input = List<Long>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day11") {
-  override fun parse(input: String): Input = input.longs()
+  override fun parse(input: ProblemInput): Input = input.longs()
 
   override fun format(output: Output): String = "$output"
 

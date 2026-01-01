@@ -3,6 +3,7 @@
 package aoc21.day14
 
 import lib.Collections.histogram
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Rules = Map<String, List<String>>
@@ -25,7 +26,7 @@ private data class Input(val template: String, val rules: Rules) {
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day14") {
-  override fun parse(input: String): Input = Input.parse(input)
+  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

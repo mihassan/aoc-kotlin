@@ -5,6 +5,7 @@ package aoc25.day09
 import lib.Adjacency
 import lib.Path
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractInts
 
@@ -121,7 +122,7 @@ private infix fun Point.rectangleTo(other: Point): Rectangle = Rectangle(this, o
 
 private val solution = object : Solution<Polygon, Output>(2025, "Day09") {
 
-  override fun parse(input: String): Polygon = input.lines().map { line ->
+  override fun parse(input: ProblemInput): Polygon = input.linesAs { line ->
     val (x, y) = line.extractInts()
     Point(x, y)
   }

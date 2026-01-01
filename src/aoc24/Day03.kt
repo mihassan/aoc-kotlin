@@ -2,6 +2,7 @@
 
 package aoc24.day03
 
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = List<Instruction>
@@ -20,8 +21,8 @@ sealed interface Instruction {
 private val solution = object : Solution<Input, Output>(2024, "Day03") {
   private val INSTRUCTION_PATTERN = """mul\((\d+),(\d+)\)|do\(\)|don't\(\)""".toRegex()
 
-  override fun parse(input: String): Input =
-    INSTRUCTION_PATTERN.findAll(input).map {
+  override fun parse(input: ProblemInput): Input =
+    INSTRUCTION_PATTERN.findAll(input.raw).map {
       when (it.value) {
         "do()" ->
           Instruction.DO

@@ -8,6 +8,7 @@ import aoc21.day23.Room.Companion.isInRoom
 import java.util.PriorityQueue
 import lib.Direction
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Energy = Long
@@ -205,7 +206,7 @@ private typealias Input = Diagram
 private typealias Output = Energy
 
 private val solution = object : Solution<Input, Output>(2021, "Day23") {
-  override fun parse(input: String): Input = Diagram.parse(input)
+  override fun parse(input: ProblemInput): Input = Diagram.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

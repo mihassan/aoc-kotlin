@@ -3,6 +3,7 @@
 package aoc22.day05_simple
 
 import lib.Collections.headTail
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.ints
 import lib.Strings.words
@@ -14,8 +15,10 @@ private data class Input(val cargo: List<ArrayDeque<Char>>, val procedure: List<
 private typealias Output = List<ArrayDeque<Char>>
 
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
-  override fun parse(input: String): Input {
-    val (cargoLines, procedureLines) = input.split("\n\n").map { it.lines() }
+  override fun parse(input: ProblemInput): Input {
+    val (cargoSection, procedureSection) = input.sections()
+    val cargoLines = cargoSection.lines()
+    val procedureLines = procedureSection.lines()
     val (stackIndexLine, stackLines) = cargoLines.reversed().headTail()
     val stackCount = checkNotNull(stackIndexLine).ints().max()
 

@@ -5,6 +5,7 @@ package aoc23.day06
 import kotlin.math.ceil
 import kotlin.math.sqrt
 import lib.Maths.isOdd
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.extractLongs
 
@@ -23,7 +24,7 @@ private typealias Input = List<Race>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day06") {
-  override fun parse(input: String): Input =
+  override fun parse(input: ProblemInput): Input =
     input.lines().map { it.extractLongs() }.let { (times, distances) ->
       times.zip(distances).map { (time, distance) -> Race(time, distance) }
     }

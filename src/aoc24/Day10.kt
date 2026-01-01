@@ -4,6 +4,7 @@ package aoc24.day10
 
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private typealias Input = Grid<Int>
@@ -11,7 +12,7 @@ private typealias Input = Grid<Int>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day10") {
-  override fun parse(input: String): Input = Grid.parse(input).map { it.digitToInt() }
+  override fun parse(input: ProblemInput): Input = input.digitGrid()
 
   override fun format(output: Output): String = "$output"
 

@@ -2,6 +2,7 @@
 
 package aoc25.day03
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Bank(val batteries: List<Int>) {
@@ -47,7 +48,7 @@ private val solution = object : Solution<Input, Output>(2025, "Day03") {
   private val PART1_BATTERIES = 2
   private val PART2_BATTERIES = 12
 
-  override fun parse(input: String): Input = input.lines().map(Bank.Companion::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(Bank.Companion::parse)
 
   override fun format(output: Output): String = "$output"
 

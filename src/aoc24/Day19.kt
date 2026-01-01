@@ -2,6 +2,7 @@
 
 package aoc24.day19
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Input(val patterns: List<String>, val designs: List<String>) {
@@ -16,7 +17,7 @@ private data class Input(val patterns: List<String>, val designs: List<String>) 
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day19") {
-  override fun parse(input: String): Input = Input.parse(input)
+  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

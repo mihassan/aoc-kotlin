@@ -3,6 +3,7 @@
 package aoc23.day08
 
 import lib.Maths.lcm
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Step(val symbol: Char) {
@@ -77,7 +78,7 @@ private data class Input(val steps: List<Step>, val network: Network) {
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day08") {
-  override fun parse(input: String) = Input.parse(input)
+  override fun parse(input: ProblemInput) = Input.parse(input.raw)
 
   override fun format(output: Output): String = "$output"
 

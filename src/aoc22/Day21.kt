@@ -3,6 +3,7 @@
 package aoc22.day21
 
 import kotlin.math.sign
+import lib.ProblemInput
 import lib.Solution
 import lib.Strings.isLong
 
@@ -51,8 +52,8 @@ private typealias Input = List<Monkey>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day21") {
-  override fun parse(input: String): Input {
-    return input.lines().map { Monkey.parse(it) }
+  override fun parse(input: ProblemInput): Input {
+    return input.linesAs { Monkey.parse(it) }
   }
 
   override fun format(output: Output): String {

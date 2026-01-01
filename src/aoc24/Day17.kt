@@ -3,6 +3,7 @@
 package aoc24.day17
 
 import lib.Maths.pow
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Register(val operand: Long) {
@@ -156,7 +157,7 @@ private typealias Input = Computer
 private typealias Output = List<Long>
 
 private val solution = object : Solution<Input, Output>(2024, "Day17") {
-  override fun parse(input: String): Input = Computer.parse(input)
+  override fun parse(input: ProblemInput): Input = Computer.parse(input.raw)
 
   override fun format(output: Output): String = output.joinToString(",") { it.toString() }
 

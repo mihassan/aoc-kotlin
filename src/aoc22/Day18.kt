@@ -2,6 +2,7 @@
 
 package aoc22.day18
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Cube(val x: Int, val y: Int, val z: Int) {
@@ -67,7 +68,7 @@ private typealias Input = Set<Cube>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day18") {
-  override fun parse(input: String): Input = input.lines().map { Cube.parse(it) }.toSet()
+  override fun parse(input: ProblemInput): Input = input.linesAs { Cube.parse(it) }.toSet()
 
   override fun format(output: Output): String = "$output"
 

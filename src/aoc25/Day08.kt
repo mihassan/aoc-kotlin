@@ -3,6 +3,7 @@
 package aoc25.day08
 
 import kotlin.math.sqrt
+import lib.ProblemInput
 import lib.Solution
 
 private data class Point3D(val x: Long, val y: Long, val z: Long) {
@@ -51,7 +52,7 @@ private typealias Input = List<Point3D>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2025, "Day08") {
-  override fun parse(input: String): Input = input.lines().map(Point3D::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(Point3D::parse)
 
   override fun format(output: Output): String = "$output"
 

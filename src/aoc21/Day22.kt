@@ -2,6 +2,7 @@
 
 package aoc21.day22
 
+import lib.ProblemInput
 import lib.Solution
 
 private data class Cuboid(
@@ -78,7 +79,7 @@ private typealias Input = List<RebootStep>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day22") {
-  override fun parse(input: String): Input = input.lines().map(RebootStep::parse)
+  override fun parse(input: ProblemInput): Input = input.linesAs(RebootStep::parse)
 
   override fun format(output: Output): String = "$output"
 

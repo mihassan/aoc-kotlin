@@ -5,6 +5,7 @@ package aoc22.day22
 import kotlin.math.sqrt
 import lib.Direction
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Tile(val symbol: Char) {
@@ -252,9 +253,9 @@ private typealias Input = Pair<Board, List<Instruction>>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day22") {
-  override fun parse(input: String): Input {
-    val (boardPart, instructionsPart) = input.split("\n\n")
-    return Board.parse(boardPart) to Instruction.parseMany(instructionsPart)
+  override fun parse(input: ProblemInput): Input {
+    val (boardSection, instructionsSection) = input.sections()
+    return Board.parse(boardSection.raw) to Instruction.parseMany(instructionsSection.raw)
   }
 
   override fun format(output: Output): String {

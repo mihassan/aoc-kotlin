@@ -3,6 +3,7 @@
 package aoc23.day02
 
 import java.lang.Integer.max
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Cube {
@@ -57,7 +58,7 @@ private typealias Input = List<Game>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day02") {
-  override fun parse(input: String): Input = input.lines().map { Game.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs { Game.parse(it) }
 
   override fun format(output: Output): String = "$output"
 

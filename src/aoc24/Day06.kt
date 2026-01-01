@@ -5,6 +5,7 @@ package aoc24.day06
 import lib.Direction
 import lib.Grid
 import lib.Point
+import lib.ProblemInput
 import lib.Solution
 
 private enum class Tile {
@@ -26,8 +27,8 @@ private data class Input(val grid: Grid<Tile>, val pose: Pose)
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day06") {
-  override fun parse(input: String): Input {
-    val inputGrid = Grid.parse(input)
+  override fun parse(input: ProblemInput): Input {
+    val inputGrid = input.charGrid()
     val grid = inputGrid.map { Tile.parse(it) }
     val pose = inputGrid.startingPose() ?: error("Starting position not found.")
     return Input(grid, pose)
