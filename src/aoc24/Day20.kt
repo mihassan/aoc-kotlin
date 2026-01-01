@@ -21,19 +21,12 @@ private enum class Tile {
   }
 }
 
-private data class Input(val grid: Grid<Tile>) {
-  val start: Point = grid.indexOf(Tile.START)
-  val end: Point = grid.indexOf(Tile.END)
-
-  companion object {
-    fun parse(gridStr: String): Input = Grid.parse(gridStr).map { Tile.parse(it) }.let { Input(it) }
-  }
-}
+private typealias Input = Grid<Tile>
 
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day20") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = input.gridAs(Tile::parse)
 
   override fun format(output: Output): String = "$output"
 
@@ -43,7 +36,8 @@ private val solution = object : Solution<Input, Output>(2024, "Day20") {
       Part.PART2 -> 20
     }
 
-    val distances = calculateShortestDistances(input.grid, input.end)
+    val endTile = input.indexOf(Tile.END)
+    val distances = calculateShortestDistances(input, endTile)
     var totalCheats = 0
 
     distances.forEach { (cheatStart, distanceFromCheatStart) ->

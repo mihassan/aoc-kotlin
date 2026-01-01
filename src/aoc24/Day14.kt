@@ -67,9 +67,7 @@ private typealias Input = Grid
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day14") {
-  override fun parse(input: ProblemInput): Input {
-    return input.linesAs { Robot.parse(it) }.let { Grid(101, 103, it) }
-  }
+  override fun parse(input: ProblemInput): Input = Grid(101, 103, input.linesAs(Robot::parse))
 
   override fun format(output: Output): String = "$output"
 

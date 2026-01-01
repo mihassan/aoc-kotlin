@@ -12,7 +12,7 @@ sealed class Schematic(val pins: List<Int>) {
   class Key(pins: List<Int>) : Schematic(pins)
 
   companion object {
-    fun parse(lockStr: String): Schematic {
+    fun parse(lockStr: ProblemInput): Schematic {
       val rows = lockStr.lines()
       val isLock = rows.first().all { it == '#' }
       val pins = List(5) { pinIdx ->
@@ -26,22 +26,18 @@ sealed class Schematic(val pins: List<Int>) {
   }
 }
 
-private data class Input(val schematics: List<Schematic>) {
-  companion object {
-    fun parse(inputStr: String): Input = Input(inputStr.split("\n\n").map { Schematic.parse(it) })
-  }
-}
+private typealias Input = List<Schematic>
 
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day25") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = input.sectionsAs(Schematic::parse)
 
   override fun format(output: Output): String = "$output"
 
   override fun part1(input: Input): Output =
-    input.schematics.sumOf { lock ->
-      input.schematics.count { key ->
+    input.sumOf { lock ->
+      input.count { key ->
         lock is Lock && key is Key && lock fits key
       }
     }

@@ -29,7 +29,7 @@ private typealias Output = Int
 private val solution = object : Solution<Input, Output>(2024, "Day06") {
   override fun parse(input: ProblemInput): Input {
     val inputGrid = input.charGrid()
-    val grid = inputGrid.map { Tile.parse(it) }
+    val grid = inputGrid.map(Tile::parse)
     val pose = inputGrid.startingPose() ?: error("Starting position not found.")
     return Input(grid, pose)
   }

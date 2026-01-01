@@ -24,8 +24,10 @@ value class ProblemInput(val raw: String) {
 
   fun <T> charsAs(transform: (Char) -> T): List<T> = chars().map(transform)
 
+  fun split(delimiter: String): List<String> = raw.split(delimiter)
+
   fun <T> splitAs(delimiter: String, transform: (String) -> T): List<T> =
-    raw.split(delimiter).map { transform(it.trim()) }
+    split(delimiter).map { transform(it.trim()) }
 
   fun <T> commaSplitAs(transform: (String) -> T): List<T> = splitAs(",", transform)
 

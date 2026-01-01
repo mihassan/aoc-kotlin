@@ -43,8 +43,8 @@ private data class Prize(val x: Long, val y: Long) {
 
 private data class Machine(val buttonA: Button, val buttonB: Button, val prize: Prize) {
   companion object {
-    fun parse(machineStr: String): Machine {
-      val (buttonA, buttonB, prize) = machineStr.split("\n")
+    fun parse(machineStr: ProblemInput): Machine {
+      val (buttonA, buttonB, prize) = machineStr.lines()
       return Machine(Button.parse(buttonA), Button.parse(buttonB), Prize.parse(prize))
     }
   }
@@ -55,7 +55,7 @@ private typealias Input = List<Machine>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day13") {
-  override fun parse(input: ProblemInput): Input = input.sectionsAs { Machine.parse(it.raw) }
+  override fun parse(input: ProblemInput): Input = input.sectionsAs(Machine::parse)
 
   override fun format(output: Output): String = "$output"
 

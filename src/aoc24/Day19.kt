@@ -5,19 +5,15 @@ package aoc24.day19
 import lib.ProblemInput
 import lib.Solution
 
-private data class Input(val patterns: List<String>, val designs: List<String>) {
-  companion object {
-    fun parse(input: String): Input {
-      val (patterns, designs) = input.split("\n\n")
-      return Input(patterns.split(", "), designs.lines())
-    }
-  }
-}
+private data class Input(val patterns: List<String>, val designs: List<String>)
 
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day19") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (patternsSection, designsSection) ->
+      Input(patternsSection.split(", "), designsSection.lines())
+    }
 
   override fun format(output: Output): String = "$output"
 

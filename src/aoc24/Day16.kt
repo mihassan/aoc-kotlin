@@ -31,10 +31,6 @@ private data class Maze(val grid: Grid<Tile>) {
 
   fun neighborsOfWithCost(pose: Pose): List<Pair<Pose, Int>> =
     pose.neighborsWithCost().filter { grid[it.first.point].isNonBlocking() }
-
-  companion object {
-    fun parse(mazeStr: String): Maze = Maze(Grid.parse(mazeStr).map { Tile.parse(it) })
-  }
 }
 
 private data class Pose(val point: Point, val direction: Direction) {
@@ -59,7 +55,7 @@ private typealias Input = Maze
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day16") {
-  override fun parse(input: ProblemInput): Input = Maze.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = Maze(input.gridAs(Tile::parse))
 
   override fun format(output: Output): String = "$output"
 

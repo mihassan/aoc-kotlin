@@ -59,8 +59,8 @@ private typealias Output = Int
 private val solution = object : Solution<Input, Output>(2024, "Day05") {
   override fun parse(input: ProblemInput): Input {
     val (ruleSection, updateSection) = input.sections()
-    val rules = ruleSection.linesAs { Rule.parse(it) }.toSet()
-    val updates = updateSection.linesAs { Update.parse(it) }
+    val rules = ruleSection.linesAs(Rule::parse).toSet()
+    val updates = updateSection.linesAs(Update::parse)
     return Input(rules, updates)
   }
 

@@ -2,6 +2,10 @@
 
 package aoc24.day15
 
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.text.split
+import kotlin.text.trim
 import lib.Direction
 import lib.Grid
 import lib.Point
@@ -45,7 +49,7 @@ private data class Warehouse(val grid: Grid<Tile>, val movements: List<Direction
     if (positions.any { grid[it] == Tile.WALL }) return null
 
     val currPositions = positions.filter { grid[it] != Tile.EMPTY }
-    var nextPositions = currPositions.map { pos ->  pos.move(direction) }.toSet()
+    var nextPositions = currPositions.map { pos -> pos.move(direction) }.toSet()
 
     if (direction == Direction.UP || direction == Direction.DOWN) {
       nextPositions = nextPositions.flatMap { pos ->
@@ -78,15 +82,6 @@ private data class Warehouse(val grid: Grid<Tile>, val movements: List<Direction
 
   fun gpsCoordinates(): List<Int> =
     grid.indicesOf { it == Tile.BOX || it == Tile.LEFT_BOX }.map { (x, y) -> 100 * y + x }
-
-  companion object {
-    fun parse(input: String): Warehouse {
-      val (gridPart, movementsPart) = input.trim().split("\n\n")
-      val grid = Grid.parse(gridPart).map { Tile.parse(it) }
-      val movements = movementsPart.mapNotNull { Direction.parse(it) }
-      return Warehouse(grid, movements)
-    }
-  }
 }
 
 private typealias Input = Warehouse
@@ -94,7 +89,12 @@ private typealias Input = Warehouse
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2024, "Day15") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (gridSection, movementSection) ->
+      val grid = gridSection.gridAs(Tile::parse)
+      val movements = movementSection.charsAs(Direction::parse).filterNotNull()
+      Warehouse(grid, movements)
+    }
 
   override fun format(output: Output): String = "$output"
 

@@ -52,7 +52,12 @@ private enum class GateType(val op: (Long, Long) -> Long) {
 }
 
 /** A gate with two input wires and one output wire. */
-private data class Gate(val gateType: GateType, val input1: Wire, val input2: Wire, val output: Wire) {
+private data class Gate(
+  val gateType: GateType,
+  val input1: Wire,
+  val input2: Wire,
+  val output: Wire,
+) {
   /** Compute the output signal of the gate based on the input signals. */
   fun computeOutputSignal(signals: Map<Wire, Signal>): Signal? {
     val signal1 = signals[input1]?.value ?: return null
@@ -128,15 +133,15 @@ private data class Circuit(val signals: Map<Wire, Signal>, val gates: List<Gate>
   }
 
   companion object {
-    fun parse(circuitStr: String): Circuit {
-      val (signalStrs, gateStrs) = circuitStr.split("\n\n")
-      val signals = signalStrs.lines().associate { line ->
+    fun parse(circuitStr: ProblemInput): Circuit {
+      val (signalSection, gateSection) = circuitStr.sections()
+      val signals = signalSection.lines().associate { line ->
         val (wireStr, signalStr) = line.split(": ")
         val value = Signal(signalStr.toLong())
         val wire = Wire(wireStr)
         wire to value
       }
-      val gates = gateStrs.lines().map { Gate.parse(it) }
+      val gates = gateSection.linesAs(Gate::parse)
       return Circuit(signals, gates)
     }
   }
@@ -230,7 +235,7 @@ private typealias Input = Circuit
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2024, "Day24") {
-  override fun parse(input: ProblemInput): Input = Circuit.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = Circuit.parse(input)
 
   override fun format(output: Output): String = output
 

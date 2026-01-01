@@ -57,7 +57,7 @@ private typealias Input = List<Equation>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2024, "Day07") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { Equation.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Equation::parse)
 
   override fun format(output: Output): String = "$output"
 

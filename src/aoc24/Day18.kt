@@ -18,9 +18,7 @@ private typealias Output = List<Int>
 private val solution = object : Solution<Input, Output>(2024, "Day18") {
   private val GRID_SIZE = 71
 
-  override fun parse(input: ProblemInput): Input {
-    return input.linesAs { Point.parse(it) }
-  }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Point::parse)
 
   override fun format(output: Output): String = output.joinToString(",")
 
