@@ -129,7 +129,7 @@ private typealias Input = List<Direction>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day17") {
-  override fun parse(input: ProblemInput): Input = input.raw.map { it.toDirection() }
+  override fun parse(input: ProblemInput): Input = input.charsAs { it.toDirection() }
 
   override fun format(output: Output): String = "$output"
 

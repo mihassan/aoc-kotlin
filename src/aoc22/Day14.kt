@@ -21,15 +21,13 @@ private data class Cave(
   }
 
   fun dropSand(): Boolean {
-    if (DROPPING_POINT.isOccupied())
-      return false
+    if (DROPPING_POINT.isOccupied()) return false
 
     var sand = DROPPING_POINT
 
     while (!sand.isStable()) {
       sand = sand.step()
-      if (sand.isFallingToAbyss())
-        return false
+      if (sand.isFallingToAbyss()) return false
     }
 
     sands += sand
@@ -50,11 +48,6 @@ private data class Cave(
   companion object {
     private val DROPPING_POINT = Point(500, 0)
     private val DROP_DIRS = listOf(Point(0, 1), Point(-1, 1), Point(1, 1))
-
-    fun parse(caveStr: String): Cave {
-      val bricks = caveStr.lines().map(Path.Companion::parse).flatMap(Path::expand).toSet()
-      return Cave(bricks.toSet())
-    }
   }
 }
 
@@ -63,7 +56,8 @@ private typealias Input = Cave
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day14") {
-  override fun parse(input: ProblemInput): Input = Cave.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    Cave(input.linesAs(Path::parse).flatMap(Path::expand).toSet())
 
   override fun format(output: Output): String = "$output"
 

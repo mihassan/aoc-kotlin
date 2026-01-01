@@ -17,12 +17,10 @@ private typealias Output = List<ArrayDeque<Char>>
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: ProblemInput): Input {
     val (cargoSection, procedureSection) = input.sections()
-    val cargoLines = cargoSection.lines()
-    val procedureLines = procedureSection.lines()
-    val (stackIndexLine, stackLines) = cargoLines.reversed().headTail()
+    val (stackIndexLine, stackLines) = cargoSection.lines().reversed().headTail()
     val stackCount = checkNotNull(stackIndexLine).ints().max()
 
-    val steps = procedureLines.map { line ->
+    val steps = procedureSection.lines().map { line ->
       val (quantity, from, to) = line.words().mapNotNull(String::toIntOrNull)
       Step(quantity, from - 1, to - 1)
     }

@@ -52,9 +52,7 @@ private typealias Input = List<Monkey>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day21") {
-  override fun parse(input: ProblemInput): Input {
-    return input.linesAs { Monkey.parse(it) }
-  }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Monkey::parse)
 
   override fun format(output: Output): String {
     return "$output"

@@ -16,6 +16,7 @@ sealed interface Instruction {
         val value = line.substringAfter(" ").toInt()
         AddX(value)
       }
+
       else -> error("Invalid input")
     }
   }
@@ -38,7 +39,7 @@ private data class CPU(
   }
 
   private fun runSingleInstruction(instruction: Instruction) {
-    when(instruction) {
+    when (instruction) {
       Instruction.Noop -> tick()
       is Instruction.AddX -> {
         tick()
@@ -60,7 +61,7 @@ private typealias Input = List<Instruction>
 private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day10") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { Instruction.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Instruction::parse)
 
   override fun format(output: Output): String = output
 

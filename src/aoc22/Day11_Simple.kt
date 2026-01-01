@@ -16,7 +16,7 @@ private data class Monkey(
   val test: (Long) -> Int,
 ) {
   companion object {
-    fun parse(str: String): Monkey {
+    fun parse(str: ProblemInput): Monkey {
       val lines = str.lines()
 
       val startingItems = lines[1].extractLongs()
@@ -45,7 +45,7 @@ private typealias Output = Long
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
   val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)
 
-  override fun parse(input: ProblemInput): Input = input.sectionsAs { Monkey.parse(it.raw) }
+  override fun parse(input: ProblemInput): Input = input.sectionsAs(Monkey::parse)
 
   override fun format(output: Output): String = "$output"
 
@@ -59,7 +59,7 @@ private val solution = object : Solution<Input, Output>(2022, "Day11") {
         val monkey = input[idx]
 
         items.forEach { item ->
-          val worryLevel = when(part) {
+          val worryLevel = when (part) {
             Part.PART1 -> monkey.operation(item) / 3L
             Part.PART2 -> monkey.operation(item) % modulus
           }

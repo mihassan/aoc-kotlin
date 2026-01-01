@@ -52,7 +52,7 @@ private data class Board(val tiles: Map<Point, Tile>) {
   fun getYBoundary(x: Int): IntRange = yBoundary[x] ?: error("Invalid x: $x")
 
   companion object {
-    fun parse(boardStr: String) = Board(boardStr.lines().flatMapIndexed(::parseLine).toMap())
+    fun parse(boardStr: ProblemInput) = Board(boardStr.lines().flatMapIndexed(::parseLine).toMap())
 
     private fun parseLine(y: Int, s: String) = s.mapIndexedNotNull { x, c -> parseTile(x, y, c) }
 
@@ -239,12 +239,11 @@ private sealed interface Instruction {
 
   companion object {
     fun parse(instructionStr: String): Instruction =
-      Turn.parse(instructionStr.first())
-        ?.let(::TurnInstruction)
+      Turn.parse(instructionStr.first())?.let(::TurnInstruction)
         ?: MoveInstruction(instructionStr.toInt())
 
-    fun parseMany(instructionsStr: String): List<Instruction> =
-      Regex("(\\d+|R|L)").findAll(instructionsStr).map { parse(it.value) }.toList()
+    fun parseMany(instructionsStr: ProblemInput): List<Instruction> =
+      Regex("(\\d+|R|L)").findAll(instructionsStr.toString()).map { parse(it.value) }.toList()
   }
 }
 
@@ -253,10 +252,10 @@ private typealias Input = Pair<Board, List<Instruction>>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day22") {
-  override fun parse(input: ProblemInput): Input {
-    val (boardSection, instructionsSection) = input.sections()
-    return Board.parse(boardSection.raw) to Instruction.parseMany(instructionsSection.raw)
-  }
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (boardSection, instructionsSection) ->
+      Board.parse(boardSection) to Instruction.parseMany(instructionsSection)
+    }
 
   override fun format(output: Output): String {
     return "$output"
@@ -264,16 +263,12 @@ private val solution = object : Solution<Input, Output>(2022, "Day22") {
 
   override fun solve(part: Part, input: Input): Output {
     val (board, instructions) = input
-    val mover = when(part) {
+    val mover = when (part) {
       Part.PART1 -> MoveHandler.WrappingMoveHandler(board)
       Part.PART2 -> MoveHandler.CubeMoveHandler(board)
     }
 
-    var point = board.tiles
-      .filterKeys { it.y == 0 }
-      .filterValues { it == Tile.OPEN }
-      .keys
-      .min()
+    var point = board.tiles.filterKeys { it.y == 0 }.filterValues { it == Tile.OPEN }.keys.min()
     var direction = Direction.RIGHT
 
     instructions.forEach { instruction ->

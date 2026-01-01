@@ -68,7 +68,7 @@ private typealias Input = Set<Cube>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day18") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { Cube.parse(it) }.toSet()
+  override fun parse(input: ProblemInput): Input = input.linesAs(Cube::parse).toSet()
 
   override fun format(output: Output): String = "$output"
 

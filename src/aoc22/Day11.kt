@@ -5,10 +5,7 @@ package aoc22.day11
 import lib.ProblemInput
 import lib.Solution
 
-private class Game private constructor(
-  val modulus: Long,
-  val monkeys: List<Monkey>,
-) {
+private class Game(val modulus: Long, val monkeys: List<Monkey>) {
   fun runMultipleRounds(rounds: Int, onInspectionHandler: (MonkeyId, Item) -> Item) =
     repeat(rounds) { runSingleRound(onInspectionHandler) }
 
@@ -16,15 +13,6 @@ private class Game private constructor(
     monkeys.forEach { monkey -> monkey.processItems(onInspectionHandler, ::throwItemTo) }
 
   private fun throwItemTo(item: Item, monkeyId: MonkeyId) = monkeys[monkeyId].receive(item)
-
-  companion object {
-    fun parse(gameConfig: String): Game {
-      val monkeys = gameConfig.split("\n\n").map { Monkey.parse(it) }
-      val modulus = monkeys.map { it.test.modulus }.distinct().reduce(Long::times)
-
-      return Game(modulus, monkeys)
-    }
-  }
 }
 
 private data class Monkey(
@@ -59,7 +47,7 @@ private data class Monkey(
   }
 
   companion object {
-    fun parse(monkeyConfig: String): Monkey {
+    fun parse(monkeyConfig: ProblemInput): Monkey {
       val lines = monkeyConfig.lines()
       val id = Regex("\\d+").find(lines[0])!!.value.toInt()
       val items = Item.parseMultipleItems(lines[1]).toMutableList()
@@ -135,7 +123,11 @@ private typealias Output = Long
 private val solution = object : Solution<Input, Output>(2022, "Day11") {
   val ROUNDS = mapOf(Part.PART1 to 20, Part.PART2 to 10000)
 
-  override fun parse(input: ProblemInput): Input = Game.parse(input.raw)
+  override fun parse(input: ProblemInput): Input {
+    val monkeys: List<Monkey> = input.sectionsAs(Monkey::parse)
+    val modulus = monkeys.map { it.test.modulus }.distinct().reduce(Long::times)
+    return Game(modulus, monkeys)
+  }
 
   override fun format(output: Output): String {
     return "$output"

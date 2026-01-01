@@ -33,7 +33,7 @@ private typealias Input = List<Sensor>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2022, "Day15") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { Sensor.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Sensor::parse)
 
   override fun format(output: Output): String = "$output"
 

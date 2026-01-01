@@ -13,7 +13,11 @@ private typealias RoomLabel = String
 
 private typealias Distance = Long
 
-private data class Room(val label: RoomLabel, val flowRate: Long, val tunnels: Map<RoomLabel, Distance>) {
+private data class Room(
+  val label: RoomLabel,
+  val flowRate: Long,
+  val tunnels: Map<RoomLabel, Distance>,
+) {
   val hasPositiveFlow by lazy { flowRate > 0 }
   val initialRoom by lazy { label == INITIAL_ROOM_LABEL }
 
@@ -39,7 +43,7 @@ private typealias Output = String
 
 private val solution = object : Solution<Input, Output>(2022, "Day16") {
   override fun parse(input: ProblemInput): Input =
-    input.linesAs { Room.parse(it) }.associateBy { it.label }
+    input.linesAs(Room::parse).associateBy { it.label }
 
   override fun format(output: Output): String {
     return output

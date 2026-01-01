@@ -6,8 +6,7 @@ import lib.ProblemInput
 import lib.Solution
 
 private val solution = object : Solution<List<List<Int>>, Int>(2022, "Day01") {
-  override fun parse(input: ProblemInput): List<List<Int>> =
-    input.sectionsAs { it.ints() }
+  override fun parse(input: ProblemInput): List<List<Int>> = input.sectionsAs(ProblemInput::ints)
 
   override fun format(output: Int): String = output.toString()
 

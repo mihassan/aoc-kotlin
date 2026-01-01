@@ -50,13 +50,9 @@ private typealias Input = List<Blueprint>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2022, "Day19") {
-  override fun parse(input: ProblemInput): Input {
-    return input.linesAs { Blueprint.parse(it) }
-  }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Blueprint::parse)
 
-  override fun format(output: Output): String {
-    return "$output"
-  }
+  override fun format(output: Output) = "$output"
 
   override fun part1(input: Input): Output {
     val totalMinutes = 24

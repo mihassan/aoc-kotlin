@@ -85,12 +85,13 @@ private typealias Output = Cargo
 private val solution = object : Solution<Input, Output>(2022, "Day05") {
   override fun parse(input: ProblemInput): Input {
     val (cargoSection, procedureSection) = input.sections()
-    val cargoLines = cargoSection.lines()
-    val procedureLines = procedureSection.lines()
-    val (stackIndexLine, stackLines) = cargoLines.reversed().headTail()
+    val (stackIndexLine, stackLines) = cargoSection.lines().reversed().headTail()
     val stackCount = checkNotNull(stackIndexLine).ints().max()
 
-    return Input(Cargo.parse(stackCount, stackLines), Procedure.parse(procedureLines))
+    val cargo = Cargo.parse(stackCount, stackLines)
+    val procedure = Procedure.parse(procedureSection.lines())
+
+    return Input(cargo, procedure)
   }
 
   override fun format(output: Output): String = output.topCrates().joinToString("")

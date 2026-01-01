@@ -11,7 +11,7 @@ import lib.Solution
 private typealias InputLine = Pair<IntRange, IntRange>
 
 private val solution = object : Solution<List<InputLine>, Int>(2022, "Day04") {
-  override fun parse(input: ProblemInput): List<InputLine> = input.lines().map { line ->
+  override fun parse(input: ProblemInput): List<InputLine> = input.linesAs { line ->
     fun parseIntRange(str: String): IntRange {
       val (l, h) = str.split("-").map { it.toInt() }
       return l..h
