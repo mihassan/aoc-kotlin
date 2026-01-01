@@ -19,12 +19,12 @@ value class ProblemInput(val raw: String) {
 
   fun chars(): List<Char> = raw.toList()
 
+  fun split(delimiter: String): List<String> = raw.split(delimiter)
+
   // Generic transform helpers
   fun <T> linesAs(transform: (String) -> T): List<T> = lines().map(transform)
 
   fun <T> charsAs(transform: (Char) -> T): List<T> = chars().map(transform)
-
-  fun split(delimiter: String): List<String> = raw.split(delimiter)
 
   fun <T> splitAs(delimiter: String, transform: (String) -> T): List<T> =
     split(delimiter).map { transform(it.trim()) }
@@ -52,8 +52,11 @@ value class ProblemInput(val raw: String) {
   fun digitGrid(): Grid<Int> = gridAs { it.digitToInt() }
 
   // Section parsing - splits on blank lines
-  fun sections(): List<ProblemInput> = raw.split("\n\n").map { ProblemInput(it) }
+  fun sections(): List<ProblemInput> = raw.split(SECTION_SEPARATOR).map { ProblemInput(it) }
 
   fun <T> sectionsAs(transform: (ProblemInput) -> T): List<T> = sections().map(transform)
-}
 
+  companion object {
+    private const val SECTION_SEPARATOR = "\n\n"
+  }
+}
