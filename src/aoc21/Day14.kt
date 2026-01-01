@@ -8,25 +8,20 @@ import lib.Solution
 
 private typealias Rules = Map<String, List<String>>
 
-private data class Input(val template: String, val rules: Rules) {
-  companion object {
-    fun parse(input: String): Input {
-      val (templateStr, rulesStr) = input.split("\n\n")
-      val template = templateStr.trim()
-      val rules = rulesStr.lines().associate { line ->
-        val (pair, insert) = line.split(" -> ")
-        check(pair.length == 2) { "Invalid pair: $pair" }
-        pair to listOf(pair[0] + insert, insert + pair[1])
-      }
-      return Input(template, rules)
-    }
-  }
-}
+private data class Input(val template: String, val rules: Rules)
 
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day14") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (templateSection, rulesSection) ->
+      val template = templateSection.toString()
+      val rules = rulesSection.linesAs { line ->
+        val (pair, insert) = line.split(" -> ")
+        pair to listOf(pair[0] + insert, insert + pair[1])
+      }.toMap()
+      Input(template, rules)
+    }
 
   override fun format(output: Output): String = "$output"
 
@@ -58,9 +53,7 @@ private val solution = object : Solution<Input, Output>(2021, "Day14") {
       pair[1] to count
     }
     val fixedCharCount = charCounts + listOf(first to 1L)
-    return fixedCharCount
-      .groupBy({ it.first }, { it.second })
-      .mapValues { it.value.sum() }
+    return fixedCharCount.groupBy({ it.first }, { it.second }).mapValues { it.value.sum() }
   }
 }
 

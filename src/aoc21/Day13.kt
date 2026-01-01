@@ -32,21 +32,17 @@ private sealed interface Fold {
   }
 }
 
-private data class Input(val grid: Grid, val folds: List<Fold>) {
-  companion object {
-    fun parse(input: String): Input {
-      val (gridStr, foldStr) = input.split("\n\n")
-      val grid = gridStr.lines().map(Point::parse).toSet()
-      val folds = foldStr.lines().map(Fold::parse)
-      return Input(grid, folds)
-    }
-  }
-}
+private data class Input(val grid: Grid, val folds: List<Fold>)
 
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day13") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (gridSection, foldSection) ->
+      val grid: Grid = gridSection.linesAs(Point::parse).toSet()
+      val folds: List<Fold> = foldSection.linesAs(Fold::parse)
+      Input(grid, folds)
+    }
 
   override fun format(output: Output): String = "$output"
 

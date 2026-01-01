@@ -7,8 +7,7 @@ import lib.ProblemInput
 import lib.Solution
 
 private enum class Pixel(val char: Char, val value: Int) {
-  LIGHT('#', 1),
-  DARK('.', 0);
+  LIGHT('#', 1), DARK('.', 0);
 
   companion object {
     fun parse(pixelChar: Char): Pixel = entries.first { it.char == pixelChar }
@@ -83,8 +82,7 @@ private data class Image(val pixels: List<List<Pixel>>) {
     return Image(newPixels)
   }
 
-  fun countLitPixels(): Int =
-    pixels.sumOf { row -> row.count { it == Pixel.LIGHT } }
+  fun countLitPixels(): Int = pixels.sumOf { row -> row.count { it == Pixel.LIGHT } }
 
   companion object {
     fun parse(imageStr: String): Image =
@@ -92,22 +90,15 @@ private data class Image(val pixels: List<List<Pixel>>) {
   }
 }
 
-private data class Input(
-  val algorithm: Algorithm,
-  val image: Image,
-) {
-  companion object {
-    fun parse(input: String): Input =
-      input.split("\n\n").let { (algorithmStr, imageStr) ->
-        Input(Algorithm.parse(algorithmStr), Image.parse(imageStr))
-      }
-  }
-}
+private data class Input(val algorithm: Algorithm, val image: Image)
 
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day20") {
-  override fun parse(input: ProblemInput): Input = Input.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().let { (algorithmSection, imageSection) ->
+      Input(Algorithm.parse(algorithmSection.toString()), Image.parse(imageSection.toString()))
+    }
 
   override fun format(output: Output): String = "$output"
 

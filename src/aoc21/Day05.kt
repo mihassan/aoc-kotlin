@@ -12,9 +12,7 @@ private typealias Input = List<Line>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day05") {
-  override fun parse(input: ProblemInput): Input {
-    return input.linesAs(Line.Companion::parse)
-  }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Line::parse)
 
   override fun format(output: Output): String = "$output"
 

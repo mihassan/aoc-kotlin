@@ -58,23 +58,21 @@ private data class Rotation(val right: Vector3D, val up: Vector3D, val front: Ve
    * Applies this rotation to a point in 3D space.
    * The point is transformed by the rotation matrix defined by this rotation.
    */
-  operator fun invoke(point: Point3D): Point3D =
-    Point3D(
-      x = right.x * point.x + up.x * point.y + front.x * point.z,
-      y = right.y * point.x + up.y * point.y + front.y * point.z,
-      z = right.z * point.x + up.z * point.y + front.z * point.z
-    )
+  operator fun invoke(point: Point3D): Point3D = Point3D(
+    x = right.x * point.x + up.x * point.y + front.x * point.z,
+    y = right.y * point.x + up.y * point.y + front.y * point.z,
+    z = right.z * point.x + up.z * point.y + front.z * point.z
+  )
 
   /**
    * Returns the inverse of this rotation by transposing the rotation matrix.
    */
   val inverse
-    get(): Rotation =
-      Rotation(
-        right = Vector3D(right.x, up.x, front.x),
-        up = Vector3D(right.y, up.y, front.y),
-        front = Vector3D(right.z, up.z, front.z)
-      )
+    get(): Rotation = Rotation(
+      right = Vector3D(right.x, up.x, front.x),
+      up = Vector3D(right.y, up.y, front.y),
+      front = Vector3D(right.z, up.z, front.z)
+    )
 
   /**
    * Transforms a point from local coordinates to global coordinates using this rotation.
@@ -109,9 +107,7 @@ private data class Rotation(val right: Vector3D, val up: Vector3D, val front: Ve
    * using the scalar triple product of the right, up, and front vectors.
    */
   fun isRightHanded(): Boolean =
-    right.x * (up.y * front.z - up.z * front.y) +
-      right.y * (up.z * front.x - up.x * front.z) +
-      right.z * (up.x * front.y - up.y * front.x) > 0
+    right.x * (up.y * front.z - up.z * front.y) + right.y * (up.z * front.x - up.x * front.z) + right.z * (up.x * front.y - up.y * front.x) > 0
 
   companion object {
     val IDENTITY = Rotation(Vector3D(1, 0, 0), Vector3D(0, 1, 0), Vector3D(0, 0, 1))
@@ -127,8 +123,7 @@ private data class Rotation(val right: Vector3D, val up: Vector3D, val front: Ve
         val (r, u, f) = it
         permutationsWithReplacement(setOf(1, -1), 3).forEach { (rs, us, fs) ->
           val rot = Rotation(right = r * rs, up = u * us, front = f * fs)
-          if (rot.isRightHanded())
-            add(rot)
+          if (rot.isRightHanded()) add(rot)
         }
       }
     }
@@ -214,16 +209,9 @@ private data class Scanner(val beacons: List<Beacon>) {
   private fun beaconPairs(): Set<Pair<Beacon, Beacon>> =
     combinations(beacons.toSet(), 2).map { it.first() to it.last() }.toSet()
 
-  private fun beaconPairDistances(): List<Int> =
-    beaconPairs().map { (a, b) -> a distance b }
+  private fun beaconPairDistances(): List<Int> = beaconPairs().map { (a, b) -> a distance b }
 
   companion object {
-    fun parseScanner(scannerStr: String): Scanner =
-      Scanner(scannerStr.lines().drop(1).map { Point3D.parse(it) })
-
-    fun parseScanners(scannersStr: String): List<Scanner> =
-      scannersStr.split("\n\n").map { parseScanner(it) }
-
     /**
      * Constructs a potential overlap graph for the scanners.
      * This graph maps each scanner index to a set of indices of scanners.
@@ -286,7 +274,10 @@ private typealias Input = List<Scanner>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2021, "Day19") {
-  override fun parse(input: ProblemInput): Input = Scanner.parseScanners(input.raw)
+  override fun parse(input: ProblemInput): Input = input.sectionsAs { section ->
+    Scanner(section.lines().drop(1).map(Point3D::parse))
+  }
+
 
   override fun format(output: Output): String = "$output"
 

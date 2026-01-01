@@ -63,17 +63,13 @@ private data class Cave(val risks: Grid<Int>) {
       }
     return Cave(Grid(newRisks))
   }
-
-  companion object {
-    fun parse(caveStr: String): Cave = Cave(Grid.parse(caveStr).map { it.digitToInt() })
-  }
 }
 
 private typealias Input = Cave
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2021, "Day15") {
-  override fun parse(input: ProblemInput): Input = Cave.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = Cave(input.digitGrid())
 
   override fun format(output: Output): String = "$output"
 
