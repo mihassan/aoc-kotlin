@@ -59,7 +59,7 @@ private data class CategoryMap(
       ?: srcNumber
 
   companion object {
-    fun parse(categoryMapStr: String): CategoryMap {
+    fun parse(categoryMapStr: ProblemInput): CategoryMap {
       val (headerStr, rangesStr) = categoryMapStr.lines().headTail()
       val (srcCategoryStr, destCategoryStr) = HEADER_REGEX.matchEntire(headerStr!!)!!.destructured
 
@@ -84,15 +84,6 @@ private data class Almanac(val seeds: List<Long>, val categoryMaps: List<Categor
     }
     return convertedItem
   }
-
-  companion object {
-    fun parse(almanacStr: String): Almanac {
-      val (seedsStr, categoriesStr) = almanacStr.split("\n\n").headTail()
-      val seeds = seedsStr!!.extractLongs()
-      val categoryMaps = categoriesStr.map(CategoryMap.Companion::parse)
-      return Almanac(seeds, categoryMaps)
-    }
-  }
 }
 
 private typealias Input = Almanac
@@ -100,7 +91,12 @@ private typealias Input = Almanac
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day05") {
-  override fun parse(input: ProblemInput): Input = Almanac.parse(input.raw)
+  override fun parse(input: ProblemInput): Input =
+    input.sections().headTail().let { (seedsSection, categoriesSection) ->
+      val seeds = seedsSection!!.longs()
+      val categoryMaps = categoriesSection.map(CategoryMap::parse)
+      Almanac(seeds, categoryMaps)
+    }
 
   override fun format(output: Output): String = "$output"
 

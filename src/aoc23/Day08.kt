@@ -7,11 +7,10 @@ import lib.ProblemInput
 import lib.Solution
 
 private enum class Step(val symbol: Char) {
-  LEFT('L'),
-  RIGHT('R');
+  LEFT('L'), RIGHT('R');
 
   companion object {
-    fun parse(symbol: Char): Step = values().find { it.symbol == symbol }!!
+    fun parse(symbol: Char): Step = entries.find { it.symbol == symbol }!!
   }
 }
 
@@ -39,15 +38,14 @@ private data class Network(val nodes: Map<String, Node>) {
 
   fun ghostSources(): List<Node> = nodes.values.filter { it.isGhostSource() }
 
-  fun step(node: Node, step: Step): Node =
-    when (step) {
-      Step.LEFT -> nodes[node.left]
-      Step.RIGHT -> nodes[node.right]
-    } ?: error("Invalid step $step for node $node")
+  fun step(node: Node, step: Step): Node = when (step) {
+    Step.LEFT -> nodes[node.left]
+    Step.RIGHT -> nodes[node.right]
+  } ?: error("Invalid step $step for node $node")
 
   companion object {
-    fun parse(networkStr: String): Network =
-      networkStr.lines().map(Node::parse).associateBy { it.label }.let { Network(it) }
+    fun parse(networkStr: ProblemInput): Network =
+      Network(networkStr.linesAs(Node::parse).associateBy { it.label })
   }
 }
 
@@ -66,31 +64,23 @@ private data class Input(val steps: List<Step>, val network: Network) {
   }
 
   private fun getStep(stepIndex: Long): Step = steps[(stepIndex % steps.size).toInt()]
-
-  companion object {
-    fun parse(inputStr: String): Input {
-      val (stepsPart, networkPart) = inputStr.split("\n\n")
-      return Input(stepsPart.map { Step.parse(it) }, Network.parse(networkPart))
-    }
-  }
 }
 
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day08") {
-  override fun parse(input: ProblemInput) = Input.parse(input.raw)
+  override fun parse(input: ProblemInput) = input.sections().let { (stepsSection, networkSection) ->
+    val steps = stepsSection.charsAs(Step::parse)
+    val network = Network.parse(networkSection)
+    Input(steps, network)
+  }
 
   override fun format(output: Output): String = "$output"
 
-  override fun part1(input: Input): Output =
-    input.countStepsToSink(input.network.source())
+  override fun part1(input: Input): Output = input.countStepsToSink(input.network.source())
 
   override fun part2(input: Input): Output =
-    input
-      .network
-      .ghostSources()
-      .map(input::countStepsToSink)
-      .reduce { acc, cnt -> acc lcm cnt }
+    input.network.ghostSources().map(input::countStepsToSink).reduce { acc, cnt -> acc lcm cnt }
 }
 
 fun main() = solution.run()

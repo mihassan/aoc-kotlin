@@ -58,7 +58,7 @@ private typealias Input = List<Game>
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day02") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { Game.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs(Game::parse)
 
   override fun format(output: Output): String = "$output"
 

@@ -20,9 +20,8 @@ private enum class Tile(val symbol: Char, val connections: Set<Direction>) {
   START('S', setOf(UP, DOWN, LEFT, RIGHT));
 
   companion object {
-    fun parse(symbol: Char): Tile {
-      return values().find { it.symbol == symbol } ?: error("Unknown symbol: $symbol")
-    }
+    fun parse(symbol: Char) =
+      entries.find { it.symbol == symbol } ?: error("Unknown symbol: $symbol")
   }
 }
 
@@ -45,10 +44,8 @@ data class Pipe(val connections: List<Connection>) {
    * Fix the orientation of the pipe. The pipe is either clockwise or counter-clockwise.
    */
   fun fixOrientation(orientation: Orientation): Pipe =
-    if (orientation == this.checkOrientation())
-      this
-    else
-      reversed()
+    if (orientation == this.checkOrientation()) this
+    else reversed()
 
   /**
    * Reverse the pipe by traversing the connections in reverse order and also by reversing each
@@ -91,19 +88,13 @@ private data class Field(val grid: Grid<Tile>) {
   private fun connections(from: Point): List<Connection> =
     possibleConnections(from).filter { it.isValid() }
 
-  private fun Connection.isValid(): Boolean =
-    from in grid && grid[to]?.let {
-      direction.turnAround() in it.connections
-    } ?: false
+  private fun Connection.isValid(): Boolean = from in grid && grid[to]?.let {
+    direction.turnAround() in it.connections
+  } ?: false
 
-  private fun possibleConnections(from: Point): List<Connection> =
-    grid[from]?.connections?.map {
-      Connection(from, from.move(it), it)
-    } ?: emptyList()
-
-  companion object {
-    fun parse(input: String): Field = Field(Grid.parse(input).map { Tile.parse(it) })
-  }
+  private fun possibleConnections(from: Point): List<Connection> = grid[from]?.connections?.map {
+    Connection(from, from.move(it), it)
+  } ?: emptyList()
 }
 
 private typealias Input = Field
@@ -111,7 +102,7 @@ private typealias Input = Field
 private typealias Output = Int
 
 private val solution = object : Solution<Input, Output>(2023, "Day10") {
-  override fun parse(input: ProblemInput): Input = Field.parse(input.raw)
+  override fun parse(input: ProblemInput): Input = Field(input.gridAs(Tile::parse))
 
   override fun format(output: Output): String = "$output"
 

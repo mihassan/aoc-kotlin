@@ -27,7 +27,7 @@ private typealias Input = List<ConditionRecord>
 private typealias Output = Long
 
 private val solution = object : Solution<Input, Output>(2023, "Day12") {
-  override fun parse(input: ProblemInput): Input = input.linesAs { ConditionRecord.parse(it) }
+  override fun parse(input: ProblemInput): Input = input.linesAs(ConditionRecord::parse)
 
   override fun format(output: Output): String = "$output"
 
