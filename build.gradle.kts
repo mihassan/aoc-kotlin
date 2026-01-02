@@ -1,5 +1,5 @@
 plugins {
-  kotlin("jvm") version "2.1.20"
+  kotlin("jvm") version "2.3.0"
 }
 
 repositories {
@@ -10,7 +10,7 @@ sourceSets.main {
   java.srcDirs("src")
 
   dependencies {
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:5.3.0")
     implementation("com.github.ajalt.clikt:clikt:5.0.3")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
   }
@@ -18,7 +18,7 @@ sourceSets.main {
 
 tasks {
   wrapper {
-    gradleVersion = "8.13"
+    gradleVersion = "9.2.1"
   }
 }
 
