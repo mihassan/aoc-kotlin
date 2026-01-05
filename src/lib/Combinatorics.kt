@@ -35,4 +35,13 @@ object Combinatorics {
 
     return combinations(tail, n - 1).map { rest -> first + rest }.toSet() + combinations(tail, n)
   }
+
+  fun <T> allSubSets(input: Set<T>): Set<Set<T>> {
+    val result = mutableSetOf<Set<T>>()
+    val n = input.size
+    for (k in 0..n) {
+      result += combinations(input, k)
+    }
+    return result
+  }
 }
