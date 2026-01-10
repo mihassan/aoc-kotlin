@@ -36,12 +36,10 @@ object Combinatorics {
     return combinations(tail, n - 1).map { rest -> first + rest }.toSet() + combinations(tail, n)
   }
 
-  fun <T> allSubSets(input: Set<T>): Set<Set<T>> {
-    val result = mutableSetOf<Set<T>>()
-    val n = input.size
-    for (k in 0..n) {
-      result += combinations(input, k)
+  fun <T> allSubSets(input: List<T>): List<List<T>> =
+    List(1 shl input.size) { mask ->
+      input.mapIndexedNotNull { index, value ->
+        value.takeIf { mask and (1 shl index) > 0 }
+      }
     }
-    return result
-  }
 }

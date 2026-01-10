@@ -53,21 +53,22 @@ private data class Machine(
    * Uses brute force enumeration of all possible button combinations.
    */
   fun findMinimumButtonPresses(): Long {
-    return allSubSets(buttons.toSet()).filter { buttonSet -> buttonSet.producesTargetConfiguration() }
-      .minOf { it.size.toLong() }
+    return allSubSets(buttons).filter { buttons -> buttons.producesTargetConfiguration() }
+      .minOfOrNull { it.size.toLong() }
+      ?: error("Error $buttons")
   }
 
   /**
    * Simulates pressing a set of buttons and checks if it produces the target configuration.
    * Each button toggles specific lights, and pressing the same button twice cancels out.
    */
-  private fun Set<Button>.producesTargetConfiguration(): Boolean =
+  private fun List<Button>.producesTargetConfiguration(): Boolean =
     simulateButtonPresses() == indicatorDiagram.targetLights
 
   /**
    * Simulates pressing all buttons in this set and returns the final light states.
    */
-  private fun Set<Button>.simulateButtonPresses(): List<Boolean> {
+  private fun List<Button>.simulateButtonPresses(): List<Boolean> {
     val states = MutableList(indicatorDiagram.targetLights.size) { false }
     for (button in this) {
       for (index in button.affectedIndices) {
@@ -144,14 +145,14 @@ private val solution = object : Solution<Input, Output>(2025, "Day10") {
     val targetPattern = requirements.map { it % 2 == 1 }
 
     val minButtonPresses =
-      allSubSets(toSet()).filter { it.hasParityPattern(targetPattern) }.minOfOrNull { buttonSet ->
-        val newRequirements = buttonSet.decrementRequirements(requirements)
+      allSubSets(this).filter { it.hasParityPattern(targetPattern) }.minOfOrNull { buttons ->
+        val newRequirements = buttons.decrementRequirements(requirements)
         val halvedRequirements = newRequirements.map { it / 2 }
         val recursiveCost = findMinimumButtonPresses(halvedRequirements)
         if (recursiveCost == Long.MAX_VALUE) {
           Long.MAX_VALUE
         } else {
-          RECURSION_COST_MULTIPLIER * recursiveCost + buttonSet.size
+          RECURSION_COST_MULTIPLIER * recursiveCost + buttons.size
         }
       } ?: Long.MAX_VALUE
 
@@ -162,7 +163,7 @@ private val solution = object : Solution<Input, Output>(2025, "Day10") {
    * Applies button toggles to create a boolean pattern.
    * This is the core toggle logic used by both light simulation and parity checking.
    */
-  private fun Set<Button>.applyToggles(size: Int): List<Boolean> {
+  private fun List<Button>.applyToggles(size: Int): List<Boolean> {
     val states = MutableList(size) { false }
     for (button in this) {
       for (index in button.affectedIndices) {
@@ -176,7 +177,7 @@ private val solution = object : Solution<Input, Output>(2025, "Day10") {
    * Checks if pressing this set of buttons produces the target parity pattern.
    * Each button toggles indices, and we check if the final parity matches the target.
    */
-  private fun Set<Button>.hasParityPattern(targetPattern: List<Boolean>): Boolean {
+  private fun List<Button>.hasParityPattern(targetPattern: List<Boolean>): Boolean {
     return applyToggles(targetPattern.size) == targetPattern
   }
 
@@ -184,7 +185,7 @@ private val solution = object : Solution<Input, Output>(2025, "Day10") {
    * Decrements requirements at indices affected by this set of buttons.
    * Returns a new list with decremented values.
    */
-  private fun Set<Button>.decrementRequirements(currentRequirements: List<Int>): List<Int> {
+  private fun List<Button>.decrementRequirements(currentRequirements: List<Int>): List<Int> {
     val newRequirements = currentRequirements.toMutableList()
     for (button in this) {
       for (index in button.affectedIndices) {
