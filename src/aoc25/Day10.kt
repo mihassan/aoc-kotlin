@@ -8,76 +8,11 @@ import lib.Solution
 import lib.Strings.extractInts
 import lib.Strings.words
 
-/**
- * Represents the target state of indicator lights.
- * Each light can be either on (#) or off (.).
- */
-private data class IndicatorDiagram(val targetLights: List<Boolean>) {
-  companion object {
-    fun parse(str: String): IndicatorDiagram = IndicatorDiagram(str.map { it == '#' })
-  }
-}
-
-/**
- * A button that toggles specific indicator lights when pressed.
- * @property affectedIndices The indices of lights that this button toggles
- */
-private data class Button(val affectedIndices: List<Int>) {
-  companion object {
-    fun parse(buttonStr: String): Button = Button(buttonStr.extractInts())
-  }
-}
-
-/**
- * Joltage requirements for the machine.
- * Each requirement represents the target joltage level for a specific component.
- */
-private data class Joltage(val requirements: List<Int>) {
-  companion object {
-    fun parse(joltageStr: String): Joltage = Joltage(joltageStr.extractInts())
-  }
-}
-
-/**
- * Represents a machine with indicator lights and buttons.
- * This is a "lights out" style puzzle where we need to find the minimum
- * number of button presses to achieve the target indicator configuration.
- */
 private data class Machine(
-  val indicatorDiagram: IndicatorDiagram,
-  val buttons: List<Button>,
-  val joltage: Joltage,
+  val lights: List<Boolean>,
+  val buttons: List<List<Boolean>>,
+  val requirements: List<Int>,
 ) {
-  /**
-   * Finds the minimum number of button presses needed to configure indicators correctly.
-   * Uses brute force enumeration of all possible button combinations.
-   */
-  fun findMinimumButtonPresses(): Long {
-    return allSubSets(buttons).filter { buttons -> buttons.producesTargetConfiguration() }
-      .minOfOrNull { it.size.toLong() }
-      ?: error("Error $buttons")
-  }
-
-  /**
-   * Simulates pressing a set of buttons and checks if it produces the target configuration.
-   * Each button toggles specific lights, and pressing the same button twice cancels out.
-   */
-  private fun List<Button>.producesTargetConfiguration(): Boolean =
-    simulateButtonPresses() == indicatorDiagram.targetLights
-
-  /**
-   * Simulates pressing all buttons in this set and returns the final light states.
-   */
-  private fun List<Button>.simulateButtonPresses(): List<Boolean> {
-    val states = MutableList(indicatorDiagram.targetLights.size) { false }
-    for (button in this) {
-      for (index in button.affectedIndices) {
-        states[index] = !states[index]
-      }
-    }
-    return states
-  }
-
   companion object {
     // Matches format: [lights] (button1) (button2) ... {requirements}
     private val MACHINE_REGEX =
@@ -92,10 +27,23 @@ private data class Machine(
       val requirementsGroup =
         match.groups["requirements"]?.value ?: error("Missing requirements group")
 
+      val lights = lightsGroup.map { it == '#' }
+
+      val buttons = mutableListOf<List<Boolean>>()
+      for (group in buttonsGroup.words()) {
+        val pressed = MutableList(lights.size) { false }
+        for (button in group.extractInts()) {
+          pressed[button] = true
+        }
+        buttons.add(pressed)
+      }
+
+      val requirements = requirementsGroup.extractInts()
+
       return Machine(
-        indicatorDiagram = IndicatorDiagram.parse(lightsGroup),
-        buttons = buttonsGroup.words().map(Button::parse),
-        joltage = Joltage.parse(requirementsGroup)
+        lights = lights,
+        buttons = buttons,
+        requirements = requirements,
       )
     }
   }
@@ -104,21 +52,41 @@ private data class Machine(
 private typealias Input = List<Machine>
 private typealias Output = Long
 
-/**
- * Cost multiplier when recursively solving halved requirements.
- * Each level of recursion doubles the effective cost of button presses.
- */
-private const val RECURSION_COST_MULTIPLIER = 2
-
 private val solution = object : Solution<Input, Output>(2025, "Day10") {
   override fun parse(input: ProblemInput): Input = input.linesAs(Machine::parse)
 
   override fun format(output: Output): String = output.toString()
 
-  override fun part1(input: Input): Output = input.sumOf { it.findMinimumButtonPresses() }
+  override fun part1(input: Input): Output =
+    input.sumOf { machine -> solveLights(machine.buttons, machine.lights) }
+
+  private fun solveLights(buttons: List<List<Boolean>>, targetLights: List<Boolean>): Long {
+    val size = targetLights.size
+    var minPresses = Long.MAX_VALUE
+
+    for (buttonSubset in allSubSets(buttons)) {
+      val resultingLights = MutableList(size) { false }
+      for (button in buttonSubset) {
+        for (index in button.indices) {
+          if (button[index]) {
+            resultingLights[index] = !resultingLights[index]
+          }
+        }
+      }
+      if (resultingLights == targetLights) {
+        minPresses = minOf(minPresses, buttonSubset.size.toLong())
+      }
+    }
+
+    return minPresses
+  }
+
+  override fun part2(input: Input): Output = input.sumOf { machine ->
+    solveRequirements(machine.buttons, machine.requirements)
+  }
 
   /**
-   * Finds minimum button presses to match joltage requirements using recursive memoized search.
+   * Finds minimum button presses to match requirements using recursive memoized search.
    *
    * Algorithm:
    * 1. Base case: all requirements are 0 → return 0
@@ -127,72 +95,66 @@ private val solution = object : Solution<Input, Output>(2025, "Day10") {
    * 4. Recursively solve for halved requirements after pressing those buttons
    * 5. Return minimum across all valid button combinations
    */
-  override fun part2(input: Input): Output {
-    return input.sumOf { machine ->
-      memoizationCache.clear()
-      machine.buttons.findMinimumButtonPresses(machine.joltage.requirements)
-    }
-  }
+  private fun solveRequirements(buttons: List<List<Boolean>>, requirements: List<Int>): Long {
+    val size = requirements.size
 
-  private val memoizationCache = mutableMapOf<List<Int>, Long>()
+    // Precalculate impact of every button subset
+    // Group them by their parity pattern (mod 2) to quickly find valid candidates for LSB
+    val impactByParity: MutableMap<List<Boolean>, MutableList<Pair<Int, List<Int>>>> = mutableMapOf()
 
-  private fun List<Button>.findMinimumButtonPresses(requirements: List<Int>): Long {
-    memoizationCache[requirements]?.let { return it }
+    for (buttonSubset in allSubSets(buttons)) {
+      val subsetImpact = MutableList(size) { 0 }
 
-    if (requirements.all { it == 0 }) return 0L
-    if (requirements.any { it < 0 }) return Long.MAX_VALUE
-
-    val targetPattern = requirements.map { it % 2 == 1 }
-
-    val minButtonPresses =
-      allSubSets(this).filter { it.hasParityPattern(targetPattern) }.minOfOrNull { buttons ->
-        val newRequirements = buttons.decrementRequirements(requirements)
-        val halvedRequirements = newRequirements.map { it / 2 }
-        val recursiveCost = findMinimumButtonPresses(halvedRequirements)
-        if (recursiveCost == Long.MAX_VALUE) {
-          Long.MAX_VALUE
-        } else {
-          RECURSION_COST_MULTIPLIER * recursiveCost + buttons.size
+      for (button in buttonSubset) {
+        for ((index, pressed) in button.withIndex()) {
+          if (pressed) {
+            subsetImpact[index] += 1
+          }
         }
-      } ?: Long.MAX_VALUE
-
-    return minButtonPresses.also { memoizationCache[requirements] = it }
-  }
-
-  /**
-   * Applies button toggles to create a boolean pattern.
-   * This is the core toggle logic used by both light simulation and parity checking.
-   */
-  private fun List<Button>.applyToggles(size: Int): List<Boolean> {
-    val states = MutableList(size) { false }
-    for (button in this) {
-      for (index in button.affectedIndices) {
-        states[index] = !states[index]
       }
+
+      val parityPattern = subsetImpact.map { it % 2 == 1 }
+
+      impactByParity
+        .getOrPut(parityPattern) { mutableListOf() }
+        .add(buttonSubset.size to subsetImpact)
     }
-    return states
-  }
 
-  /**
-   * Checks if pressing this set of buttons produces the target parity pattern.
-   * Each button toggles indices, and we check if the final parity matches the target.
-   */
-  private fun List<Button>.hasParityPattern(targetPattern: List<Boolean>): Boolean {
-    return applyToggles(targetPattern.size) == targetPattern
-  }
+    val memo: MutableMap<List<Int>, Long> = mutableMapOf()
 
-  /**
-   * Decrements requirements at indices affected by this set of buttons.
-   * Returns a new list with decremented values.
-   */
-  private fun List<Button>.decrementRequirements(currentRequirements: List<Int>): List<Int> {
-    val newRequirements = currentRequirements.toMutableList()
-    for (button in this) {
-      for (index in button.affectedIndices) {
-        newRequirements[index] -= 1
+    fun findMinPresses(currentReqs: List<Int>): Long {
+      if (currentReqs.all { it == 0 }) return 0L
+      // If we overshot (negative requirements), this path is invalid
+      if (currentReqs.any { it < 0 }) return Long.MAX_VALUE
+
+      memo[currentReqs]?.let { return it }
+
+      val currentParity = currentReqs.map { it % 2 != 0 }
+      var minTotalPresses = Long.MAX_VALUE
+
+      // Try all subsets that match the parity of the current requirements
+      val candidates = impactByParity[currentParity] ?: emptyList()
+
+      for ((subsetSize, impact) in candidates) {
+        val nextReqs = List(size) { index ->
+          (currentReqs[index] - impact[index]) / 2
+        }
+
+        val costRest = findMinPresses(nextReqs)
+        if (costRest != Long.MAX_VALUE) {
+          // Current level costs 'subsetSize', higher levels cost '2 * costRest'
+          val totalCost = 2 * costRest + subsetSize
+          if (totalCost < minTotalPresses) {
+            minTotalPresses = totalCost
+          }
+        }
       }
+
+      memo[currentReqs] = minTotalPresses
+      return minTotalPresses
     }
-    return newRequirements
+
+    return findMinPresses(requirements)
   }
 }
 
