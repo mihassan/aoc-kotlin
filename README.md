@@ -5,6 +5,20 @@
 [Advent of Code][aoc] – an annual event in December since 2015.
 This repository contains partial solutions to the problems in [kotlin].
 
+## Current Scope
+
+- Kotlin solutions for selected Advent of Code years and days.
+- Shared helper code under `src/lib` for parsing, grids, combinatorics, dynamic programming, and common data structures.
+- Gradle tasks for fetching input, preparing a new year, and running solutions.
+
+## Quick Start
+
+```bash
+./gradlew solve --args="--year=25 --day=1"
+```
+
+If no `--year` or `--day` is specified, all solved solutions will be run.
+
 ## How to fetch input data
 
 The input data is not included in the repository to respect the [AoC][aoc] terms
@@ -86,7 +100,18 @@ Example with all options:
 ./gradlew solve --args="--year=25 --day=1 --fetch-input --debug"
 ```
 
-If no `--year` or `--day` is specified, all solved solutions will be run.
+## Verification
+
+```bash
+./gradlew build
+./gradlew solve --args="--year=25 --day=1"
+```
+
+## Limitations
+
+- This is a learning archive, not a polished library or product.
+- Puzzle inputs are intentionally not committed, in line with Advent of Code terms.
+- Coverage is partial across years and days.
 
 ## Philosophy
 
